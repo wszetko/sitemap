@@ -1,0 +1,30 @@
+{
+  "name": "wszetko/sitemap",
+  "type": "library",
+  "description": "Sitemap generator",
+  "keywords": ["sitemap","sitemaps","generator"],
+  "homepage": "https://wszetko.pl",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Paweł Kłopotek-Główczewski",
+      "email": "pawelkg@pawelkg.com",
+      "homepage": "https://pawelkg.com",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": ">=7.3.0",
+    "ext-intl": "*",
+    "ext-mbstring": "*"
+  },
+  "suggest": {
+    "ext-xmlwriter": "*",
+    "ext-zlib": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Wszetko\\Sitemap\\": "src"
+    }
+  }
+}
