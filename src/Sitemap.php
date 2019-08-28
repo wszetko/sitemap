@@ -77,11 +77,11 @@ class Sitemap
      */
     const SITEMAP_PER_SITEMAPINDEX = 1000;
 
-/**
-     * Limit of single files size
-     *
-     * @var int
-     */
+    /**
+         * Limit of single files size
+         *
+         * @var int
+         */
     const SITEMAP_MAX_SIZE = 52000000;
 
     /**
@@ -154,7 +154,7 @@ class Sitemap
      */
     private $xml;
 
-        /**
+    /**
      * Separator to be used in Sitemap filenames
      *
      * @var string
