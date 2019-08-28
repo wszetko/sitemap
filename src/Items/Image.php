@@ -51,7 +51,36 @@ class Image extends Extension
      */
     public function __construct(string $loc)
     {
-        $this->loc = '/'.ltrim($loc, '/');
+        $this->loc = '/' . ltrim($loc, '/');
+    }
+
+    public function toArray(): array
+    {
+        $array = [
+            '_namespace' => static::NAMESPACE_NAME,
+            '_element' => 'image',
+            'image' => [
+                'loc' => $this->getLoc()
+            ]
+        ];
+
+        if ($this->getCaption()) {
+            $array['image']['caption'] = $this->getCaption();
+        }
+
+        if ($this->getGeoLocation()) {
+            $array['image']['geo_location'] = $this->getGeoLocation();
+        }
+
+        if ($this->getTitle()) {
+            $array['image']['title'] = $this->getTitle();
+        }
+
+        if ($this->getLicense()) {
+            $array['image']['license'] = $this->getLicense();
+        }
+
+        return $array;
     }
 
     /**
@@ -154,41 +183,10 @@ class Image extends Extension
      */
     public function setLicense($license): self
     {
-        $license = \Wszetko\Sitemap\Helpers\Url::normalizeUrl($license);
-
-        if ($license) {
+        if ($license = \Wszetko\Sitemap\Helpers\Url::normalizeUrl($license)) {
             $this->license = $license;
         }
 
         return $this;
-    }
-
-    public function toArray(): array
-    {
-        $array = [
-            '_namespace' => static::NAMESPACE_NAME,
-            '_element' => 'image',
-            'image' => [
-                'loc' => $this->getLoc()
-            ]
-        ];
-
-        if ($this->getCaption()) {
-            $array['image']['caption'] = $this->getCaption();
-        }
-
-        if ($this->getGeoLocation()) {
-            $array['image']['geo_location'] = $this->getGeoLocation();
-        }
-
-        if ($this->getTitle()) {
-            $array['image']['title'] = $this->getTitle();
-        }
-
-        if ($this->getLicense()) {
-            $array['image']['license'] = $this->getLicense();
-        }
-
-        return $array;
     }
 }

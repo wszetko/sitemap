@@ -17,6 +17,7 @@ class Memory implements DataCollector
      * @var array
      */
     private $items = [];
+
     /**
      * @var array
      */
@@ -52,11 +53,16 @@ class Memory implements DataCollector
     }
 
     /**
-     * @return array
+     * @param \Wszetko\Sitemap\Items\Extension[] $extensions
      */
-    public function getGroups(): array
+    public function addExtension(array $extensions): void
     {
-        return array_keys($this->items);
+        /**
+         * @var \Wszetko\Sitemap\Items\Extension $extension
+         */
+        foreach ($extensions as $extension) {
+            $this->extensions[$extension::NAMESPACE_NAME] = $extension::NAMESPACE_URL;
+        }
     }
 
     /**
@@ -83,66 +89,6 @@ class Memory implements DataCollector
     }
 
     /**
-     * @return array
-     */
-    public function fetchAll(): array
-    {
-        return $this->items;
-    }
-
-    /**
-     * @param string $group
-     *
-     * @return bool
-     */
-    public function isLast(string $group): bool
-    {
-        return (bool) !isset($this->items[$group][$this->getGroupElement($group) + 1]);
-    }
-
-    /**
-     * @param string $group
-     *
-     * @return array
-     */
-    public function fetchGroup(string $group): array
-    {
-        return $this->items[$group];
-    }
-
-    /**
-     * @param string $group
-     *
-     * @return int
-     */
-    public function getGroupCount(string $group): int
-    {
-        return count($this->items[$group]);
-    }
-
-    /**
-     * @return int
-     */
-    public function getGroupsCount(): int
-    {
-        return count($this->getGroups());
-    }
-
-    /**
-     * @return int
-     */
-    public function getCount(): int
-    {
-        $result = 0;
-
-        foreach ($this->items as $item) {
-            $result += count($item);
-        }
-
-        return $result;
-    }
-
-    /**
      * @param string $group
      *
      * @return int|null
@@ -162,6 +108,16 @@ class Memory implements DataCollector
 
     /**
      * @param string $group
+     *
+     * @return int
+     */
+    public function getGroupCount(string $group): int
+    {
+        return count($this->items[$group]);
+    }
+
+    /**
+     * @param string $group
      */
     private function incrementGroupElement(string $group): void
     {
@@ -171,16 +127,61 @@ class Memory implements DataCollector
     }
 
     /**
-     * @param \Wszetko\Sitemap\Items\Extension[] $extensions
+     * @return array
      */
-    public function addExtension(array $extensions): void
+    public function fetchAll(): array
     {
-        /**
-         * @var \Wszetko\Sitemap\Items\Extension $extension
-         */
-        foreach ($extensions as $extension) {
-            $this->extensions[$extension::NAMESPACE_NAME] = $extension::NAMESPACE_URL;
+        return $this->items;
+    }
+
+    /**
+     * @param string $group
+     *
+     * @return bool
+     */
+    public function isLast(string $group): bool
+    {
+        return (bool)!isset($this->items[$group][$this->getGroupElement($group) + 1]);
+    }
+
+    /**
+     * @param string $group
+     *
+     * @return array
+     */
+    public function fetchGroup(string $group): array
+    {
+        return $this->items[$group];
+    }
+
+    /**
+     * @return int
+     */
+    public function getGroupsCount(): int
+    {
+        return count($this->getGroups());
+    }
+
+    /**
+     * @return array
+     */
+    public function getGroups(): array
+    {
+        return array_keys($this->items);
+    }
+
+    /**
+     * @return int
+     */
+    public function getCount(): int
+    {
+        $result = 0;
+
+        foreach ($this->items as $item) {
+            $result += count($item);
         }
+
+        return $result;
     }
 
     /**

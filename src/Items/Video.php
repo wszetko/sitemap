@@ -143,7 +143,7 @@ class Video extends Extension
     /**
      * The video uploader's name. Only one <video:uploader> is allowed per video.
      *
-     * @var string
+     * @var string|array
      */
     protected $uploader;
 
@@ -170,16 +170,194 @@ class Video extends Extension
      */
     public function __construct($thumbnailLoc, $title, $description)
     {
-        $this->thumbnailLoc = '/'.ltrim($thumbnailLoc, '/');
+        $this->thumbnailLoc = '/' . ltrim($thumbnailLoc, '/');
         $this->title = mb_substr($title, 0, 100);
         $this->description = mb_substr($description, 0, 2048);
     }
 
-    private function validRelationship(string $value): bool
+    /**
+     * The currency used for the price.
+     *
+     * @return string
+     */
+    public function getCurrency(): string
     {
-        $accepted = ['allow', 'deny'];
+        return $this->currency;
+    }
 
-        return (bool)in_array($value, $accepted);
+    /**
+     * The currency used for the price.
+     *
+     * @param string $currency
+     *
+     * @return self
+     */
+    public function setCurrency(string $currency): self
+    {
+        $this->currency = $currency;
+
+        return $this;
+    }
+
+    public function toArray(): array
+    {
+        if (empty($this->getContentLoc()) && empty($this->getPlayerLoc())) {
+            throw new InvalidArgumentException('Nor content_loc or player_loc parameter is set.');
+        }
+
+        $array = [
+            '_namespace' => static::NAMESPACE_NAME,
+            '_element' => 'video',
+            'video' => [
+                'thumbnail_loc' => $this->getThumbnailLoc(),
+                'title' => $this->getTitle(),
+                'description' => $this->getDescription()
+            ]
+        ];
+
+        if (!empty($this->getContentLoc())) {
+            $array['video']['content_loc'] = $this->getContentLoc();
+        }
+
+        if (!empty($this->getPlayerLoc())) {
+            if (is_array($this->getPlayerLoc())) {
+                $playerLoc = array_key_first($this->getPlayerLoc());
+                $array['video']['player_loc'] = [
+                    '_attributes' => ['allow_embed' => $this->getPlayerLoc()[$playerLoc]],
+                    '_value' => $playerLoc
+                ];
+            } else {
+                $array['video']['player_loc'] = $this->getPlayerLoc();
+            }
+        }
+
+        if (!empty($this->getDuration())) {
+            $array['video']['duration'] = $this->getDuration();
+        }
+
+        if (!empty($this->getExpirationDate())) {
+            $array['video']['expiration_date'] = $this->getExpirationDate();
+        }
+
+        if (!empty($this->getRating())) {
+            $array['video']['rating'] = $this->getRating();
+        }
+
+        if (!empty($this->getViewCount())) {
+            $array['video']['view_count'] = $this->getViewCount();
+        }
+
+        if (!empty($this->getPublicationDate())) {
+            $array['video']['publication_date'] = $this->getPublicationDate();
+        }
+
+        if (!empty($this->getFamilyFriendly())) {
+            $array['video']['family_friendly'] = $this->getFamilyFriendly();
+        }
+
+        if (!empty($this->getRestriction())) {
+            $restriction = $this->getRestriction();
+            $relationship = array_key_first($this->getRestriction());
+            $countries = $restriction[$relationship];
+
+            $array['video']['restriction'] = [
+                '_attributes' => ['relationship' => $relationship],
+                '_value' => $countries
+            ];
+        }
+
+        if (!empty($this->getPlatform())) {
+            $platform = $this->getPlatform();
+            $relationship = array_key_first($platform);
+            $platform = $platform[$relationship];
+            $array['video']['platform'] = [
+                '_attributes' => ['relationship' => $relationship],
+                '_value' => $platform
+            ];
+        }
+
+        if (!empty($this->getPrice())) {
+            $price = $this->getPrice();
+            $array['video']['price'] = [
+                '_attributes' => ['currency' => $price['currency']],
+                '_value' => $price['price']
+            ];
+
+            if (isset($price['type'])) {
+                $array['video']['price']['_attributes']['type'] = $price['type'];
+            }
+
+            if (isset($price['resolution'])) {
+                $array['video']['price']['_attributes']['resolution'] = $price['resolution'];
+            }
+        }
+
+        if (!empty($this->getRequiresSubscription())) {
+            $array['video']['requires_subscription'] = $this->getRequiresSubscription();
+        }
+
+        if (!empty($this->getUploader())) {
+            if (is_array($this->getUploader())) {
+                $uploader = array_key_first($this->getUploader());
+                $array['video']['uploader'] = [
+                    '_attributes' => ['info' => $this->getUploader()[$uploader]],
+                    '_value' => $uploader
+                ];
+            } else {
+                $array['video']['uploader'] = $this->getUploader();
+            }
+        }
+
+        if (!empty($this->getLive())) {
+            $array['video']['live'] = $this->getLive();
+        }
+
+        if (!empty($this->getTags())) {
+            $tags = $this->getTags();
+            $array['video']['tag'] = [];
+
+            foreach ($tags as $tag) {
+                $array['video']['tag'][] = $tag;
+            }
+        }
+
+        if (!empty($this->getCategory())) {
+            $array['video']['category'] = $this->getCategory();
+        }
+
+        if (!empty($this->getGalleryLoc())) {
+            $array['video']['gallery_loc'] = $this->getGalleryLoc();
+        }
+
+        return $array;
+    }
+
+    /**
+     * URL pointing to the actual media file (mp4).
+     *
+     * @return string
+     */
+    public function getContentLoc(): ?string
+    {
+        if ($contentLoc = \Wszetko\Sitemap\Helpers\Url::normalizeUrl($this->getDomain() . $this->contentLoc)) {
+            return $contentLoc;
+        }
+
+        return null;
+    }
+
+    /**
+     * URL pointing to the actual media file (mp4).
+     *
+     * @param string $contentLoc
+     *
+     * @return self
+     */
+    public function setContentLoc(string $contentLoc): self
+    {
+        $this->contentLoc = '/' . ltrim($contentLoc, '/');
+
+        return $this;
     }
 
     /**
@@ -200,7 +378,7 @@ class Video extends Extension
      */
     public function setPlayerLoc(string $playerLoc, $allowEmbed = null): self
     {
-        $playerLoc = '/'.ltrim($playerLoc, '/');
+        $playerLoc = '/' . ltrim($playerLoc, '/');
 
         if (!empty($playerLoc)) {
             if ($allowEmbed !== null) {
@@ -220,9 +398,7 @@ class Video extends Extension
      */
     public function getThumbnailLoc(): string
     {
-        $thumbnailLoc = \Wszetko\Sitemap\Helpers\Url::normalizeUrl($this->getDomain() . $this->thumbnailLoc);
-
-        if (empty($thumbnailLoc)) {
+        if (!($thumbnailLoc = \Wszetko\Sitemap\Helpers\Url::normalizeUrl($this->getDomain() . $this->thumbnailLoc))) {
             throw new InvalidArgumentException('Invalid thumbnail location parameter');
         }
 
@@ -247,36 +423,6 @@ class Video extends Extension
     public function getDescription(): string
     {
         return $this->description;
-    }
-
-    /**
-     * URL pointing to the actual media file (mp4).
-     *
-     * @return string
-     */
-    public function getContentLoc(): ?string
-    {
-        $contentLoc = \Wszetko\Sitemap\Helpers\Url::normalizeUrl($this->getDomain() . $this->contentLoc);
-
-        if (!empty($contentLoc)) {
-            return $contentLoc;
-        }
-
-        return null;
-    }
-
-    /**
-     * URL pointing to the actual media file (mp4).
-     *
-     * @param string $contentLoc
-     *
-     * @return self
-     */
-    public function setContentLoc(string $contentLoc): self
-    {
-        $this->contentLoc = '/'.ltrim($contentLoc, '/');
-
-        return $this;
     }
 
     /**
@@ -447,6 +593,192 @@ class Video extends Extension
     }
 
     /**
+     * A space-delimited list of countries where the video may or may not be played.
+     *
+     * @return array|null
+     */
+    public function getRestriction(): ?array
+    {
+        return $this->restriction;
+    }
+
+    /**
+     * A space-delimited list of countries where the video may or may not be played.
+     *
+     * @param string $relationship
+     * @param string $countries
+     *
+     * @return self
+     */
+    public function setRestriction(string $relationship, string $countries): self
+    {
+        preg_match_all("/^(?'countries'[A-Z]{2}( +[A-Z]{2})*)?$/", $countries, $matches);
+
+        if ($this->validRelationship($relationship) && !empty($matches['countries'])) {
+            $this->restriction = [$relationship => $countries];
+        }
+
+        return $this;
+    }
+
+    /**
+     * String of space delimited platform values.
+     *
+     * Allowed values are web, mobile, and tv.
+     *
+     * @return array|null
+     */
+    public function getPlatform(): ?array
+    {
+        return $this->platform;
+    }
+
+    /**
+     * String of space delimited platform values.
+     *
+     * Allowed values are web, mobile, and tv.
+     *
+     * @param string $relationship
+     * @param string $platform
+     *
+     * @return self
+     */
+    public function setPlatform(string $relationship, string $platform): self
+    {
+        preg_match_all("/^(?'platform'(web|mobile|tv)( (web|mobile|tv))*)?/", $platform, $matches);
+
+        if ($this->validRelationship($relationship) && !empty($matches['platform'])) {
+            $this->platform = [$relationship => $platform];
+        }
+
+        return $this;
+    }
+
+    /**
+     * The price to download or view the video in ISO 4217 format.
+     *
+     * @return array|null
+     */
+    public function getPrice(): ?array
+    {
+        return $this->price;
+    }
+
+    /**
+     * The price to download or view the video in ISO 4217 format.
+     *
+     * @param float  $price
+     * @param string $currency
+     * @param string $type
+     * @param string $resolution
+     *
+     * @return self
+     */
+    public function setPrice(float $price, string $currency, string $type = '', string $resolution = ''): self
+    {
+        preg_match_all("/^(?'currency'[A-Z]{3})$/", $currency, $matches);
+
+        if (!empty($matches['currency'])) {
+            $data = [];
+            $data['price'] = round($price, 2);
+            $data['currency'] = $currency;
+
+            if (in_array($type, ['rent', 'RENT', 'purchase', 'PURCHASE'])) {
+                $data['type'] = $type;
+            }
+
+            if (in_array($resolution, ['sd', 'hd', 'SD', 'HD'])) {
+                $data['resolution'] = $resolution;
+            }
+
+            $this->price = $data;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Does the video require a subscription?
+     *
+     * @return string|null
+     */
+    public function getRequiresSubscription(): ?string
+    {
+        return $this->requiresSubscription;
+    }
+
+    /**
+     * Does the video require a subscription?
+     *
+     * @param boolean $requiresSubscription
+     *
+     * @return self
+     */
+    public function setRequiresSubscription(bool $requiresSubscription): self
+    {
+        $this->requiresSubscription = $requiresSubscription ? 'Yes' : 'No';
+
+        return $this;
+    }
+
+    /**
+     * The video uploader's name. Only one <video:uploader> is allowed per video.
+     *
+     * @return string|array
+     */
+    public function getUploader()
+    {
+        if (is_array($this->uploader)) {
+            return [array_key_first($this->uploader) => $this->getDomain() . $this->uploader[array_key_first($this->uploader)]];
+        }
+
+        return $this->uploader;
+    }
+
+    /**
+     * The video uploader's name. Only one <video:uploader> is allowed per video.
+     *
+     * @param string $uploader
+     * @param string $info
+     *
+     * @return self
+     */
+    public function setUploader(string $uploader, string $info = ''): self
+    {
+        if (!empty($info)) {
+            $this->uploader = [$uploader => $info];
+        } else {
+            $this->uploader = $uploader;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Indicates whether the video is live.
+     *
+     * @return string|null
+     */
+    public function getLive(): ?string
+    {
+        return $this->live;
+    }
+
+    /**
+     * Indicates whether the video is live.
+     *
+     * @param boolean $live
+     *
+     * @return self
+     */
+    public function setLive(bool $live): self
+    {
+        $this->live = $live ? 'Yes' : 'No';
+
+        return $this;
+    }
+
+    /**
      * A tag associated with the video.
      *
      * @return array|null
@@ -494,35 +826,6 @@ class Video extends Extension
     }
 
     /**
-     * A space-delimited list of countries where the video may or may not be played.
-     *
-     * @return array|null
-     */
-    public function getRestriction(): ?array
-    {
-        return $this->restriction;
-    }
-
-    /**
-     * A space-delimited list of countries where the video may or may not be played.
-     *
-     * @param string $relationship
-     * @param string $countries
-     *
-     * @return self
-     */
-    public function setRestriction(string $relationship, string $countries): self
-    {
-        preg_match_all("/^(?'countries'[A-Z]{2}( +[A-Z]{2})*)?$/", $countries, $matches);
-
-        if ($this->validRelationship($relationship) && !empty($matches['countries'])) {
-            $this->restriction = [$relationship => $countries];
-        }
-
-        return $this;
-    }
-
-    /**
      * Link to gallery of which this video appears in.
      *
      * @return string|null
@@ -530,6 +833,13 @@ class Video extends Extension
     public function getGalleryLoc(): ?string
     {
         return $this->galleryLoc;
+    }
+
+    private function validRelationship(string $value): bool
+    {
+        $accepted = ['allow', 'deny'];
+
+        return (bool)in_array($value, $accepted);
     }
 
     /**
@@ -546,318 +856,5 @@ class Video extends Extension
         }
 
         return $this;
-    }
-
-    /**
-     * The price to download or view the video in ISO 4217 format.
-     *
-     * @return array|null
-     */
-    public function getPrice(): ?array
-    {
-        return $this->price;
-    }
-
-    /**
-     * The price to download or view the video in ISO 4217 format.
-     *
-     * @param float  $price
-     * @param string $currency
-     * @param string $type
-     * @param string $resolution
-     *
-     * @return self
-     */
-    public function setPrice(float $price, string $currency, string $type = '', string $resolution = ''): self
-    {
-        preg_match_all("/^(?'currency'[A-Z]{3})$/", $currency, $matches);
-
-        if (!empty($matches['currency'])) {
-            $data['price'] = round($price, 2);
-            $data['currency'] = $currency;
-
-            if (in_array($type, ['rent', 'RENT', 'purchase', 'PURCHASE'])) {
-                $data['type'] = $type;
-            }
-
-            if (in_array($resolution, ['sd', 'hd', 'SD', 'HD'])) {
-                $data['resolution'] = $resolution;
-            }
-
-            $this->price = $data;
-        }
-
-        return $this;
-    }
-
-    /**
-     * The currency used for the price.
-     *
-     * @return string
-     */
-    public function getCurrency(): string
-    {
-        return $this->currency;
-    }
-
-    /**
-     * The currency used for the price.
-     *
-     * @param string $currency
-     *
-     * @return self
-     */
-    public function setCurrency(string $currency): self
-    {
-        $this->currency = $currency;
-
-        return $this;
-    }
-
-    /**
-     * Does the video require a subscription?
-     *
-     * @return string|null
-     */
-    public function getRequiresSubscription(): ?string
-    {
-        return $this->requiresSubscription;
-    }
-
-    /**
-     * Does the video require a subscription?
-     *
-     * @param boolean $requiresSubscription
-     *
-     * @return self
-     */
-    public function setRequiresSubscription(bool $requiresSubscription): self
-    {
-        $this->requiresSubscription = $requiresSubscription ? 'Yes' : 'No';
-
-        return $this;
-    }
-
-    /**
-     * The video uploader's name. Only one <video:uploader> is allowed per video.
-     *
-     * @return string|array
-     */
-    public function getUploader()
-    {
-        if (is_array($this->uploader)) {
-            return [array_key_first($this->uploader) => $this->getDomain().$this->uploader[array_key_first($this->uploader)]];
-        }
-
-        return $this->uploader;
-    }
-
-    /**
-     * The video uploader's name. Only one <video:uploader> is allowed per video.
-     *
-     * @param string $uploader
-     * @param string $info
-     *
-     * @return self
-     */
-    public function setUploader(string $uploader, string $info = ''): self
-    {
-        if (!empty($info)) {
-            $this->uploader = [$uploader => $info];
-        } else {
-            $this->uploader = $uploader;
-        }
-
-        return $this;
-    }
-
-    /**
-     * String of space delimited platform values.
-     *
-     * Allowed values are web, mobile, and tv.
-     *
-     * @return array|null
-     */
-    public function getPlatform(): ?array
-    {
-        return $this->platform;
-    }
-
-    /**
-     * String of space delimited platform values.
-     *
-     * Allowed values are web, mobile, and tv.
-     *
-     * @param string $relationship
-     * @param string $platform
-     *
-     * @return self
-     */
-    public function setPlatform(string $relationship, string $platform): self
-    {
-        preg_match_all("/^(?'platform'(web|mobile|tv)( (web|mobile|tv))*)?/", $platform, $matches);
-
-        if ($this->validRelationship($relationship) && !empty($matches['platform'])) {
-            $this->platform = [$relationship => $platform];
-        }
-
-        return $this;
-    }
-
-    /**
-     * Indicates whether the video is live.
-     *
-     * @return string|null
-     */
-    public function getLive(): ?string
-    {
-        return $this->live;
-    }
-
-    /**
-     * Indicates whether the video is live.
-     *
-     * @param boolean $live
-     *
-     * @return self
-     */
-    public function setLive(bool $live): self
-    {
-        $this->live = $live ? 'Yes' : 'No';
-
-        return $this;
-    }
-
-    public function toArray(): array
-    {
-        if (empty($this->getContentLoc()) && empty($this->getPlayerLoc())) {
-            throw new InvalidArgumentException('Nor content_loc or player_loc parameter is set.');
-        }
-
-        $array = [
-            '_namespace' => static::NAMESPACE_NAME,
-            '_element' => 'video',
-            'video' => [
-                'thumbnail_loc' => $this->getThumbnailLoc(),
-                'title' => $this->getTitle(),
-                'description' => $this->getDescription()
-            ]
-        ];
-
-        if (!empty($this->getContentLoc())) {
-            $array['video']['content_loc'] = $this->getContentLoc();
-        }
-
-        if (!empty($this->getPlayerLoc())) {
-            if (is_array($this->getPlayerLoc())) {
-                $playerLoc = array_key_first($this->getPlayerLoc());
-                $array['video']['player_loc'] = [
-                    '_attributes' => ['allow_embed' => $this->getPlayerLoc()[$playerLoc]],
-                    '_value' => $playerLoc
-                ];
-            } else {
-                $array['video']['player_loc'] = $this->getPlayerLoc();
-            }
-        }
-
-        if (!empty($this->getDuration())) {
-            $array['video']['duration'] = $this->getDuration();
-        }
-
-        if (!empty($this->getExpirationDate())) {
-            $array['video']['expiration_date'] = $this->getExpirationDate();
-        }
-
-        if (!empty($this->getRating())) {
-            $array['video']['rating'] = $this->getRating();
-        }
-
-        if (!empty($this->getViewCount())) {
-            $array['video']['view_count'] = $this->getViewCount();
-        }
-
-        if (!empty($this->getPublicationDate())) {
-            $array['video']['publication_date'] = $this->getPublicationDate();
-        }
-
-        if (!empty($this->getFamilyFriendly())) {
-            $array['video']['family_friendly'] = $this->getFamilyFriendly();
-        }
-
-        if (!empty($this->getRestriction())) {
-            $restriction = $this->getRestriction();
-            $relationship = array_key_first($this->getRestriction());
-            $countries = $restriction[$relationship];
-
-            $array['video']['restriction'] = [
-                '_attributes' => ['relationship' => $relationship],
-                '_value' => $countries
-            ];
-        }
-
-        if (!empty($this->getPlatform())) {
-            $platform = $this->getPlatform();
-            $relationship = array_key_first($platform);
-            $platform = $platform[$relationship];
-            $array['video']['platform'] = [
-                '_attributes' => ['relationship' => $relationship],
-                '_value' => $platform
-            ];
-        }
-
-        if (!empty($this->getPrice())) {
-            $price = $this->getPrice();
-            $array['video']['price'] = [
-                '_attributes' => ['currency' => $price['currency']],
-                '_value' => $price['price']
-            ];
-
-            if (isset($price['type'])) {
-                $array['video']['price']['_attributes']['type'] = $price['type'];
-            }
-
-            if (isset($price['resolution'])) {
-                $array['video']['price']['_attributes']['resolution'] = $price['resolution'];
-            }
-        }
-
-        if (!empty($this->getRequiresSubscription())) {
-            $array['video']['requires_subscription'] = $this->getRequiresSubscription();
-        }
-
-        if (!empty($this->getUploader())) {
-            if (is_array($this->getUploader())) {
-                $uploader = array_key_first($this->getUploader());
-                $array['video']['uploader'] = [
-                    '_attributes' => ['info' => $this->getUploader()[$uploader]],
-                    '_value' => $uploader
-                ];
-            } else {
-                $array['video']['uploader'] = $this->getUploader();
-            }
-        }
-
-        if (!empty($this->getLive())) {
-            $array['video']['live'] = $this->getLive();
-        }
-
-        if (!empty($this->getTags())) {
-            $tags = $this->getTags();
-            $array['video']['tag'] = [];
-
-            foreach ($tags as $tag) {
-                $array['video']['tag'][] = $tag;
-            }
-        }
-
-        if (!empty($this->getCategory())) {
-            $array['video']['category'] = $this->getCategory();
-        }
-
-        if (!empty($this->getGalleryLoc())) {
-            $array['video']['gallery_loc'] = $this->getGalleryLoc();
-        }
-
-        return $array;
     }
 }

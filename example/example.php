@@ -53,6 +53,6 @@ try {
     $a->addItem($item);
     $a->generate();
 } catch (Exception $e) {
-    echo $e->getMessage().PHP_EOL;
-    echo $e->getFile()." : ".$e->getLine().PHP_EOL;
+    echo $e->getMessage() . PHP_EOL;
+    echo $e->getFile() . " : " . $e->getLine() . PHP_EOL;
 }
