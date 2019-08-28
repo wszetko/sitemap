@@ -78,10 +78,10 @@ class Sitemap
     const SITEMAP_PER_SITEMAPINDEX = 1000;
 
     /**
-         * Limit of single files size
-         *
-         * @var int
-         */
+     * Limit of single files size
+     *
+     * @var int
+     */
     const SITEMAP_MAX_SIZE = 52000000;
 
     /**
@@ -246,7 +246,7 @@ class Sitemap
     public function setDomain(string $domain): void
     {
         if ($domain = Url::normalizeUrl($domain)) {
-            $this->domain = $domain;
+            $this->domain = rtrim($domain, '/');
         } else {
             throw new InvalidArgumentException('Parameter $domain need to be valid domain name.');
         }
@@ -486,6 +486,29 @@ class Sitemap
     }
 
     /**
+     * Check if compression is used
+     *
+     * @return bool
+     */
+    public function isUseCompression(): bool
+    {
+        return $this->useCompression;
+    }
+
+    /**
+     * Set whether to use compression or not
+     *
+     * @param bool $useCompression
+     */
+    public function setUseCompression(bool $useCompression): void
+    {
+        if ($useCompression && !extension_loaded('zlib')) {
+            return;
+        }
+        $this->useCompression = $useCompression;
+    }
+
+    /**
      * @param string $dir
      * @param array  $files
      *
@@ -659,28 +682,5 @@ class Sitemap
         } else {
             return self::EXT;
         }
-    }
-
-    /**
-     * Check if compression is used
-     *
-     * @return bool
-     */
-    public function isUseCompression(): bool
-    {
-        return $this->useCompression;
-    }
-
-    /**
-     * Set whether to use compression or not
-     *
-     * @param bool $useCompression
-     */
-    public function setUseCompression(bool $useCompression): void
-    {
-        if ($useCompression && !extension_loaded('zlib')) {
-            return;
-        }
-        $this->useCompression = $useCompression;
     }
 }

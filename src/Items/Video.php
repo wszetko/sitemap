@@ -339,9 +339,7 @@ class Video extends Extension
      */
     public function getContentLoc(): ?string
     {
-        $contentLoc = \Wszetko\Sitemap\Helpers\Url::normalizeUrl($this->getDomain() . $this->contentLoc);
-
-        if (!empty($contentLoc)) {
+        if ($contentLoc = \Wszetko\Sitemap\Helpers\Url::normalizeUrl($this->getDomain() . $this->contentLoc)) {
             return $contentLoc;
         }
 
@@ -400,9 +398,7 @@ class Video extends Extension
      */
     public function getThumbnailLoc(): string
     {
-        $thumbnailLoc = \Wszetko\Sitemap\Helpers\Url::normalizeUrl($this->getDomain() . $this->thumbnailLoc);
-
-        if (empty($thumbnailLoc)) {
+        if (!($thumbnailLoc = \Wszetko\Sitemap\Helpers\Url::normalizeUrl($this->getDomain() . $this->thumbnailLoc))) {
             throw new InvalidArgumentException('Invalid thumbnail location parameter');
         }
 
@@ -625,13 +621,6 @@ class Video extends Extension
         return $this;
     }
 
-    private function validRelationship(string $value): bool
-    {
-        $accepted = ['allow', 'deny'];
-
-        return (bool)in_array($value, $accepted);
-    }
-
     /**
      * String of space delimited platform values.
      *
@@ -844,6 +833,13 @@ class Video extends Extension
     public function getGalleryLoc(): ?string
     {
         return $this->galleryLoc;
+    }
+
+    private function validRelationship(string $value): bool
+    {
+        $accepted = ['allow', 'deny'];
+
+        return (bool)in_array($value, $accepted);
     }
 
     /**

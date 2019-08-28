@@ -20,5 +20,7 @@ To do
 * Logging compatible with PSR-3
 * Better LastMod date checking in Extensions
 * Move duplicate parts from Extensions to Triat
-* Check all methods for proper retunr values
-* Polish PHPDoc comments
+
+## License
+
+This library is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.

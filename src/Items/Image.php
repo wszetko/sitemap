@@ -183,9 +183,7 @@ class Image extends Extension
      */
     public function setLicense($license): self
     {
-        $license = \Wszetko\Sitemap\Helpers\Url::normalizeUrl($license);
-
-        if ($license) {
+        if ($license = \Wszetko\Sitemap\Helpers\Url::normalizeUrl($license)) {
             $this->license = $license;
         }
 

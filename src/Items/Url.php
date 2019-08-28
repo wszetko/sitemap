@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Wszetko\Sitemap\Items;
 
 use DateTimeInterface;
+use InvalidArgumentException;
 use Wszetko\Sitemap\Interfaces\Item;
 use Wszetko\Sitemap\Sitemap;
 
@@ -38,14 +39,14 @@ class Url implements Item
     /**
      * Change frequency of the location
      *
-     * @var string
+     * @var string|null
      */
     private $changeFreq = null;
 
     /**
      * Priority of page importance
      *
-     * @var string
+     * @var float|null
      */
     private $priority = null;
 
@@ -115,7 +116,11 @@ class Url implements Item
      */
     public function setDomain(string $domain): self
     {
-        $this->domain = $domain;
+        if ($domain = \Wszetko\Sitemap\Helpers\Url::normalizeUrl($domain)) {
+            $this->domain = rtrim($domain, '/');
+        } else {
+            throw new InvalidArgumentException('Parameter $domain need to be valid domain name.');
+        }
 
         return $this;
     }
@@ -159,7 +164,7 @@ class Url implements Item
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getChangeFreq(): ?string
     {
@@ -167,35 +172,41 @@ class Url implements Item
     }
 
     /**
-     * @param string $changeFreq
+     * @param string|null $changeFreq
      *
      * @return self
      */
-    public function setChangeFreq(string $changeFreq): self
+    public function setChangeFreq(?string $changeFreq): self
     {
         if (in_array($changeFreq, Sitemap::CHANGEFREQ)) {
             $this->changeFreq = $changeFreq;
+        } else {
+            $this->changeFreq = null;
         }
 
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getPriority(): ?string
     {
-        return $this->priority;
+        return $this->priority !== null ? number_format($this->priority, 1) : null;
     }
 
     /**
-     * @param string $priority
+     * @param int|float|null $priority
      *
      * @return self
      */
-    public function setPriority(string $priority): self
+    public function setPriority($priority): self
     {
-        $this->priority = $priority;
+        if ($priority >= 0 && $priority <= 1) {
+            $this->priority = $priority;
+        } else {
+            $this->priority = null;
+        }
 
         return $this;
     }
