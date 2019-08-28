@@ -157,10 +157,16 @@ class XMLWriter implements XML
      * Remove whitespace chars from end of file (Google don't like them)
      *
      * @return void
+     * @throws \Exception
      */
     private function endFile(): void
     {
         $sitemapFile = fopen($this->getSitemapFileFullPath(), 'r+');
+
+        if (!$sitemapFile) {
+            throw new Exception("Unable to open file.");
+        }
+
         fseek($sitemapFile, -1, SEEK_END);
         $truncate = 0;
         $length = $this->getSitemapSize();
