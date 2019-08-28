@@ -201,7 +201,7 @@ class XMLWriter implements XML
         $this->endFile();
     }
 
-    private function addElement(string $element, $value, string $namespace = null ): void
+    private function addElement(string $element, $value, string $namespace = null): void
     {
         if ($namespace) {
             $begin = $namespace . ':';

@@ -5,15 +5,17 @@ namespace Wszetko\Sitemap\Helpers;
 
 class Url
 {
-    static function check(string $url): bool {
+    public static function check(string $url): bool
+    {
         return (bool) filter_var(self::normalizeUrl($url), FILTER_VALIDATE_URL);
     }
 
-    static function checkDomain(string $domain): bool {
+    public static function checkDomain(string $domain): bool
+    {
         return (bool) filter_var($domain, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME);
     }
 
-    static function normalizeUrl(string $url): string
+    public static function normalizeUrl(string $url): string
     {
         $url = parse_url($url);
 

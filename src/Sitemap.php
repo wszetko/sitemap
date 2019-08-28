@@ -553,8 +553,7 @@ class Sitemap
                     }
 
                     if ($filesInGroup >= self::ITEM_PER_SITEMAP ||
-                        $this->getXml()->getSitemapSize() >= (self::SITEMAP_MAX_SIZE - 20)) // 20 chars buffer for close tag
-                    {
+                        $this->getXml()->getSitemapSize() >= (self::SITEMAP_MAX_SIZE - 20)) { // 20 chars buffer for close tag
                         $this->getXml()->closeSitemap();
 
                         if (!$this->getDataCollector()->isLast($group)) {

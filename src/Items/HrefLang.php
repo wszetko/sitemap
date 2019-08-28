@@ -3,7 +3,6 @@
 
 namespace Wszetko\Sitemap\Items;
 
-
 use InvalidArgumentException;
 
 class HrefLang extends Extension
