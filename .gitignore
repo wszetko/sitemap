@@ -1,4 +1,9 @@
-/.idea
+# Ignore auto-generated files
 /vendor
 composer.lock
-composer.phar
+.phpunit.result.cache
+
+# Ignore IDE
+.project
+.vscode/
+.idea/
