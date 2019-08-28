@@ -30,7 +30,7 @@ class Url
 
         $url = parse_url($encodedUrl);
 
-        if (!$url || !isset($url['host'])) {
+        if (empty($url) || !isset($url['host'])) {
             return false;
         }
 

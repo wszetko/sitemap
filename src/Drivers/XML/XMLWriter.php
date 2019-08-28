@@ -163,7 +163,7 @@ class XMLWriter implements XML
     {
         $sitemapFile = fopen($this->getSitemapFileFullPath(), 'r+');
 
-        if (!$sitemapFile) {
+        if ($sitemapFile === false) {
             throw new Exception("Unable to open file.");
         }
 

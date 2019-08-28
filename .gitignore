@@ -1,5 +1,6 @@
 # Ignore auto-generated files
 /vendor
+/build
 composer.lock
 .phpunit.result.cache
 
