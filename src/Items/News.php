@@ -91,6 +91,40 @@ class News extends Extension
         $this->title = $title;
     }
 
+    public function toArray(): array
+    {
+        $array = [
+            '_namespace' => static::NAMESPACE_NAME,
+            '_element' => 'news',
+            'news' => [
+                'publication' => [
+                    'name' => $this->getPublicationName(),
+                    'language' => $this->getPublicationLanguage()
+                ],
+                'publication_date' => $this->getPublicationDate(),
+                'title' => $this->getTitle()
+            ]
+        ];
+
+        if ($this->getAccess()) {
+            $array['news']['access'] = $this->getAccess();
+        }
+
+        if ($this->getGenres()) {
+            $array['news']['genres'] = $this->getGenres();
+        }
+
+        if ($this->getKeywords()) {
+            $array['news']['keywords'] = $this->getKeywords();
+        }
+
+        if ($this->getStockTickers()) {
+            $array['news']['stock_tickers'] = $this->getStockTickers();
+        }
+
+        return $array;
+    }
+
     /**
      * Publication name.
      *
@@ -109,6 +143,36 @@ class News extends Extension
     public function getPublicationLanguage()
     {
         return $this->publicationLanguage;
+    }
+
+    /**
+     * Date of publication.
+     *
+     * @return string|null
+     */
+    public function getPublicationDate(): ?string
+    {
+        if (!empty($this->publicationDate)) {
+            if ($this->publicationDate->format('H') == 0 &&
+                $this->publicationDate->format('i') == 0 &&
+                $this->publicationDate->format('s') == 0) {
+                return $this->publicationDate->format("Y-m-d");
+            } else {
+                return $this->publicationDate->format(DateTimeInterface::W3C);
+            }
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Title.
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
     }
 
     /**
@@ -167,36 +231,6 @@ class News extends Extension
     }
 
     /**
-     * Date of publication.
-     *
-     * @return string|null
-     */
-    public function getPublicationDate(): ?string
-    {
-        if (!empty($this->publicationDate)) {
-            if ($this->publicationDate->format('H') == 0 &&
-                $this->publicationDate->format('i') == 0 &&
-                $this->publicationDate->format('s') == 0) {
-                return $this->publicationDate->format("Y-m-d");
-            } else {
-                return $this->publicationDate->format(DateTimeInterface::W3C);
-            }
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Title.
-     *
-     * @return string
-     */
-    public function getTitle()
-    {
-        return $this->title;
-    }
-
-    /**
      * Key words, comma-separated string values.
      *
      * @return string
@@ -228,7 +262,6 @@ class News extends Extension
         return $this->stockTickers;
     }
 
-
     /**
      * @param $stockTickers
      *
@@ -243,39 +276,5 @@ class News extends Extension
         }
 
         return $this;
-    }
-
-    public function toArray(): array
-    {
-        $array = [
-            '_namespace' => static::NAMESPACE_NAME,
-            '_element' => 'news',
-            'news' => [
-                'publication' => [
-                    'name' => $this->getPublicationName(),
-                    'language' => $this->getPublicationLanguage()
-                ],
-                'publication_date' => $this->getPublicationDate(),
-                'title' => $this->getTitle()
-            ]
-        ];
-
-        if ($this->getAccess()) {
-            $array['news']['access'] = $this->getAccess();
-        }
-
-        if ($this->getGenres()) {
-            $array['news']['genres'] = $this->getGenres();
-        }
-
-        if ($this->getKeywords()) {
-            $array['news']['keywords'] = $this->getKeywords();
-        }
-
-        if ($this->getStockTickers()) {
-            $array['news']['stock_tickers'] = $this->getStockTickers();
-        }
-
-        return $array;
     }
 }

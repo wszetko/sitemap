@@ -1,0 +1,17 @@
+language: php
+
+os:
+  - linux
+
+php:
+  - 7.3
+  - 7.4snapshot
+
+# We don't want to run linux commands as super user
+sudo: false
+
+install:
+  composer install
+
+script:
+  - vendor/bin/phpunit

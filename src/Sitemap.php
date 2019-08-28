@@ -27,6 +27,64 @@ use Wszetko\Sitemap\Interfaces\XML;
 class Sitemap
 {
     /**
+     * Avaliable values for changefreq tag
+     *
+     * @var array
+     */
+    const CHANGEFREQ = [
+        'always',
+        'hourly',
+        'daily',
+        'weekly',
+        'monthly',
+        'yearly',
+        'never'
+    ];
+
+    /**
+     * Extension for sitemap file
+     *
+     * @var string
+     */
+    const EXT = '.xml';
+
+    /**
+     * Extension for gzipped sitemap file
+     *
+     * @var string
+     */
+    const GZ_EXT = '.xml.gz';
+
+    /**
+     * URL to Sitemap Schema
+     *
+     * @var string
+     */
+    const SCHEMA = 'http://www.sitemaps.org/schemas/sitemap/0.9';
+
+    /**
+     * Limit of items in Sitemap files
+     *
+     * @var int
+     */
+    const ITEM_PER_SITEMAP = 50000;
+
+    /**
+     * Limit of Sitmeaps in SitemapsIndex
+     *
+     * @var int
+     *
+     */
+    const SITEMAP_PER_SITEMAPINDEX = 1000;
+
+/**
+     * Limit of single files size
+     *
+     * @var int
+     */
+    const SITEMAP_MAX_SIZE = 52000000;
+
+    /**
      * Domain name of site
      *
      * @var string
@@ -96,70 +154,12 @@ class Sitemap
      */
     private $xml;
 
-    /**
+        /**
      * Separator to be used in Sitemap filenames
      *
      * @var string
      */
-    private $separator = '-';
-
-    /**
-     * Avaliable values for changefreq tag
-     *
-     * @var array
-     */
-    const CHANGEFREQ = [
-        'always',
-        'hourly',
-        'daily',
-        'weekly',
-        'monthly',
-        'yearly',
-        'never'
-    ];
-
-    /**
-     * Extension for sitemap file
-     *
-     * @var string
-     */
-    const EXT = '.xml';
-
-    /**
-     * Extension for gzipped sitemap file
-     *
-     * @var string
-     */
-    const GZ_EXT = '.xml.gz';
-
-    /**
-     * URL to Sitemap Schema
-     *
-     * @var string
-     */
-    const SCHEMA = 'http://www.sitemaps.org/schemas/sitemap/0.9';
-
-    /**
-     * Limit of items in Sitemap files
-     *
-     * @var int
-     */
-    const ITEM_PER_SITEMAP = 50000;
-
-    /**
-     * Limit of Sitmeaps in SitemapsIndex
-     *
-     * @var int
-     *
-     */
-    const SITEMAP_PER_SITEMAPINDEX = 1000;
-
-    /**
-     * Limit of single files size
-     *
-     * @var int
-     */
-    const SITEMAP_MAX_SIZE = 52000000; // ~49,6MB - to have some limit to close file
+    private $separator = '-'; // ~49,6MB - to have some limit to close file
 
     /**
      * Construktor
@@ -171,6 +171,61 @@ class Sitemap
         if ($domain) {
             $this->setDomain($domain);
         }
+    }
+
+    /**
+     * Set path to sitemap
+     *
+     * @return string
+     */
+    public function getPath(): string
+    {
+        return $this->path;
+    }
+
+    /**
+     * Get path to sitemap
+     *
+     * @param string $path
+     */
+    public function setPath(string $path): void
+    {
+        $this->path = $path;
+    }
+
+    /**
+     * @param \Wszetko\Sitemap\Items\Url $item
+     * @param string|null                $group
+     */
+    public function addItem(Items\Url $item, ?string $group = null)
+    {
+        if ($group === null) {
+            $group = $this->getDefaultFilename();
+        }
+
+        $group = strtolower(preg_replace('/\W+/', '', $group));
+        $item->setDomain($this->getDomain());
+        $this->getDataCollector()->add($item, $group);
+    }
+
+    /**
+     * Get default filename for sitemap file
+     *
+     * @return string
+     */
+    public function getDefaultFilename(): string
+    {
+        return $this->defaultFilename;
+    }
+
+    /**
+     * Set default filename for sitemap file
+     *
+     * @param string $defaultFilename
+     */
+    public function setDefaultFilename(string $defaultFilename): void
+    {
+        $this->defaultFilename = $defaultFilename;
     }
 
     /**
@@ -198,153 +253,6 @@ class Sitemap
     }
 
     /**
-     * Set path to sitemap
-     *
-     * @return string
-     */
-    public function getPath(): string
-    {
-        return $this->path;
-    }
-
-    /**
-     * Get path to sitemap
-     *
-     * @param string $path
-     */
-    public function setPath(string $path): void
-    {
-        $this->path = $path;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPublicDirectory(): string
-    {
-        return $this->publicDirectory;
-    }
-
-    /**
-     * @param string $publicDirectory
-     *
-     * @throws \Exception
-     */
-    public function setPublicDirectory(string $publicDirectory): void
-    {
-        $publicDirectory = realpath($publicDirectory);
-
-        if ($publicDirectory == false) {
-            throw new Exception('Sitemap directory does not exists.');
-        }
-
-        $this->publicDirectory = $publicDirectory;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSitepamsDirectory(): string
-    {
-        $directory = realpath($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory);
-
-        if ($directory == false) {
-            mkdir($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory, 0777, true);
-            $directory = realpath($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory);
-        }
-
-        return $directory;
-    }
-
-    /**
-     * @param string $sitepamsDirectory
-     */
-    public function setSitepamsDirectory(string $sitepamsDirectory): void
-    {
-        $this->sitepamsDirectory = $sitepamsDirectory;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSitepamsTempDirectory(): string
-    {
-        $directory = realpath($this->getTempDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory);
-
-        if ($directory == false) {
-            mkdir($this->getTempDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory,
-                0777, true);
-            $directory = realpath($this->getTempDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory);
-        }
-
-        return $directory;
-    }
-
-
-    /**
-     * Get default filename for sitemap file
-     *
-     * @return string
-     */
-    public function getDefaultFilename(): string
-    {
-        return $this->defaultFilename;
-    }
-
-    /**
-     * Set default filename for sitemap file
-     *
-     * @param string $defaultFilename
-     */
-    public function setDefaultFilename(string $defaultFilename): void
-    {
-        $this->defaultFilename = $defaultFilename;
-    }
-
-    /**
-     * Get filename of sitemap index file
-     *
-     * @return string
-     */
-    public function getIndexFilename(): string
-    {
-        return $this->indexFilename;
-    }
-
-    /**
-     * Set filename of sitemap index file
-     *
-     * @param string $indexFilename
-     */
-    public function setIndexFilename(string $indexFilename): void
-    {
-        $this->indexFilename = $indexFilename;
-    }
-
-    /**
-     * Check if compression is used
-     *
-     * @return bool
-     */
-    public function isUseCompression(): bool
-    {
-        return $this->useCompression;
-    }
-
-    /**
-     * Set whether to use compression or not
-     *
-     * @param bool $useCompression
-     */
-    public function setUseCompression(bool $useCompression): void
-    {
-        if ($useCompression && !extension_loaded('zlib')) {
-            return;
-        }
-        $this->useCompression = $useCompression;
-    }
-
-    /**
      * Get DataCollecotr Object
      *
      * @return \Wszetko\Sitemap\Interfaces\DataCollector|null
@@ -368,19 +276,54 @@ class Sitemap
     }
 
     /**
-     * @return string
+     * @throws \Exception
      */
-    public function getSeparator(): string
+    public function generate()
     {
-        return $this->separator;
+        if ($this->getPublicDirectory() === '') {
+            throw new Exception('Public directory is not set.');
+        }
+
+        if ($this->getDomain() === '') {
+            throw new Exception('Domain is not set.');
+        }
+
+        if ($this->getDataCollector() === null) {
+            throw new Exception('DataCollector is not set.');
+        }
+
+        if (empty($this->getXml())) {
+            $this->setXml(XMLWriter::class, ['domain' => $this->getDomain()]);
+        }
+
+        $this->removeDir($this->getTempDirectory());
+        $this->getXml()->setWorkDir($this->getSitepamsTempDirectory());
+        $sitemaps = $this->generateSitemaps();
+        $this->getXml()->setWorkDir($this->getTempDirectory());
+        $this->generateSitemapsIndex($sitemaps);
+        $this->publishSitemap();
     }
 
     /**
-     * @param string $separator
+     * @return string
      */
-    public function setSeparator(string $separator): void
+    public function getPublicDirectory(): string
     {
-        $this->separator = $separator;
+        return $this->publicDirectory;
+    }
+
+    /**
+     * @param string $publicDirectory
+     *
+     * @throws \Exception
+     */
+    public function setPublicDirectory(string $publicDirectory): void
+    {
+        if (!($publicDirectory = realpath($publicDirectory))) {
+            throw new Exception('Sitemap directory does not exists.');
+        }
+
+        $this->publicDirectory = $publicDirectory;
     }
 
     /**
@@ -411,18 +354,24 @@ class Sitemap
     }
 
     /**
-     * @param \Wszetko\Sitemap\Items\Url $item
-     * @param null                       $group
+     * @param $dir
+     * @param $pattern
      */
-    public function addItem(Items\Url $item, $group = null)
+    private function removeDir($dir)
     {
-        if ($group === null) {
-            $group = $this->getDefaultFilename();
+        if (is_dir($dir)) {
+            $objects = scandir($dir);
+            foreach ($objects as $object) {
+                if ($object != "." && $object != "..") {
+                    if (filetype($dir . "/" . $object) == "dir") {
+                        $this->removeDir($dir . "/" . $object);
+                    } else {
+                        unlink($dir . "/" . $object);
+                    }
+                }
+            }
+            rmdir($dir);
         }
-
-        $group = strtolower(preg_replace('/\W+/', '', $group));
-        $item->setDomain($this->getDomain());
-        $this->getDataCollector()->add($item, $group);
     }
 
     /**
@@ -445,72 +394,15 @@ class Sitemap
     /**
      * @return string
      */
-    private function getExt()
+    public function getSitepamsTempDirectory(): string
     {
-        if ($this->isUseCompression()) {
-            return self::GZ_EXT;
-        } else {
-            return self::EXT;
-        }
-    }
-
-    /**
-     * @param $dir
-     * @param $pattern
-     */
-    private function removeDir($dir)
-    {
-        if (is_dir($dir)) {
-            $objects = scandir($dir);
-            foreach ($objects as $object) {
-                if ($object != "." && $object != "..") {
-                    if (filetype($dir . "/" . $object) == "dir") {
-                        $this->removeDir($dir . "/" . $object);
-                    } else {
-                        unlink($dir . "/" . $object);
-                    }
-                }
-            }
-            rmdir($dir);
-        }
-    }
-
-    /**
-     * @param string $dir
-     * @param array  $files
-     *
-     * @throws \Exception
-     */
-    private function compressFiles(string $dir, array &$files)
-    {
-        $newFiles = [];
-
-        foreach ($files as $file => $lastmod) {
-            $source = $dir . DIRECTORY_SEPARATOR . $file;
-            $gzFile = substr($file, 0, strlen($file) - 4) . self::GZ_EXT;
-            $output = $dir . DIRECTORY_SEPARATOR . $gzFile;
-            $out = gzopen($output, 'wb9');
-            $in = fopen($source, 'rb');
-
-            if (!$out) {
-                throw new Exception('Can\'t create GZip archive.');
-            }
-
-            if (!$in) {
-                throw new Exception('Can\'t open xml file.');
-            }
-
-            while (!feof($in)) {
-                gzwrite($out, fread($in, 524288));
-            }
-
-            fclose($in);
-            gzclose($out);
-            unlink($source);
-            $newFiles[$gzFile] = $lastmod;
+        if (!($directory = realpath($this->getTempDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory))) {
+            mkdir($this->getTempDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory,
+                0777, true);
+            $directory = realpath($this->getTempDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory);
         }
 
-        $files = $newFiles;
+        return $directory;
     }
 
     /**
@@ -578,6 +470,60 @@ class Sitemap
     }
 
     /**
+     * @return string
+     */
+    public function getSeparator(): string
+    {
+        return $this->separator;
+    }
+
+    /**
+     * @param string $separator
+     */
+    public function setSeparator(string $separator): void
+    {
+        $this->separator = $separator;
+    }
+
+    /**
+     * @param string $dir
+     * @param array  $files
+     *
+     * @throws \Exception
+     */
+    private function compressFiles(string $dir, array &$files)
+    {
+        $newFiles = [];
+
+        foreach ($files as $file => $lastmod) {
+            $source = $dir . DIRECTORY_SEPARATOR . $file;
+            $gzFile = substr($file, 0, strlen($file) - 4) . self::GZ_EXT;
+            $output = $dir . DIRECTORY_SEPARATOR . $gzFile;
+            $out = gzopen($output, 'wb9');
+            $in = fopen($source, 'rb');
+
+            if (!$out) {
+                throw new Exception('Can\'t create GZip archive.');
+            }
+
+            if (!$in) {
+                throw new Exception('Can\'t open xml file.');
+            }
+
+            while (!feof($in)) {
+                gzwrite($out, fread($in, 524288));
+            }
+
+            fclose($in);
+            gzclose($out);
+            unlink($source);
+            $newFiles[$gzFile] = $lastmod;
+        }
+
+        $files = $newFiles;
+    }
+
+    /**
      * @param array $sitemaps
      *
      * @return array
@@ -623,32 +569,44 @@ class Sitemap
     }
 
     /**
-     * @throws \Exception
+     * Get filename of sitemap index file
+     *
+     * @return string
      */
-    public function generate()
+    public function getIndexFilename(): string
     {
-        if ($this->getPublicDirectory() === '') {
-            throw new Exception('Public directory is not set.');
+        return $this->indexFilename;
+    }
+
+    /**
+     * Set filename of sitemap index file
+     *
+     * @param string $indexFilename
+     */
+    public function setIndexFilename(string $indexFilename): void
+    {
+        $this->indexFilename = $indexFilename;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSitepamsDirectory(): string
+    {
+        if (!($directory = realpath($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory))) {
+            mkdir($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory, 0777, true);
+            $directory = realpath($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory);
         }
 
-        if ($this->getDomain() === '') {
-            throw new Exception('Domain is not set.');
-        }
+        return $directory;
+    }
 
-        if ($this->getDataCollector() === null) {
-            throw new Exception('DataCollector is not set.');
-        }
-
-        if (empty($this->getXml())) {
-            $this->setXml(XMLWriter::class, ['domain' => $this->getDomain()]);
-        }
-
-        $this->removeDir($this->getTempDirectory());
-        $this->getXml()->setWorkDir($this->getSitepamsTempDirectory());
-        $sitemaps = $this->generateSitemaps();
-        $this->getXml()->setWorkDir($this->getTempDirectory());
-        $this->generateSitemapsIndex($sitemaps);
-        $this->publishSitemap();
+    /**
+     * @param string $sitepamsDirectory
+     */
+    public function setSitepamsDirectory(string $sitepamsDirectory): void
+    {
+        $this->sitepamsDirectory = $sitepamsDirectory;
     }
 
     private function publishSitemap()
@@ -689,5 +647,40 @@ class Sitemap
         }
 
         $this->removeDir($this->getTempDirectory());
+    }
+
+    /**
+     * @return string
+     */
+    private function getExt()
+    {
+        if ($this->isUseCompression()) {
+            return self::GZ_EXT;
+        } else {
+            return self::EXT;
+        }
+    }
+
+    /**
+     * Check if compression is used
+     *
+     * @return bool
+     */
+    public function isUseCompression(): bool
+    {
+        return $this->useCompression;
+    }
+
+    /**
+     * Set whether to use compression or not
+     *
+     * @param bool $useCompression
+     */
+    public function setUseCompression(bool $useCompression): void
+    {
+        if ($useCompression && !extension_loaded('zlib')) {
+            return;
+        }
+        $this->useCompression = $useCompression;
     }
 }

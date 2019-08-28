@@ -13,7 +13,7 @@ abstract class Extension implements Item
 {
     const NAMESPACE_NAME = null;
 
-    const NAMESPACE_URL  = null;
+    const NAMESPACE_URL = null;
 
     /**
      * Domain
@@ -23,18 +23,18 @@ abstract class Extension implements Item
     private $domain = '';
 
     /**
-     * @param string $domain
-     */
-    public function setDomain(string $domain): void
-    {
-        $this->domain = $domain;
-    }
-
-    /**
      * @return string
      */
     public function getDomain(): string
     {
         return $this->domain;
+    }
+
+    /**
+     * @param string $domain
+     */
+    public function setDomain(string $domain): void
+    {
+        $this->domain = $domain;
     }
 }

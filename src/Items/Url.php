@@ -63,7 +63,33 @@ class Url implements Item
      */
     public function __construct(string $loc)
     {
-        $this->loc = '/'.ltrim($loc, '/');
+        $this->loc = '/' . ltrim($loc, '/');
+    }
+
+    public function toArray(): array
+    {
+        $array = [
+            'loc' => $this->getLoc()
+        ];
+
+        if ($this->getLastMod()) {
+            $array['lastmod'] = $this->getLastMod();
+        }
+
+        if ($this->getChangeFreq()) {
+            $array['changefreq'] = $this->getChangeFreq();
+        }
+
+        if ($this->getPriority()) {
+            $array['priority'] = $this->getPriority();
+        }
+
+        foreach ($this->getExtensions() as $extension => $data) {
+            $data->setDomain($this->getDomain());
+            $array[$extension] = $data->toArray();
+        }
+
+        return $array;
     }
 
     /**
@@ -72,6 +98,14 @@ class Url implements Item
     public function getLoc(): string
     {
         return $this->getDomain() . $this->loc;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDomain(): string
+    {
+        return $this->domain;
     }
 
     /**
@@ -84,14 +118,6 @@ class Url implements Item
         $this->domain = $domain;
 
         return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDomain(): string
-    {
-        return $this->domain;
     }
 
     /**
@@ -125,7 +151,7 @@ class Url implements Item
             $this->lastMod = $lastMod;
         }
 
-        if ($this->lastMod && (int) $this->lastMod->format("Y") < 0) {
+        if ($this->lastMod && (int)$this->lastMod->format("Y") < 0) {
             $this->lastMod = null;
         }
 
@@ -174,30 +200,12 @@ class Url implements Item
         return $this;
     }
 
-    public function toArray(): array
+    /**
+     * @return array
+     */
+    public function getExtensions(): array
     {
-        $array = [
-            'loc' => $this->getLoc()
-        ];
-
-        if ($this->getLastMod()) {
-            $array['lastmod'] = $this->getLastMod();
-        }
-
-        if ($this->getChangeFreq()) {
-            $array['changefreq'] = $this->getChangeFreq();
-        }
-
-        if ($this->getPriority()) {
-            $array['priority'] = $this->getPriority();
-        }
-
-        foreach ($this->getExtensions() as $extension => $data) {
-            $data->setDomain($this->getDomain());
-            $array[$extension] = $data->toArray();
-        }
-
-        return $array;
+        return $this->extensions;
     }
 
     /**
@@ -210,13 +218,5 @@ class Url implements Item
         $this->extensions[$extension::NAMESPACE_NAME] = $extension;
 
         return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getExtensions(): array
-    {
-        return $this->extensions;
     }
 }

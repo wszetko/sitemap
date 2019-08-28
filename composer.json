@@ -2,7 +2,11 @@
   "name": "wszetko/sitemap",
   "type": "library",
   "description": "Sitemap generator",
-  "keywords": ["sitemap","sitemaps","generator"],
+  "keywords": [
+    "sitemap",
+    "sitemaps",
+    "generator"
+  ],
   "homepage": "https://wszetko.pl",
   "license": "MIT",
   "authors": [

@@ -51,22 +51,6 @@ class XMLWriter implements XML
     }
 
     /**
-     * @param string $dir
-     */
-    public function setWorkDir(string $dir): void
-    {
-        $this->workDir = $dir;
-    }
-
-    /**
-     * @return string
-     */
-    public function getWorkDir(): string
-    {
-        return $this->workDir;
-    }
-
-    /**
      * @return string
      */
     public function getDomain(): string
@@ -99,39 +83,29 @@ class XMLWriter implements XML
     }
 
     /**
+     * @param string $sitemap
+     * @param array  $extensions
+     */
+    public function openSitemap(string $sitemap, array $extensions = []): void
+    {
+        $this->setCurrentSitemap($sitemap);
+        $this->getXMLWriter()->openMemory();
+        $this->getXMLWriter()->startDocument('1.0', 'UTF-8');
+        $this->getXMLWriter()->setIndent(true);
+        $this->getXMLWriter()->startElement('urlset');
+        $this->getXMLWriter()->writeAttribute('xmlns', Sitemap::SCHEMA);
+        foreach ($extensions as $extension => $urlset) {
+            $this->getXMLWriter()->writeAttribute('xmlns:' . $extension, $urlset);
+        }
+        $this->flushData();
+    }
+
+    /**
      * @return \XMLWriter
      */
     private function getXMLWriter(): \XMLWriter
     {
         return $this->XMLWriter;
-    }
-
-    /**
-     * @return string
-     */
-    private function getSitemapFileFullPath(): string
-    {
-        return $this->getWorkDir() . DIRECTORY_SEPARATOR . $this->currentSitemap;
-    }
-
-    private function isAssoc(array $array): bool
-    {
-        foreach ($array as $key => $val) {
-            if (!is_integer($key)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @return int
-     */
-    public function getSitemapSize(): int
-    {
-        clearstatcache(true, $this->getSitemapFileFullPath());
-        return file_exists($this->getSitemapFileFullPath()) ? filesize($this->getSitemapFileFullPath()) : 0;
     }
 
     /**
@@ -142,6 +116,41 @@ class XMLWriter implements XML
     private function flushData(): void
     {
         file_put_contents($this->getSitemapFileFullPath(), $this->getXMLWriter()->flush(true), FILE_APPEND);
+    }
+
+    /**
+     * @return string
+     */
+    private function getSitemapFileFullPath(): string
+    {
+        return $this->getWorkDir() . DIRECTORY_SEPARATOR . $this->currentSitemap;
+    }
+
+    /**
+     * @return string
+     */
+    public function getWorkDir(): string
+    {
+        return $this->workDir;
+    }
+
+    /**
+     * @param string $dir
+     */
+    public function setWorkDir(string $dir): void
+    {
+        $this->workDir = $dir;
+    }
+
+    /**
+     *
+     */
+    public function closeSitemap(): void
+    {
+        $this->getXMLWriter()->endElement();
+        $this->getXMLWriter()->endDocument();
+        $this->flushData();
+        $this->endFile();
     }
 
     /**
@@ -173,32 +182,27 @@ class XMLWriter implements XML
     }
 
     /**
-     * @param string $sitemap
-     * @param array  $extensions
+     * @return int
      */
-    public function openSitemap(string $sitemap, array $extensions = []): void
+    public function getSitemapSize(): int
     {
-        $this->setCurrentSitemap($sitemap);
-        $this->getXMLWriter()->openMemory();
-        $this->getXMLWriter()->startDocument('1.0', 'UTF-8');
-        $this->getXMLWriter()->setIndent(true);
-        $this->getXMLWriter()->startElement('urlset');
-        $this->getXMLWriter()->writeAttribute('xmlns', Sitemap::SCHEMA);
-        foreach ($extensions as $extension => $urlset) {
-            $this->getXMLWriter()->writeAttribute('xmlns:' . $extension, $urlset);
-        }
-        $this->flushData();
+        clearstatcache(true, $this->getSitemapFileFullPath());
+        return file_exists($this->getSitemapFileFullPath()) ? filesize($this->getSitemapFileFullPath()) : 0;
     }
 
     /**
-     *
+     * @param array $element
      */
-    public function closeSitemap(): void
+    public function addUrl(array $element): void
     {
+        $this->getXMLWriter()->startElement('url');
+
+        foreach ($element as $el => $val) {
+            $this->addElement($el, $val);
+        }
+
         $this->getXMLWriter()->endElement();
-        $this->getXMLWriter()->endDocument();
         $this->flushData();
-        $this->endFile();
     }
 
     private function addElement(string $element, $value, string $namespace = null): void
@@ -266,19 +270,15 @@ class XMLWriter implements XML
         }
     }
 
-    /**
-     * @param array $element
-     */
-    public function addUrl(array $element): void
+    private function isAssoc(array $array): bool
     {
-        $this->getXMLWriter()->startElement('url');
-
-        foreach ($element as $el => $val) {
-            $this->addElement($el, $val);
+        foreach ($array as $key => $val) {
+            if (!is_integer($key)) {
+                return true;
+            }
         }
 
-        $this->getXMLWriter()->endElement();
-        $this->flushData();
+        return false;
     }
 
     /**
