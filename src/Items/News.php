@@ -47,9 +47,9 @@ class News extends Extension
     /**
      * List of genres, comma-separated string values.
      *
-     * @var string
+     * @var array
      */
-    protected $genres;
+    protected $genres = [];
 
     /**
      * Date of publication.
@@ -68,12 +68,14 @@ class News extends Extension
     /**
      * Key words, comma-separated string values.
      *
-     * @var string
+     * @var array
      */
     protected $keywords;
 
     /**
+     * Key words, comma-separated string values.
      *
+     * @var array
      */
     protected $stockTickers;
 
@@ -83,13 +85,13 @@ class News extends Extension
      *
      * @param string             $publicationName
      * @param string             $publicationLanguage
-     * @param \DateTimeInterface $publicationDate
+     * @param DateTimeInterface|string $publicationDate
      * @param string             $title
      */
     public function __construct(
         string $publicationName,
         string $publicationLanguage,
-        DateTimeInterface $publicationDate,
+        $publicationDate,
         string $title
     ) {
         if (!empty($publicationName)) {
@@ -106,7 +108,17 @@ class News extends Extension
             throw new InvalidArgumentException('Invalid publication lang parameter.');
         }
 
-        $this->publicationDate = $publicationDate;
+        if (is_string($publicationDate)) {
+            $this->publicationDate = date_create($publicationDate);
+        } elseif ($publicationDate instanceof DateTimeInterface) {
+            $this->publicationDate = $publicationDate;
+        }
+
+        if (($this->publicationDate && (int)$this->publicationDate->format("Y") < 0) || empty($this->publicationDate)) {
+            throw new InvalidArgumentException('Invalid publication date parameter.');
+        }
+
+
         $this->title = $title;
     }
 
@@ -170,20 +182,16 @@ class News extends Extension
     /**
      * Date of publication.
      *
-     * @return string|null
+     * @return string
      */
-    public function getPublicationDate(): ?string
+    public function getPublicationDate(): string
     {
-        if (!empty($this->publicationDate)) {
-            if ($this->publicationDate->format('H') == 0 &&
-                $this->publicationDate->format('i') == 0 &&
-                $this->publicationDate->format('s') == 0) {
-                return $this->publicationDate->format("Y-m-d");
-            } else {
-                return $this->publicationDate->format(DateTimeInterface::W3C);
-            }
+        if ($this->publicationDate->format('H') == 0 &&
+            $this->publicationDate->format('i') == 0 &&
+            $this->publicationDate->format('s') == 0) {
+            return $this->publicationDate->format("Y-m-d");
         } else {
-            return null;
+            return $this->publicationDate->format(DateTimeInterface::W3C);
         }
     }
 
@@ -218,6 +226,8 @@ class News extends Extension
     {
         if (in_array($access, ['Subscription', 'Registration'])) {
             $this->access = $access;
+        } else {
+            $this->access = null;
         }
 
         return $this;
@@ -230,7 +240,7 @@ class News extends Extension
      */
     public function getGenres()
     {
-        return $this->genres;
+        return implode(', ', $this->genres);
     }
 
     /**
@@ -240,13 +250,15 @@ class News extends Extension
      *
      * @return self
      */
-    public function setGenres(string $genres): self
+    public function addGenres(string $genres): self
     {
-        preg_match_all("/^(?'genres'(PressRelease|Satire|Blog|OpEd|Opinion|UserGenerated)(, *(PressRelease|Satire|Blog|OpEd|Opinion|UserGenerated)))*$/",
-            $genres, $matches);
+        $genres = explode(',', $genres);
 
-        if (!empty($matches['genres'])) {
-            $this->genres = $genres;
+        foreach ($genres as $genre) {
+            $genre = trim($genre);
+            if (in_array($genre, ['PressRelease', 'Satire', 'Blog', 'OpEd', 'Opinion', 'UserGenerated'])) {
+                $this->genres[] = trim($genre);
+            }
         }
 
         return $this;
@@ -259,7 +271,7 @@ class News extends Extension
      */
     public function getKeywords()
     {
-        return $this->keywords;
+        return implode(', ', $this->keywords);
     }
 
     /**
@@ -269,19 +281,23 @@ class News extends Extension
      *
      * @return self
      */
-    public function setKeywords($keywords): self
+    public function addKeywords($keywords): self
     {
-        $this->keywords = $keywords;
+        $keywords = explode(',', $keywords);
+
+        foreach ($keywords as $keyword) {
+            $this->keywords[] = trim($keyword);
+        }
 
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getStockTickers()
+    public function getStockTickers(): string
     {
-        return $this->stockTickers;
+        return implode(', ', array_slice($this->stockTickers, 0, 5));
     }
 
     /**
@@ -289,12 +305,15 @@ class News extends Extension
      *
      * @return self
      */
-    public function setStockTickers($stockTickers): self
+    public function addStockTickers($stockTickers): self
     {
         preg_match_all("/^(?'stockTickers'\w+:\w+(, *\w+:\w+){0,4})?$/", $stockTickers, $matches);
 
         if (!empty($matches['stockTickers'])) {
-            $this->stockTickers = $stockTickers;
+            $matches = explode(',', $matches['stockTickers'][0]);
+            foreach ($matches as $match) {
+                $this->stockTickers[] = trim($match);
+            }
         }
 
         return $this;

@@ -53,7 +53,7 @@ class Url implements Item
     /**
      * Array of used extensions
      *
-     * @var \Wszetko\Sitemap\Items\Extension[]
+     * @var Extension[]
      */
     private $extensions = [];
 

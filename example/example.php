@@ -48,9 +48,9 @@ try {
     // Add News extension
     $news = (new Wszetko\Sitemap\Items\News('Test', 'pl', new DateTime('now'), 'Test'))
         ->setAccess('Subscription')
-        ->setGenres('PressRelease, Blog')
-        ->setKeywords('Keyword1, keyword2')
-        ->setStockTickers('NASDAQ:AMAT');
+        ->addGenres('PressRelease, Blog')
+        ->addKeywords('Keyword1, keyword2')
+        ->addStockTickers('NASDAQ:AMAT');
     $item->addExtension($news);
 
     // Add Video extension
