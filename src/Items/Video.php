@@ -5,6 +5,7 @@ namespace Wszetko\Sitemap\Items;
 
 use DateTimeInterface;
 use InvalidArgumentException;
+use Wszetko\Sitemap\Traits\DateTime;
 
 /**
  * Class Video
@@ -13,6 +14,8 @@ use InvalidArgumentException;
  */
 class Video extends Extension
 {
+    use DateTime;
+
     /**
      * Name of Namescapce
      */
@@ -140,7 +143,7 @@ class Video extends Extension
     /**
      * The date the video was first published.
      *
-     * @var DateTimeInterface
+     * @var string|null
      */
     protected $publicationDate;
 
@@ -168,7 +171,7 @@ class Video extends Extension
     /**
      * The date after which the video will no longer be available
      *
-     * @var DateTimeInterface
+     * @var string
      */
     protected $expirationDate;
 
@@ -472,29 +475,19 @@ class Video extends Extension
      */
     public function getExpirationDate(): ?string
     {
-        if (!empty($this->expirationDate)) {
-            if ($this->expirationDate->format('H') == 0 &&
-                $this->expirationDate->format('i') == 0 &&
-                $this->expirationDate->format('s') == 0) {
-                return $this->expirationDate->format("Y-m-d");
-            } else {
-                return $this->expirationDate->format(DateTimeInterface::W3C);
-            }
-        } else {
-            return null;
-        }
+        return $this->expirationDate;
     }
 
     /**
      * The date after which the video will no longer be available.
      *
-     * @param DateTimeInterface $expirationDate
+     * @param DateTimeInterface|string $expirationDate
      *
      * @return self
      */
-    public function setExpirationDate(DateTimeInterface $expirationDate): self
+    public function setExpirationDate($expirationDate): self
     {
-        $this->expirationDate = $expirationDate;
+        $this->expirationDate = $this->processDateTime($expirationDate);
 
         return $this;
     }
@@ -556,29 +549,19 @@ class Video extends Extension
      */
     public function getPublicationDate(): ?string
     {
-        if (!empty($this->publicationDate)) {
-            if ($this->publicationDate->format('H') == 0 &&
-                $this->publicationDate->format('i') == 0 &&
-                $this->publicationDate->format('s') == 0) {
-                return $this->publicationDate->format("Y-m-d");
-            } else {
-                return $this->publicationDate->format(DateTimeInterface::W3C);
-            }
-        } else {
-            return null;
-        }
+        $this->publicationDate;
     }
 
     /**
      * The date the video was first published, in W3C format.
      *
-     * @param DateTimeInterface $publicationDate
+     * @param DateTimeInterface|string $publicationDate
      *
      * @return self
      */
-    public function setPublicationDate(DateTimeInterface $publicationDate): self
+    public function setPublicationDate($publicationDate): self
     {
-        $this->publicationDate = $publicationDate;
+        $this->publicationDate = $this->processDateTime($publicationDate);
         return $this;
     }
 
@@ -858,7 +841,7 @@ class Video extends Extension
     {
         $accepted = ['allow', 'deny'];
 
-        return (bool)in_array($value, $accepted);
+        return (bool) in_array($value, $accepted);
     }
 
     /**

@@ -7,6 +7,7 @@ use DateTimeInterface;
 use InvalidArgumentException;
 use Wszetko\Sitemap\Interfaces\Item;
 use Wszetko\Sitemap\Sitemap;
+use Wszetko\Sitemap\Traits\DateTime;
 
 /**
  * Class Url
@@ -15,6 +16,8 @@ use Wszetko\Sitemap\Sitemap;
  */
 class Url implements Item
 {
+    use DateTime;
+
     /**
      * Domain
      *
@@ -32,7 +35,7 @@ class Url implements Item
     /**
      * Last modified time
      *
-     * @var DateTimeInterface
+     * @var string
      */
     private $lastMod;
 
@@ -126,21 +129,11 @@ class Url implements Item
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getLastMod(): ?string
     {
-        if (!empty($this->lastMod)) {
-            if ($this->lastMod->format('H') == 0 &&
-                $this->lastMod->format('i') == 0 &&
-                $this->lastMod->format('s') == 0) {
-                return $this->lastMod->format("Y-m-d");
-            } else {
-                return $this->lastMod->format(DateTimeInterface::W3C);
-            }
-        }
-
-        return null;
+        return $this->lastMod;
     }
 
     /**
@@ -150,15 +143,7 @@ class Url implements Item
      */
     public function setLastMod($lastMod): self
     {
-        if (is_string($lastMod)) {
-            $this->lastMod = date_create($lastMod);
-        } elseif ($lastMod instanceof DateTimeInterface) {
-            $this->lastMod = $lastMod;
-        }
-
-        if ($this->lastMod && (int)$this->lastMod->format("Y") < 0) {
-            $this->lastMod = null;
-        }
+        $this->lastMod = $this->processDateTime($lastMod);
 
         return $this;
     }

@@ -5,6 +5,7 @@ namespace Wszetko\Sitemap\Items;
 
 use DateTimeInterface;
 use InvalidArgumentException;
+use Wszetko\Sitemap\Traits\DateTime;
 
 /**
  * Class News
@@ -13,6 +14,8 @@ use InvalidArgumentException;
  */
 class News extends Extension
 {
+    use DateTime;
+
     /**
      * Name of Namescapce
      */
@@ -54,7 +57,7 @@ class News extends Extension
     /**
      * Date of publication.
      *
-     * @var DateTimeInterface
+     * @var string
      */
     protected $publicationDate;
 
@@ -108,16 +111,7 @@ class News extends Extension
             throw new InvalidArgumentException('Invalid publication lang parameter.');
         }
 
-        if (is_string($publicationDate)) {
-            $this->publicationDate = date_create($publicationDate);
-        } elseif ($publicationDate instanceof DateTimeInterface) {
-            $this->publicationDate = $publicationDate;
-        }
-
-        if (($this->publicationDate && (int)$this->publicationDate->format("Y") < 0) || empty($this->publicationDate)) {
-            throw new InvalidArgumentException('Invalid publication date parameter.');
-        }
-
+        $this->publicationDate = $this->processDateTime($publicationDate, true);
 
         $this->title = $title;
     }
@@ -186,13 +180,7 @@ class News extends Extension
      */
     public function getPublicationDate(): string
     {
-        if ($this->publicationDate->format('H') == 0 &&
-            $this->publicationDate->format('i') == 0 &&
-            $this->publicationDate->format('s') == 0) {
-            return $this->publicationDate->format("Y-m-d");
-        } else {
-            return $this->publicationDate->format(DateTimeInterface::W3C);
-        }
+        return $this->publicationDate;
     }
 
     /**

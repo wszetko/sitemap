@@ -50,14 +50,14 @@ class NewsTest extends TestCase
     public function testConstructorExceptionInvalidDate()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid publication date parameter.');
+        $this->expectExceptionMessage('Invalid date parameter.');
         new Items\News('News name', 'en', '0000-00-00', 'Title');
     }
 
     public function testConstructorExceptionNoDate()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid publication date parameter.');
+        $this->expectExceptionMessage('Invalid date parameter.');
         new Items\News('News name', 'en', 'Thi is no date', 'Title');
     }
 

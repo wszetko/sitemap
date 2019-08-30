@@ -214,7 +214,7 @@ class XMLWriter implements XML
     private function addElement(string $element, $value, ?string $namespace = null): void
     {
         if (!is_array($value)) {
-            $this->getXMLWriter()->writeElement(($namespace ? $namespace . ':' : '') . $element, (string)$value);
+            $this->getXMLWriter()->writeElement(($namespace ? $namespace . ':' : '') . $element, (string) $value);
         } else {
             if (isset($value['_namespace'])) {
                 $this->addElementNS($value['_element'], $value[$value['_element']], $namespace);
@@ -264,7 +264,7 @@ class XMLWriter implements XML
                             $this->addElement($el, $val);
                         }
                     } else {
-                        $this->getXMLWriter()->text((string)$value['_value']);
+                        $this->getXMLWriter()->text((string) $value['_value']);
                     }
                 }
             } else {
@@ -272,7 +272,7 @@ class XMLWriter implements XML
                     if (is_array($val)) {
                         $this->addElement($el, $val, $namespace);
                     } else {
-                        $this->getXMLWriter()->writeElement(($namespace ? $namespace . ':' : '') . $el, (string)$val);
+                        $this->getXMLWriter()->writeElement(($namespace ? $namespace . ':' : '') . $el, (string) $val);
                     }
                 }
             }
@@ -352,7 +352,7 @@ class XMLWriter implements XML
         }
 
         if (!is_array($value)) {
-            $this->getXMLWriter()->writeElement($begin . $element, (string)$value);
+            $this->getXMLWriter()->writeElement($begin . $element, (string) $value);
         } else {
             if (isset($value['_namespace'])) {
                 $this->addElementNS($value);
@@ -371,7 +371,7 @@ class XMLWriter implements XML
                                     $this->addElement($el, $val);
                                 }
                             } else {
-                                $this->getXMLWriter()->text((string)$value['_value']);
+                                $this->getXMLWriter()->text((string) $value['_value']);
                             }
                         }
                     } else {

@@ -142,7 +142,7 @@ class Memory implements DataCollector
      */
     public function isLast(string $group): bool
     {
-        return (bool)!isset($this->items[$group][$this->getGroupElement($group) + 1]);
+        return (bool) !isset($this->items[$group][$this->getGroupElement($group) + 1]);
     }
 
     /**
