@@ -5,10 +5,21 @@ namespace Wszetko\Sitemap\Items;
 
 use InvalidArgumentException;
 
+/**
+ * Class HrefLang
+ *
+ * @package Wszetko\Sitemap\Items
+ */
 class HrefLang extends Extension
 {
+    /**
+     * Name of Namescapce
+     */
     const NAMESPACE_NAME = 'xhtml';
 
+    /**
+     * Namespace URL
+     */
     const NAMESPACE_URL = 'http://www.w3.org/1999/xhtml';
 
     /**
@@ -24,6 +35,17 @@ class HrefLang extends Extension
      */
     public function __construct(string $hrefLang, string $href)
     {
+        return $this->addHrefLang($hrefLang, $href);
+    }
+
+    /**
+     * @param string $hrefLang
+     * @param string $href
+     *
+     * @return self
+     */
+    public function addHrefLang(string $hrefLang, string $href): self
+    {
         preg_match_all("/^(?'hreflang'([a-z]{2}|(x)){1}((-){1}([A-Za-z]{2}|[A-Z]{1}([a-z]{1}|[a-z]{3})|(default)))?)$/",
             $hrefLang, $matches);
 
@@ -36,37 +58,39 @@ class HrefLang extends Extension
         return $this;
     }
 
-    public function toArray(): array
+    /**
+     * @return array
+     */
+    public function getHrefLangs(): array
     {
-        $array = [
-            '_namespace' => static::NAMESPACE_NAME,
-            '_element' => 'link',
-            'link' => [
-                '_attributes' => []
-            ]
-        ];
-
-        foreach ($this->get() as $hreflang => $href) {
-            $array['link']['_attributes'] = [
-                'rel' => 'alternate',
-                'hreflang' => $hreflang,
-                'href' => $href
-            ];
+        foreach ($this->hrefLang as &$href) {
+            $href = $this->getDomain() . $href;
         }
 
-        return $array;
+        return $this->hrefLang;
     }
 
     /**
      * @return array
      */
-    public function get(): array
+    public function toArray(): array
     {
-        $result = [];
+        $array = [
+            '_namespace' => static::NAMESPACE_NAME,
+            '_element' => 'link',
+            'link' => []
+        ];
 
-        foreach ($this->hrefLang as $hrefLang => $href) {
-            $result[$hrefLang] = $this->getDomain() . $href;
+        foreach ($this->getHrefLangs() as $hreflang => $href) {
+            $array['link'][] = [
+                '_attributes' => [
+                    'rel' => 'alternate',
+                    'hreflang' => $hreflang,
+                    'href' => $href
+                ]
+            ];
         }
-        return $result;
+
+        return $array;
     }
 }

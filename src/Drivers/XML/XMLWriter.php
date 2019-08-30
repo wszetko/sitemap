@@ -211,42 +211,108 @@ class XMLWriter implements XML
         $this->flushData();
     }
 
-    private function addElement(string $element, $value, string $namespace = null): void
+    private function startElement($name, $namespace = null, $uri = null): bool
     {
         if ($namespace) {
-            $begin = $namespace . ':';
+            $result = $this->getXMLWriter()->startElementNS($namespace, $name, $uri);
         } else {
-            $begin = '';
+            $result = $this->getXMLWriter()->startElement($name);
         }
+
+        return $result;
+    }
+
+    private function addElementNS(string $element, $value, ?string $namespace = null): void
+    {
+
+        $this->startElement($element, $namespace, null);
+
+        if (!empty($value)) {
+            $this->addElement($element, $value, $namespace);
+        }
+
+        $this->getXMLWriter()->endElement();
+    }
+
+    private function addElementArray(string $element, $value, ?string $namespace = null): void
+    {
+        if (!$this->isAssoc($value)) {
+            $this->addElementArrayNonAssoc($element, $value, $namespace);
+        } else {
+            $this->getXMLWriter()->startElement(($namespace ? $namespace.':' : '').$element);
+
+            if (isset($value['_attributes'])) {
+                foreach ($value['_attributes'] as $attribute => $val) {
+                    $this->getXMLWriter()->writeAttribute($attribute, $val);
+                }
+
+                if (isset($value['_value'])) {
+                    if (is_array($value['_value'])) {
+                        foreach ($value['_value'] as $el => $val) {
+                            $this->addElement($el, $val);
+                        }
+                    } else {
+                        $this->getXMLWriter()->text((string) $value['_value']);
+                    }
+                }
+            } else {
+                foreach ($value as $el => $val) {
+                    if (is_array($val)) {
+                        $this->addElement($el, $val, $namespace);
+                    } else {
+                        $this->getXMLWriter()->writeElement(($namespace ? $namespace.':' : '') . $el, (string) $val);
+                    }
+                }
+            }
+
+            $this->getXMLWriter()->endElement();
+        }
+    }
+
+    private function addElementArrayNonAssoc(string $element, $value, ?string $namespace = null): void
+    {
+        foreach ($value as $val) {
+            if (is_array($val)) {
+                $this->addElement($element, $val, $namespace);
+            }
+        }
+    }
+
+    private function addElement(string $element, $value, ?string $namespace = null): void
+    {
+        if (!is_array($value)) {
+            $this->getXMLWriter()->writeElement(($namespace ? $namespace . ':' : '') . $element, (string)$value);
+        } else {
+            if (isset($value['_namespace'])) {
+                $this->addElementNS($value['_element'], $value[$value['_element']], $namespace);
+            } else {
+                $this->addElementArray($element, $value, $namespace);
+            }
+        }
+    }
+
+    private function _addElement(string $element, $value, ?string $namespace = null): void
+    {
+        $begin = '';
+
+        if ($namespace) {
+            $begin = $namespace . ':';
+        }
+
         if (!is_array($value)) {
             $this->getXMLWriter()->writeElement($begin . $element, (string)$value);
         } else {
             if (isset($value['_namespace'])) {
-                $this->getXMLWriter()->startElementNS($value['_namespace'], $value['_element'], null);
-
-                if (isset($value[$value['_element']]['_attributes'])) {
-                    foreach ($value[$value['_element']]['_attributes'] as $attribute => $val) {
-                        $this->getXMLWriter()->writeAttribute($attribute, $val);
-                    }
-                    if (isset($value[$value['_element']]['_value'])) {
-                        $this->getXMLWriter()->text($value[$value['_element']]['_value']);
-                    }
-                } else {
-                    if (!empty($value[$value['_element']])) {
-                        foreach ($value[$value['_element']] as $el => $val) {
-                            $this->addElement($el, $val, $value['_namespace']);
-                        }
-                    }
-                }
-                $this->getXMLWriter()->endElement();
+                $this->addElementNS($value);
             } else {
                 if ($this->isAssoc($value)) {
-                    $this->getXMLWriter()->startElement($begin . $element);
+                    $this->startElement($element, $namespace, null);
 
                     if (isset($value['_attributes'])) {
                         foreach ($value['_attributes'] as $attribute => $val) {
                             $this->getXMLWriter()->writeAttribute($attribute, $val);
                         }
+
                         if (isset($value['_value'])) {
                             if (is_array($value['_value'])) {
                                 foreach ($value['_value'] as $el => $val) {
@@ -269,7 +335,11 @@ class XMLWriter implements XML
                     $this->getXMLWriter()->endElement();
                 } else {
                     foreach ($value as $val) {
-                        $this->getXMLWriter()->writeElement($begin . $element, $val);
+                        if (is_array($val)) {
+                            $this->addElement($element, $val, $namespace);
+                        } else {
+                            $this->getXMLWriter()->writeElement($begin . $element, $val);
+                        }
                     }
                 }
             }

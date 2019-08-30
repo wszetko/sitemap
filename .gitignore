@@ -1,4 +1,5 @@
 # Ignore auto-generated files
+/example/sitemap
 /vendor
 /build
 composer.lock

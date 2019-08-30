@@ -3,10 +3,21 @@ declare(strict_types=1);
 
 namespace Wszetko\Sitemap\Items;
 
+/**
+ * Class Image
+ *
+ * @package Wszetko\Sitemap\Items
+ */
 class Image extends Extension
 {
+    /**
+     * Name of Namescapce
+     */
     const NAMESPACE_NAME = 'image';
 
+    /**
+     * Namespace URL
+     */
     const NAMESPACE_URL = 'http://www.google.com/schemas/sitemap-image/1.1';
 
     /**
@@ -54,6 +65,9 @@ class Image extends Extension
         $this->loc = '/' . ltrim($loc, '/');
     }
 
+    /**
+     * @return array
+     */
     public function toArray(): array
     {
         $array = [
@@ -185,6 +199,8 @@ class Image extends Extension
     {
         if ($license = \Wszetko\Sitemap\Helpers\Url::normalizeUrl($license)) {
             $this->license = $license;
+        } else {
+            $this->license = null;
         }
 
         return $this;

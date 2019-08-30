@@ -6,10 +6,21 @@ namespace Wszetko\Sitemap\Items;
 use DateTimeInterface;
 use InvalidArgumentException;
 
+/**
+ * Class News
+ *
+ * @package Wszetko\Sitemap\Items
+ */
 class News extends Extension
 {
+    /**
+     * Name of Namescapce
+     */
     const NAMESPACE_NAME = 'news';
 
+    /**
+     * Namespace URL
+     */
     const NAMESPACE_URL = 'http://www.google.com/schemas/sitemap-news/0.9';
 
     /**
@@ -67,6 +78,14 @@ class News extends Extension
     protected $stockTickers;
 
 
+    /**
+     * News constructor.
+     *
+     * @param string             $publicationName
+     * @param string             $publicationLanguage
+     * @param \DateTimeInterface $publicationDate
+     * @param string             $title
+     */
     public function __construct(
         string $publicationName,
         string $publicationLanguage,
@@ -91,6 +110,9 @@ class News extends Extension
         $this->title = $title;
     }
 
+    /**
+     * @return array
+     */
     public function toArray(): array
     {
         $array = [

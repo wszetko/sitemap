@@ -6,10 +6,21 @@ namespace Wszetko\Sitemap\Items;
 use DateTimeInterface;
 use InvalidArgumentException;
 
+/**
+ * Class Video
+ *
+ * @package Wszetko\Sitemap\Items
+ */
 class Video extends Extension
 {
+    /**
+     * Name of Namescapce
+     */
     const NAMESPACE_NAME = 'video';
 
+    /**
+     * Namespace URL
+     */
     const NAMESPACE_URL = 'http://www.google.com/schemas/sitemap-video/1.1';
 
     /**
@@ -199,6 +210,9 @@ class Video extends Extension
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function toArray(): array
     {
         if (empty($this->getContentLoc()) && empty($this->getPlayerLoc())) {
@@ -835,6 +849,11 @@ class Video extends Extension
         return $this->galleryLoc;
     }
 
+    /**
+     * @param string $value
+     *
+     * @return bool
+     */
     private function validRelationship(string $value): bool
     {
         $accepted = ['allow', 'deny'];

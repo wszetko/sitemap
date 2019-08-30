@@ -11,8 +11,14 @@ use Wszetko\Sitemap\Interfaces\Item;
  */
 abstract class Extension implements Item
 {
+    /**
+     * Name of Namescapce
+     */
     const NAMESPACE_NAME = null;
 
+    /**
+     * Namescapce URL
+     */
     const NAMESPACE_URL = null;
 
     /**
