@@ -226,7 +226,6 @@ class XMLWriter implements XML
 
     private function addElementNS(string $element, $value, ?string $namespace = null): void
     {
-
         $this->startElement($element, $namespace, null);
 
         if (!empty($value)) {

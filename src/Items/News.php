@@ -93,8 +93,7 @@ class News extends Extension
         string $publicationLanguage,
         $publicationDate,
         string $title
-    )
-    {
+    ) {
         if (!empty($publicationName)) {
             $this->publicationName = $publicationName;
         } else {
