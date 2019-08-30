@@ -35,7 +35,7 @@ class UrlTest extends TestCase
         $this->assertEquals('https://example.com', $url->getDomain());
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Parameter $domain need to be valid domain name.');
+        $this->expectExceptionMessage('Domain name is not valid.');
 
         $url->setDomain('broken|domain');
     }

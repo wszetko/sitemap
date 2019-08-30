@@ -3,6 +3,7 @@
 namespace Wszetko\Sitemap\Items;
 
 use Wszetko\Sitemap\Interfaces\Item;
+use Wszetko\Sitemap\Traits\Domain;
 
 /**
  * Class Extension
@@ -11,6 +12,8 @@ use Wszetko\Sitemap\Interfaces\Item;
  */
 abstract class Extension implements Item
 {
+    use Domain;
+
     /**
      * Name of Namescapce
      */
@@ -20,27 +23,4 @@ abstract class Extension implements Item
      * Namescapce URL
      */
     const NAMESPACE_URL = null;
-
-    /**
-     * Domain
-     *
-     * @var string
-     */
-    private $domain = '';
-
-    /**
-     * @return string
-     */
-    public function getDomain(): string
-    {
-        return $this->domain;
-    }
-
-    /**
-     * @param string $domain
-     */
-    public function setDomain(string $domain): void
-    {
-        $this->domain = $domain;
-    }
 }

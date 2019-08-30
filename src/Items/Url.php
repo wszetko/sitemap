@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use Wszetko\Sitemap\Interfaces\Item;
 use Wszetko\Sitemap\Sitemap;
 use Wszetko\Sitemap\Traits\DateTime;
+use Wszetko\Sitemap\Traits\Domain;
 
 /**
  * Class Url
@@ -17,13 +18,7 @@ use Wszetko\Sitemap\Traits\DateTime;
 class Url implements Item
 {
     use DateTime;
-
-    /**
-     * Domain
-     *
-     * @var string
-     */
-    private $domain = '';
+    use Domain;
 
     /**
      * Location (URL)
@@ -68,6 +63,7 @@ class Url implements Item
     public function __construct(string $loc)
     {
         $this->loc = '/' . ltrim($loc, '/');
+        $this->domainIsRequired = true;
     }
 
     public function toArray(): array
@@ -102,30 +98,6 @@ class Url implements Item
     public function getLoc(): string
     {
         return $this->getDomain() . $this->loc;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDomain(): string
-    {
-        return $this->domain;
-    }
-
-    /**
-     * @param string $domain
-     *
-     * @return self
-     */
-    public function setDomain(string $domain): self
-    {
-        if ($domain = \Wszetko\Sitemap\Helpers\Url::normalizeUrl($domain)) {
-            $this->domain = rtrim($domain, '/');
-        } else {
-            throw new InvalidArgumentException('Parameter $domain need to be valid domain name.');
-        }
-
-        return $this;
     }
 
     /**
