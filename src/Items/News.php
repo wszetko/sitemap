@@ -54,7 +54,7 @@ class News extends Extension
     /**
      * Date of publication.
      *
-     * @var \DateTimeInterface
+     * @var DateTimeInterface
      */
     protected $publicationDate;
 
@@ -83,17 +83,18 @@ class News extends Extension
     /**
      * News constructor.
      *
-     * @param string             $publicationName
-     * @param string             $publicationLanguage
+     * @param string $publicationName
+     * @param string $publicationLanguage
      * @param DateTimeInterface|string $publicationDate
-     * @param string             $title
+     * @param string $title
      */
     public function __construct(
         string $publicationName,
         string $publicationLanguage,
         $publicationDate,
         string $title
-    ) {
+    )
+    {
         if (!empty($publicationName)) {
             $this->publicationName = $publicationName;
         } else {
@@ -244,6 +245,24 @@ class News extends Extension
     }
 
     /**
+     * Key words, comma-separated string values.
+     *
+     * @return string
+     */
+    public function getKeywords()
+    {
+        return implode(', ', $this->keywords);
+    }
+
+    /**
+     * @return string
+     */
+    public function getStockTickers(): string
+    {
+        return implode(', ', array_slice($this->stockTickers, 0, 5));
+    }
+
+    /**
      * Set list of genres, comma-separated string values.
      *
      * @param string $genres
@@ -265,16 +284,6 @@ class News extends Extension
     }
 
     /**
-     * Key words, comma-separated string values.
-     *
-     * @return string
-     */
-    public function getKeywords()
-    {
-        return implode(', ', $this->keywords);
-    }
-
-    /**
      * Set key words, comma-separated string values.
      *
      * @param string $keywords
@@ -290,14 +299,6 @@ class News extends Extension
         }
 
         return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getStockTickers(): string
-    {
-        return implode(', ', array_slice($this->stockTickers, 0, 5));
     }
 
     /**

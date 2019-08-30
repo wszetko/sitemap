@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace Wszetko\Sitemap\Tests;
 
 use DateTime;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Wszetko\Sitemap\Items;
+use Wszetko\Sitemap\Items\Mobile;
 
 /**
  * Class UrlTest
@@ -32,7 +34,7 @@ class UrlTest extends TestCase
 
         $this->assertEquals('https://example.com', $url->getDomain());
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Parameter $domain need to be valid domain name.');
 
         $url->setDomain('broken|domain');
@@ -106,7 +108,7 @@ class UrlTest extends TestCase
         $url = new Items\Url('test');
         $url->setDomain('https://example.com');
 
-        $extension = new \Wszetko\Sitemap\Items\Mobile();
+        $extension = new Mobile();
 
         $url->addExtension($extension);
 
@@ -126,7 +128,7 @@ class UrlTest extends TestCase
         $url->setLastMod(new DateTime('2013-11-16'));
         $url->setChangeFreq('always');
         $url->setPriority(1);
-        $extension = new \Wszetko\Sitemap\Items\Mobile();
+        $extension = new Mobile();
         $url->addExtension($extension);
         $extension->setDomain($url->getDomain());
 

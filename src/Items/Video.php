@@ -140,7 +140,7 @@ class Video extends Extension
     /**
      * The date the video was first published.
      *
-     * @var \DateTimeInterface
+     * @var DateTimeInterface
      */
     protected $publicationDate;
 
@@ -168,7 +168,7 @@ class Video extends Extension
     /**
      * The date after which the video will no longer be available
      *
-     * @var \DateTimeInterface
+     * @var DateTimeInterface
      */
     protected $expirationDate;
 
@@ -386,7 +386,7 @@ class Video extends Extension
 
     /**
      * @param string $playerLoc
-     * @param mixed  $allowEmbed
+     * @param mixed $allowEmbed
      *
      * @return self
      */
@@ -488,7 +488,7 @@ class Video extends Extension
     /**
      * The date after which the video will no longer be available.
      *
-     * @param \DateTimeInterface $expirationDate
+     * @param DateTimeInterface $expirationDate
      *
      * @return self
      */
@@ -572,7 +572,7 @@ class Video extends Extension
     /**
      * The date the video was first published, in W3C format.
      *
-     * @param \DateTimeInterface $publicationDate
+     * @param DateTimeInterface $publicationDate
      *
      * @return self
      */
@@ -681,7 +681,7 @@ class Video extends Extension
     /**
      * The price to download or view the video in ISO 4217 format.
      *
-     * @param float  $price
+     * @param float $price
      * @param string $currency
      * @param string $type
      * @param string $resolution

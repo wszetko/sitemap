@@ -32,7 +32,7 @@ class Url implements Item
     /**
      * Last modified time
      *
-     * @var \DateTimeInterface
+     * @var DateTimeInterface
      */
     private $lastMod;
 
@@ -144,7 +144,7 @@ class Url implements Item
     }
 
     /**
-     * @param \DateTimeInterface|string $lastMod
+     * @param DateTimeInterface|string $lastMod
      *
      * @return self
      */
@@ -220,7 +220,7 @@ class Url implements Item
     }
 
     /**
-     * @param \Wszetko\Sitemap\Items\Extension $extension
+     * @param Extension $extension
      *
      * @return self
      */

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Wszetko\Sitemap\Drivers\DataCollectors;
 
 use Wszetko\Sitemap\Interfaces\DataCollector;
+use Wszetko\Sitemap\Items\Extension;
 use Wszetko\Sitemap\Items\Url;
 
 /**
@@ -38,8 +39,8 @@ class Memory implements DataCollector
     }
 
     /**
-     * @param \Wszetko\Sitemap\Items\Url $item
-     * @param string                     $group
+     * @param Url $item
+     * @param string $group
      */
     public function add(Url $item, string $group): void
     {
@@ -53,12 +54,12 @@ class Memory implements DataCollector
     }
 
     /**
-     * @param \Wszetko\Sitemap\Items\Extension[] $extensions
+     * @param Extension[] $extensions
      */
     public function addExtension(array $extensions): void
     {
         /**
-         * @var \Wszetko\Sitemap\Items\Extension $extension
+         * @var Extension $extension
          */
         foreach ($extensions as $extension) {
             $this->extensions[$extension::NAMESPACE_NAME] = $extension::NAMESPACE_URL;

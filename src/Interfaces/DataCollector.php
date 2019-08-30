@@ -20,8 +20,8 @@ interface DataCollector
     public function __construct(?array $config);
 
     /**
-     * @param \Wszetko\Sitemap\Items\Url $item
-     * @param string                     $group
+     * @param Url $item
+     * @param string $group
      */
     public function add(Url $item, string $group): void;
 

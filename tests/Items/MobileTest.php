@@ -3,9 +3,8 @@ declare(strict_types=1);
 
 namespace Wszetko\Sitemap\Tests;
 
-use DateTime;
 use PHPUnit\Framework\TestCase;
-use Wszetko\Sitemap\Items;
+use Wszetko\Sitemap\Items\Mobile;
 
 /**
  * Class MobileTest
@@ -16,7 +15,7 @@ class MobileTest extends TestCase
 {
     public function testToArray()
     {
-        $mobile = new \Wszetko\Sitemap\Items\Mobile();
+        $mobile = new Mobile();
 
         $expectedResult = [
             '_namespace' => $mobile::NAMESPACE_NAME,

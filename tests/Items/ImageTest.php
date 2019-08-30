@@ -80,7 +80,7 @@ class ImageTest extends TestCase
         $image->setTitle('Title example');
         $image->setLicense('https://example/licence.txt');
 
-        $expectedResult =  [
+        $expectedResult = [
             '_namespace' => $image::NAMESPACE_NAME,
             '_element' => 'image',
             'image' => [

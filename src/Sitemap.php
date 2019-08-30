@@ -136,7 +136,7 @@ class Sitemap
     /**
      * DataCollector instance
      *
-     * @var  \Wszetko\Sitemap\Interfaces\DataCollector
+     * @var  DataCollector
      */
     private $dataCollector = null;
 
@@ -150,7 +150,7 @@ class Sitemap
     /**
      * XML Writer object
      *
-     * @var \Wszetko\Sitemap\Interfaces\XML
+     * @var XML
      */
     private $xml;
 
@@ -194,8 +194,8 @@ class Sitemap
     }
 
     /**
-     * @param \Wszetko\Sitemap\Items\Url $item
-     * @param string|null                $group
+     * @param Items\Url $item
+     * @param string|null $group
      */
     public function addItem(Items\Url $item, ?string $group = null)
     {
@@ -255,7 +255,7 @@ class Sitemap
     /**
      * Get DataCollecotr Object
      *
-     * @return \Wszetko\Sitemap\Interfaces\DataCollector|null
+     * @return DataCollector|null
      */
     public function getDataCollector(): ?DataCollector
     {
@@ -276,7 +276,7 @@ class Sitemap
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function generate()
     {
@@ -315,7 +315,7 @@ class Sitemap
     /**
      * @param string $publicDirectory
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function setPublicDirectory(string $publicDirectory): void
     {
@@ -327,7 +327,7 @@ class Sitemap
     }
 
     /**
-     * @return \Wszetko\Sitemap\Interfaces\XML|null
+     * @return XML|null
      */
     public function getXml(): ?XML
     {
@@ -336,7 +336,7 @@ class Sitemap
 
     /**
      * @param string $driver
-     * @param array  $config
+     * @param array $config
      */
     public function setXml(string $driver, array $config = []): void
     {
@@ -406,7 +406,7 @@ class Sitemap
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function generateSitemaps(): array
     {
@@ -510,9 +510,9 @@ class Sitemap
 
     /**
      * @param string $dir
-     * @param array  $files
+     * @param array $files
      *
-     * @throws \Exception
+     * @throws Exception
      */
     private function compressFiles(string $dir, array &$files)
     {
@@ -551,7 +551,7 @@ class Sitemap
      *
      * @return array
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function generateSitemapsIndex(array $sitemaps): array
     {

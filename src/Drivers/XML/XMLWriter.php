@@ -37,7 +37,7 @@ class XMLWriter implements XML
     /**
      * XMLWriter constructor.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct(array $config)
     {
@@ -84,7 +84,7 @@ class XMLWriter implements XML
 
     /**
      * @param string $sitemap
-     * @param array  $extensions
+     * @param array $extensions
      */
     public function openSitemap(string $sitemap, array $extensions = []): void
     {
@@ -157,7 +157,7 @@ class XMLWriter implements XML
      * Remove whitespace chars from end of file (Google don't like them)
      *
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     private function endFile(): void
     {
@@ -211,15 +211,17 @@ class XMLWriter implements XML
         $this->flushData();
     }
 
-    private function startElement($name, $namespace = null, $uri = null): bool
+    private function addElement(string $element, $value, ?string $namespace = null): void
     {
-        if ($namespace) {
-            $result = $this->getXMLWriter()->startElementNS($namespace, $name, $uri);
+        if (!is_array($value)) {
+            $this->getXMLWriter()->writeElement(($namespace ? $namespace . ':' : '') . $element, (string)$value);
         } else {
-            $result = $this->getXMLWriter()->startElement($name);
+            if (isset($value['_namespace'])) {
+                $this->addElementNS($value['_element'], $value[$value['_element']], $namespace);
+            } else {
+                $this->addElementArray($element, $value, $namespace);
+            }
         }
-
-        return $result;
     }
 
     private function addElementNS(string $element, $value, ?string $namespace = null): void
@@ -234,12 +236,23 @@ class XMLWriter implements XML
         $this->getXMLWriter()->endElement();
     }
 
+    private function startElement($name, $namespace = null, $uri = null): bool
+    {
+        if ($namespace) {
+            $result = $this->getXMLWriter()->startElementNS($namespace, $name, $uri);
+        } else {
+            $result = $this->getXMLWriter()->startElement($name);
+        }
+
+        return $result;
+    }
+
     private function addElementArray(string $element, $value, ?string $namespace = null): void
     {
         if (!$this->isAssoc($value)) {
             $this->addElementArrayNonAssoc($element, $value, $namespace);
         } else {
-            $this->getXMLWriter()->startElement(($namespace ? $namespace.':' : '').$element);
+            $this->getXMLWriter()->startElement(($namespace ? $namespace . ':' : '') . $element);
 
             if (isset($value['_attributes'])) {
                 foreach ($value['_attributes'] as $attribute => $val) {
@@ -252,7 +265,7 @@ class XMLWriter implements XML
                             $this->addElement($el, $val);
                         }
                     } else {
-                        $this->getXMLWriter()->text((string) $value['_value']);
+                        $this->getXMLWriter()->text((string)$value['_value']);
                     }
                 }
             } else {
@@ -260,13 +273,24 @@ class XMLWriter implements XML
                     if (is_array($val)) {
                         $this->addElement($el, $val, $namespace);
                     } else {
-                        $this->getXMLWriter()->writeElement(($namespace ? $namespace.':' : '') . $el, (string) $val);
+                        $this->getXMLWriter()->writeElement(($namespace ? $namespace . ':' : '') . $el, (string)$val);
                     }
                 }
             }
 
             $this->getXMLWriter()->endElement();
         }
+    }
+
+    private function isAssoc(array $array): bool
+    {
+        foreach ($array as $key => $val) {
+            if (!is_integer($key)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function addElementArrayNonAssoc(string $element, $value, ?string $namespace = null): void
@@ -278,17 +302,46 @@ class XMLWriter implements XML
         }
     }
 
-    private function addElement(string $element, $value, ?string $namespace = null): void
+    /**
+     * @param string $sitemap
+     */
+    public function openSitemapIndex(string $sitemap): void
     {
-        if (!is_array($value)) {
-            $this->getXMLWriter()->writeElement(($namespace ? $namespace . ':' : '') . $element, (string)$value);
-        } else {
-            if (isset($value['_namespace'])) {
-                $this->addElementNS($value['_element'], $value[$value['_element']], $namespace);
-            } else {
-                $this->addElementArray($element, $value, $namespace);
-            }
+        $this->setCurrentSitemap($sitemap);
+        $this->getXMLWriter()->openMemory();
+        $this->getXMLWriter()->startDocument('1.0', 'UTF-8');
+        $this->getXMLWriter()->setIndent(true);
+        $this->getXMLWriter()->startElement('sitemapindex');
+        $this->getXMLWriter()->writeAttribute('xmlns', Sitemap::SCHEMA);
+        $this->flushData();
+    }
+
+    /**
+     *
+     */
+    public function closeSitemapIndex(): void
+    {
+        $this->getXMLWriter()->endElement();
+        $this->getXMLWriter()->endDocument();
+        $this->flushData();
+        $this->endFile();
+    }
+
+    /**
+     * @param string $sitemap
+     * @param ?string $lastmod
+     */
+    public function addSitemap(string $sitemap, string $lastmod = null): void
+    {
+        $this->getXMLWriter()->startElement('sitemap');
+        $this->getXMLWriter()->writeElement('loc', $sitemap);
+
+        if (isset($lastmod)) {
+            $this->getXMLWriter()->writeElement('lastmod', $lastmod);
         }
+
+        $this->getXMLWriter()->endElement();
+        $this->flushData();
     }
 
     private function _addElement(string $element, $value, ?string $namespace = null): void
@@ -344,58 +397,5 @@ class XMLWriter implements XML
                 }
             }
         }
-    }
-
-    private function isAssoc(array $array): bool
-    {
-        foreach ($array as $key => $val) {
-            if (!is_integer($key)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param string $sitemap
-     */
-    public function openSitemapIndex(string $sitemap): void
-    {
-        $this->setCurrentSitemap($sitemap);
-        $this->getXMLWriter()->openMemory();
-        $this->getXMLWriter()->startDocument('1.0', 'UTF-8');
-        $this->getXMLWriter()->setIndent(true);
-        $this->getXMLWriter()->startElement('sitemapindex');
-        $this->getXMLWriter()->writeAttribute('xmlns', Sitemap::SCHEMA);
-        $this->flushData();
-    }
-
-    /**
-     *
-     */
-    public function closeSitemapIndex(): void
-    {
-        $this->getXMLWriter()->endElement();
-        $this->getXMLWriter()->endDocument();
-        $this->flushData();
-        $this->endFile();
-    }
-
-    /**
-     * @param string $sitemap
-     * @param ?string $lastmod
-     */
-    public function addSitemap(string $sitemap, string $lastmod = null): void
-    {
-        $this->getXMLWriter()->startElement('sitemap');
-        $this->getXMLWriter()->writeElement('loc', $sitemap);
-
-        if (isset($lastmod)) {
-            $this->getXMLWriter()->writeElement('lastmod', $lastmod);
-        }
-
-        $this->getXMLWriter()->endElement();
-        $this->flushData();
     }
 }

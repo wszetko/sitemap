@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Wszetko\Sitemap\Tests;
 
+use DateTime;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Wszetko\Sitemap\Items;
 
@@ -15,16 +17,16 @@ class NewsTest extends TestCase
 {
     public function testConstructor()
     {
-        $news = new Items\News('News name', 'pl', new \DateTime('2014-02-14'), 'Title');
+        $news = new Items\News('News name', 'pl', new DateTime('2014-02-14'), 'Title');
         $this->assertInstanceOf(Items\News::class, $news);
 
-        $news = new Items\News('News name', 'zh-cn', new \DateTime('2014-02-14'), 'Title');
+        $news = new Items\News('News name', 'zh-cn', new DateTime('2014-02-14'), 'Title');
         $this->assertInstanceOf(Items\News::class, $news);
 
-        $news = new Items\News('News name', 'zh-tw', new \DateTime('2014-02-14'), 'Title');
+        $news = new Items\News('News name', 'zh-tw', new DateTime('2014-02-14'), 'Title');
         $this->assertInstanceOf(Items\News::class, $news);
 
-        $news = new Items\News('News name', 'csb', new \DateTime('2014-02-14'), 'Title');
+        $news = new Items\News('News name', 'csb', new DateTime('2014-02-14'), 'Title');
         $this->assertInstanceOf(Items\News::class, $news);
 
         $news = new Items\News('News name', 'en', '2014-02-14', 'Title');
@@ -33,42 +35,42 @@ class NewsTest extends TestCase
 
     public function testConstructorExceptionName()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid publication name parameter.');
         $news = new Items\News('', 'en', '2014-02-14', 'Title');
     }
 
     public function testConstructorExceptionLang()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid publication lang parameter.');
         new Items\News('News name', 'invalid', '2014-02-14', 'Title');
     }
 
     public function testConstructorExceptionInvalidDate()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid publication date parameter.');
         new Items\News('News name', 'en', '0000-00-00', 'Title');
     }
 
     public function testConstructorExceptionNoDate()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid publication date parameter.');
         new Items\News('News name', 'en', 'Thi is no date', 'Title');
     }
 
     public function testGetPublicationName()
     {
-        $news = new Items\News('News name', 'pl', new \DateTime('2014-08-01'), 'Title');
+        $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
 
         $this->assertEquals('News name', $news->getPublicationName());
     }
 
     public function testGetPublicationLanguage()
     {
-        $news = new Items\News('News name', 'pl', new \DateTime('2014-08-01'), 'Title');
+        $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
 
         $this->assertEquals('pl', $news->getPublicationLanguage());
     }
@@ -77,7 +79,7 @@ class NewsTest extends TestCase
     {
         date_default_timezone_set('Europe/London');
 
-        $news = new Items\News('News name', 'pl', new \DateTime('2013-11-01'), 'Title');
+        $news = new Items\News('News name', 'pl', new DateTime('2013-11-01'), 'Title');
 
         $this->assertEquals('2013-11-01', $news->getPublicationDate());
 
@@ -85,21 +87,21 @@ class NewsTest extends TestCase
 
         $this->assertEquals('2015-09-05', $news->getPublicationDate());
 
-        $news = new Items\News('News name', 'pl', new \DateTime('2013-11-01 16:40:00'), 'Title');
+        $news = new Items\News('News name', 'pl', new DateTime('2013-11-01 16:40:00'), 'Title');
 
         $this->assertEquals('2013-11-01T16:40:00+00:00', $news->getPublicationDate());
     }
 
     public function testGetTitle()
     {
-        $news = new Items\News('News name', 'pl', new \DateTime('2014-08-01'), 'Title');
+        $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
 
         $this->assertEquals('Title', $news->getTitle());
     }
 
     public function testAccess()
     {
-        $news = new Items\News('News name', 'pl', new \DateTime('2014-08-01'), 'Title');
+        $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
 
         $news->setAccess('Subscription');
         $this->assertEquals('Subscription', $news->getAccess());
@@ -113,7 +115,7 @@ class NewsTest extends TestCase
 
     public function testGenres()
     {
-        $news = new Items\News('News name', 'pl', new \DateTime('2014-08-01'), 'Title');
+        $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
 
         $news->addGenres('Blog');
         $this->assertEquals('Blog', $news->getGenres());
@@ -133,7 +135,7 @@ class NewsTest extends TestCase
 
     public function testKeywords()
     {
-        $news = new Items\News('News name', 'pl', new \DateTime('2014-08-01'), 'Title');
+        $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
 
         $news->addKeywords('Test1');
         $this->assertEquals('Test1', $news->getKeywords());
@@ -144,7 +146,7 @@ class NewsTest extends TestCase
 
     public function testStockTickers()
     {
-        $news = new Items\News('News name', 'pl', new \DateTime('2014-08-01'), 'Title');
+        $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
 
         $news->addStockTickers('NASDAQ:AMAT');
         $this->assertEquals('NASDAQ:AMAT', $news->getStockTickers());
@@ -160,7 +162,7 @@ class NewsTest extends TestCase
     {
         date_default_timezone_set('Europe/London');
 
-        $news = new Items\News('News name', 'pl', new \DateTime('2014-08-01'), 'Title');
+        $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
         $news->setAccess('Subscription');
         $news->addGenres('Blog');
         $news->addKeywords('Test1');

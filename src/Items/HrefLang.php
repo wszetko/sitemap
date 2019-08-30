@@ -61,18 +61,6 @@ class HrefLang extends Extension
     /**
      * @return array
      */
-    public function getHrefLangs(): array
-    {
-        foreach ($this->hrefLang as &$href) {
-            $href = $this->getDomain() . $href;
-        }
-
-        return $this->hrefLang;
-    }
-
-    /**
-     * @return array
-     */
     public function toArray(): array
     {
         $array = [
@@ -92,5 +80,17 @@ class HrefLang extends Extension
         }
 
         return $array;
+    }
+
+    /**
+     * @return array
+     */
+    public function getHrefLangs(): array
+    {
+        foreach ($this->hrefLang as &$href) {
+            $href = $this->getDomain() . $href;
+        }
+
+        return $this->hrefLang;
     }
 }
