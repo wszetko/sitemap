@@ -32,6 +32,7 @@
   "autoload": {
     "psr-4": {
       "Wszetko\\Sitemap\\": "src"
-    }
+    },
+    "files" : ["src/Compatibility/array_key_first.php"]
   }
 }
