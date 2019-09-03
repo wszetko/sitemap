@@ -65,6 +65,9 @@ class Url implements Item
         $this->domainIsRequired = true;
     }
 
+    /**
+     * @return array
+     */
     public function toArray(): array
     {
         $array = [
@@ -166,7 +169,7 @@ class Url implements Item
     }
 
     /**
-     * @return array
+     * @return Extension[]
      */
     public function getExtensions(): array
     {

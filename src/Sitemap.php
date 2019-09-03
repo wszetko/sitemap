@@ -351,8 +351,7 @@ class Sitemap
     }
 
     /**
-     * @param $dir
-     * @param $pattern
+     * @param string $dir
      */
     private function removeDir($dir)
     {

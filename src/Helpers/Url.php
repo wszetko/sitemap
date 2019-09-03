@@ -21,7 +21,7 @@ class Url
     {
         $encodedUrl = preg_replace_callback(
             '%[^:/@?&=#]+%usD',
-            function ($matches) {
+            function($matches) {
                 return rawurlencode($matches[0]);
             },
             $url
@@ -62,7 +62,7 @@ class Url
 
         if (!empty($url['query'])) {
             parse_str($url['query'], $query);
-            array_walk($query, function (&$val, &$var) {
+            array_walk($query, function(&$val, &$var) {
                 $var = rawurlencode($var);
                 $val = rawurlencode($val);
             });

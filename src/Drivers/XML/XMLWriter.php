@@ -213,6 +213,11 @@ class XMLWriter implements XML
         $this->flushData();
     }
 
+    /**
+     * @param string      $element
+     * @param             $value
+     * @param string|null $namespace
+     */
     private function addElement(string $element, $value, ?string $namespace = null): void
     {
         if (!is_array($value)) {
@@ -226,6 +231,11 @@ class XMLWriter implements XML
         }
     }
 
+    /**
+     * @param string      $element
+     * @param             $value
+     * @param string|null $namespace
+     */
     private function addElementNS(string $element, $value, ?string $namespace = null): void
     {
         $this->startElement($element, $namespace, null);
@@ -237,6 +247,13 @@ class XMLWriter implements XML
         $this->getXMLWriter()->endElement();
     }
 
+    /**
+     * @param      $name
+     * @param null $namespace
+     * @param null $uri
+     *
+     * @return bool
+     */
     private function startElement($name, $namespace = null, $uri = null): bool
     {
         if ($namespace) {
@@ -248,6 +265,11 @@ class XMLWriter implements XML
         return $result;
     }
 
+    /**
+     * @param string      $element
+     * @param             $value
+     * @param string|null $namespace
+     */
     private function addElementArray(string $element, $value, ?string $namespace = null): void
     {
         if (!$this->isAssoc($value)) {
@@ -281,6 +303,11 @@ class XMLWriter implements XML
         }
     }
 
+    /**
+     * @param array $array
+     *
+     * @return bool
+     */
     private function isAssoc(array $array): bool
     {
         foreach ($array as $key => $val) {
@@ -292,6 +319,11 @@ class XMLWriter implements XML
         return false;
     }
 
+    /**
+     * @param string      $element
+     * @param             $value
+     * @param string|null $namespace
+     */
     private function addElementArrayNonAssoc(string $element, $value, ?string $namespace = null): void
     {
         foreach ($value as $val) {
@@ -339,6 +371,11 @@ class XMLWriter implements XML
         $this->flushData();
     }
 
+    /**
+     * @param string      $element
+     * @param             $value
+     * @param string|null $namespace
+     */
     private function _addElement(string $element, $value, ?string $namespace = null): void
     {
         $begin = '';
