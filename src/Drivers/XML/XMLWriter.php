@@ -281,6 +281,13 @@ class XMLWriter implements XML
         }
     }
 
+    private function addElementArrayNonAssoc(string $element, $value, ?string $namespace = null): void
+    {
+        foreach ($value as $val) {
+            $this->addElement($element, $val, $namespace);
+        }
+    }
+
     private function isAssoc(array $array): bool
     {
         foreach ($array as $key => $val) {
@@ -290,15 +297,6 @@ class XMLWriter implements XML
         }
 
         return false;
-    }
-
-    private function addElementArrayNonAssoc(string $element, $value, ?string $namespace = null): void
-    {
-        foreach ($value as $val) {
-            if (is_array($val)) {
-                $this->addElement($element, $val, $namespace);
-            }
-        }
     }
 
     /**

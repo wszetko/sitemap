@@ -50,14 +50,14 @@ class Video extends Extension
     /**
      * URL pointing to the actual media file (mp4).
      *
-     * @var string
+     * @var array
      */
     protected $contentLoc;
 
     /**
      * URL pointing to the player file (normally a SWF).
      *
-     * @var string|array
+     * @var array
      */
     protected $playerLoc;
 
@@ -242,20 +242,36 @@ class Video extends Extension
             ]
         ];
 
-        if (!empty($this->getContentLoc()) && $this->getContentLoc() != $this->getDomain()) {
-            $array['video']['content_loc'] = $this->getContentLoc();
+        if (!empty($this->getContentLoc())) {
+            foreach ($this->getContentLoc() as $contentLoc) {
+                if ($contentLoc != $this->getDomain()) {
+                    if (!isset($array['video']['content_loc'])) {
+                        $array['video']['content_loc'] = [];
+                    }
+
+                    $array['video']['content_loc'][] = $contentLoc;
+                }
+            }
         }
 
-        if (!empty($this->getPlayerLoc()) && $this->getPlayerLoc() != $this->getDomain()) {
-            if (is_array($this->getPlayerLoc())) {
-                $playerLoc = array_key_first($this->getPlayerLoc());
-                $array['video']['player_loc'] = [
-                    '_attributes' => ['allow_embed' => $this->getPlayerLoc()[$playerLoc]],
-                    '_value' => $playerLoc
-                ];
-            } else {
-                $array['video']['player_loc'] = $this->getPlayerLoc();
-            }
+        if (!empty($this->getPlayerLoc())) {
+           foreach ($this->getPlayerLoc() as $playerLoc) {
+               if ($playerLoc != $this->getDomain()) {
+                   if (!isset($array['video']['player_loc'])) {
+                       $array['video']['player_loc'] = [];
+                   }
+                   if (is_array($playerLoc)) {
+                       $loc = array_key_first($playerLoc);
+                       $array['video']['player_loc'][] = [
+                           '_attributes' => ['allow_embed' => $playerLoc[$loc]],
+                           '_value' => $loc
+                       ];
+                   } else {
+                       $array['video']['player_loc'][] = $playerLoc;
+                   }
+               }
+           }
+
         }
 
         if (!empty($this->getDuration())) {
@@ -362,15 +378,21 @@ class Video extends Extension
     /**
      * URL pointing to the actual media file (mp4).
      *
-     * @return string
+     * @return array
      *
      * @throws \InvalidArgumentException
      */
-    public function getContentLoc(): ?string
+    public function getContentLoc(): ?array
     {
         if ($this->getDomain()) {
-            if ($this->contentLoc) {
-                return \Wszetko\Sitemap\Helpers\Url::normalizeUrl($this->getDomain() . $this->contentLoc);
+            if (!empty($this->contentLoc)) {
+                $result = [];
+
+                foreach ($this->contentLoc as $contentLoc) {
+                    $result[] = \Wszetko\Sitemap\Helpers\Url::normalizeUrl($this->getDomain() . $contentLoc);
+                }
+
+                return $result;
             } else {
                 return null;
             }
@@ -386,9 +408,11 @@ class Video extends Extension
      *
      * @return self
      */
-    public function setContentLoc(string $contentLoc): self
+    public function addContentLoc(string $contentLoc): self
     {
-        $this->contentLoc = '/' . ltrim($contentLoc, '/');
+        if (!empty($contentLoc)) {
+            $this->contentLoc[] = '/' . ltrim($contentLoc, '/');
+        }
 
         return $this;
     }
@@ -403,10 +427,20 @@ class Video extends Extension
     public function getPlayerLoc()
     {
         if ($this->getDomain()) {
-            if (is_string($this->playerLoc)) {
-                return \Wszetko\Sitemap\Helpers\Url::normalizeUrl($this->getDomain() . $this->playerLoc);
-            } elseif (is_array($this->playerLoc)) {
-                return [\Wszetko\Sitemap\Helpers\Url::normalizeUrl($this->getDomain() . array_key_first($this->playerLoc)) => array_values($this->playerLoc)[0]];
+            if (!empty($this->playerLoc)) {
+                $result = [];
+
+                foreach ($this->playerLoc as $playerLoc) {
+                    if (is_string($playerLoc)) {
+                        $result[] = \Wszetko\Sitemap\Helpers\Url::normalizeUrl($this->getDomain() . $playerLoc);
+                    } elseif (is_array($playerLoc)) {
+                        $result[] = [\Wszetko\Sitemap\Helpers\Url::normalizeUrl($this->getDomain() . array_key_first($playerLoc)) => array_values($playerLoc)[0]];
+                    }
+                }
+
+                return $result;
+            } else {
+                return null;
             }
         } else {
             throw new InvalidArgumentException('Domain is not set.');
@@ -419,15 +453,15 @@ class Video extends Extension
      *
      * @return self
      */
-    public function setPlayerLoc(string $playerLoc, $allowEmbed = null): self
+    public function addPlayerLoc(string $playerLoc, $allowEmbed = null): self
     {
         $playerLoc = '/' . ltrim($playerLoc, '/');
 
         if (!empty($playerLoc)) {
             if ($allowEmbed !== null) {
-                $this->playerLoc = [$playerLoc => $allowEmbed];
+                $this->playerLoc[] = [$playerLoc => $allowEmbed];
             } else {
-                $this->playerLoc = $playerLoc;
+                $this->playerLoc[] = $playerLoc;
             }
         }
 

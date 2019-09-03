@@ -36,31 +36,39 @@ class VideoTest extends TestCase
     {
         $video = new Video('thumb.png', 'Video', 'Description');
         $video->setDomain('https://example.com');
-        $video->setContentLoc('example/test');
-        $this->assertEquals('https://example.com/example/test', $video->getContentLoc());
+        $video->addContentLoc('example/test');
+        $this->assertEquals(['https://example.com/example/test'], $video->getContentLoc());
 
         $video = new Video('thumb.png', 'Video', 'Description');
         $video->setDomain('https://example.com');
-        $video->setContentLoc('/example/test');
-        $this->assertEquals('https://example.com/example/test', $video->getContentLoc());
+        $video->addContentLoc('/example/test');
+        $this->assertEquals(['https://example.com/example/test'], $video->getContentLoc());
+
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $video->setDomain('https://example.com');
+        $this->assertNull($video->getContentLoc());
     }
 
     public function testPlayerLoc()
     {
         $video = new Video('thumb.png', 'Video', 'Description');
         $video->setDomain('https://example.com');
-        $video->setPlayerLoc('/player.swf');
-        $this->assertEquals('https://example.com/player.swf', $video->getPlayerLoc());
+        $video->addPlayerLoc('/player.swf');
+        $this->assertEquals(['https://example.com/player.swf'], $video->getPlayerLoc());
 
         $video = new Video('thumb.png', 'Video', 'Description');
         $video->setDomain('https://example.com');
-        $video->setPlayerLoc('player.swf');
-        $this->assertEquals('https://example.com/player.swf', $video->getPlayerLoc());
+        $video->addPlayerLoc('player.swf');
+        $this->assertEquals(['https://example.com/player.swf'], $video->getPlayerLoc());
 
         $video = new Video('thumb.png', 'Video', 'Description');
         $video->setDomain('https://example.com');
-        $video->setPlayerLoc('/player.swf', 'Yes');
-        $this->assertEquals(['https://example.com/player.swf' => 'Yes'], $video->getPlayerLoc());
+        $video->addPlayerLoc('/player.swf', 'Yes');
+        $this->assertEquals([['https://example.com/player.swf' => 'Yes']], $video->getPlayerLoc());
+
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $video->setDomain('https://example.com');
+        $this->assertNull($video->getPlayerLoc());
     }
 
     public function testThumbnailLoc()
@@ -78,12 +86,18 @@ class VideoTest extends TestCase
     {
         $video = new Video('thumb.png', 'Video', 'Description');
         $this->assertEquals('Video', $video->getTitle());
+
+        $video = new Video('thumb.png', 'VideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoMOREthan100chars', 'Description');
+        $this->assertEquals('VideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideo', $video->getTitle());
     }
 
     public function testGetDescription()
     {
         $video = new Video('thumb.png', 'Video', 'Description');
         $this->assertEquals('Description', $video->getDescription());
+
+        $video = new Video('thumb.png', 'Video', 'Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one.');
+        $this->assertEquals('Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one', $video->getDescription());
     }
 
     public function testDuration()
@@ -313,8 +327,8 @@ class VideoTest extends TestCase
     {
         $video = new Video('thumb.png', 'Video', 'Description');
         $video->setDomain('https://example.com');
-        $video->setContentLoc('example/test');
-        $video->setPlayerLoc('/player.swf', 'Yes');
+        $video->addContentLoc('example/test');
+        $video->addPlayerLoc('/player.swf', 'Yes');
         $video->setDuration(60);
         $video->setExpirationDate('2020-01-01');
         $video->setPublicationDate('2018-01-01');
@@ -338,10 +352,14 @@ class VideoTest extends TestCase
                 'thumbnail_loc' => 'https://example.com/thumb.png',
                 'title' => 'Video',
                 'description' => 'Description',
-                'content_loc' => 'https://example.com/example/test',
+                'content_loc' => [
+                    'https://example.com/example/test'
+                ],
                 'player_loc' => [
-                    '_attributes' => ['allow_embed' => 'Yes'],
-                    '_value' => 'https://example.com/player.swf'
+                    [
+                        '_attributes' => ['allow_embed' => 'Yes'],
+                        '_value' => 'https://example.com/player.swf'
+                    ]
                 ],
                 'duration' => 60,
                 'expiration_date' => '2020-01-01',
@@ -381,7 +399,7 @@ class VideoTest extends TestCase
 
         $video = new Video('thumb.png', 'Video', 'Description');
         $video->setDomain('https://example.com');
-        $video->setPlayerLoc('/player.swf');
+        $video->addPlayerLoc('/player.swf');
         $video->setUploader('UserName');
 
         $this->assertEquals([
@@ -391,7 +409,7 @@ class VideoTest extends TestCase
                 'thumbnail_loc' => 'https://example.com/thumb.png',
                 'title' => 'Video',
                 'description' => 'Description',
-                'player_loc' => 'https://example.com/player.swf',
+                'player_loc' => ['https://example.com/player.swf'],
                 'uploader' => 'UserName'
             ]
         ], $video->toArray());

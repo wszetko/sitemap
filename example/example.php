@@ -55,7 +55,10 @@ try {
 
     // Add Video extension
     $video = (new Wszetko\Sitemap\Items\Video('/thumb.png', 'Video title', 'Video desc'))
-        ->setContentLoc('/video.avi')
+        ->addContentLoc('/video.avi')
+        ->addContentLoc('/video.mp4')
+        ->addPlayerLoc('player.swf', 'Yes')
+        ->addPlayerLoc('player2.swf')
         ->setPrice(10, 'PLN', 'rent', 'hd')
         ->setDuration(10)
         ->setExpirationDate(new DateTime('now'))
