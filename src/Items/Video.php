@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Wszetko\Sitemap\Items;
 
 use DateTimeInterface;
-use InvalidArgumentException;
+use InvalidArgumentException as InvalidArgumentException;
 use Wszetko\Sitemap\Traits\DateTime;
 
 /**
@@ -181,9 +181,15 @@ class Video extends Extension
      * @param string $thumbnailLoc
      * @param string $title
      * @param string $description
+     *
+     * @throws InvalidArgumentException
      */
     public function __construct($thumbnailLoc, $title, $description)
     {
+        if (!\Wszetko\Sitemap\Helpers\Url::normalizeUrl('https://example.com' . $thumbnailLoc)) {
+            throw new InvalidArgumentException('Invalid thumbnail location parameter.');
+        }
+
         $this->thumbnailLoc = '/' . ltrim($thumbnailLoc, '/');
         $this->title = mb_substr($title, 0, 100);
         $this->description = mb_substr($description, 0, 2048);
@@ -192,9 +198,9 @@ class Video extends Extension
     /**
      * The currency used for the price.
      *
-     * @return string
+     * @return string|null
      */
-    public function getCurrency(): string
+    public function getCurrency(): ?string
     {
         return $this->currency;
     }
@@ -208,7 +214,11 @@ class Video extends Extension
      */
     public function setCurrency(string $currency): self
     {
-        $this->currency = $currency;
+        preg_match_all("/^(?'currency'[A-Z]{3})$/", $currency, $matches);
+
+        if (!empty($matches['currency'])) {
+            $this->currency = $matches['currency'][0];
+        }
 
         return $this;
     }
@@ -232,11 +242,11 @@ class Video extends Extension
             ]
         ];
 
-        if (!empty($this->getContentLoc())) {
+        if (!empty($this->getContentLoc()) && $this->getContentLoc() != $this->getDomain()) {
             $array['video']['content_loc'] = $this->getContentLoc();
         }
 
-        if (!empty($this->getPlayerLoc())) {
+        if (!empty($this->getPlayerLoc()) && $this->getPlayerLoc() != $this->getDomain()) {
             if (is_array($this->getPlayerLoc())) {
                 $playerLoc = array_key_first($this->getPlayerLoc());
                 $array['video']['player_loc'] = [
@@ -353,14 +363,20 @@ class Video extends Extension
      * URL pointing to the actual media file (mp4).
      *
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     public function getContentLoc(): ?string
     {
-        if ($contentLoc = \Wszetko\Sitemap\Helpers\Url::normalizeUrl($this->getDomain() . $this->contentLoc)) {
-            return $contentLoc;
+        if ($this->getDomain()) {
+            if ($this->contentLoc) {
+                return \Wszetko\Sitemap\Helpers\Url::normalizeUrl($this->getDomain() . $this->contentLoc);
+            } else {
+                return null;
+            }
+        } else {
+            throw new InvalidArgumentException('Domain is not set.');
         }
-
-        return null;
     }
 
     /**
@@ -381,10 +397,20 @@ class Video extends Extension
      * Player location information
      *
      * @return string|array
+     *
+     * @throws \InvalidArgumentException
      */
     public function getPlayerLoc()
     {
-        return $this->playerLoc;
+        if ($this->getDomain()) {
+            if (is_string($this->playerLoc)) {
+                return \Wszetko\Sitemap\Helpers\Url::normalizeUrl($this->getDomain() . $this->playerLoc);
+            } elseif (is_array($this->playerLoc)) {
+                return [\Wszetko\Sitemap\Helpers\Url::normalizeUrl($this->getDomain() . array_key_first($this->playerLoc)) => array_values($this->playerLoc)[0]];
+            }
+        } else {
+            throw new InvalidArgumentException('Domain is not set.');
+        }
     }
 
     /**
@@ -415,11 +441,7 @@ class Video extends Extension
      */
     public function getThumbnailLoc(): string
     {
-        if (!($thumbnailLoc = \Wszetko\Sitemap\Helpers\Url::normalizeUrl($this->getDomain() . $this->thumbnailLoc))) {
-            throw new InvalidArgumentException('Invalid thumbnail location parameter');
-        }
-
-        return $thumbnailLoc;
+        return \Wszetko\Sitemap\Helpers\Url::normalizeUrl($this->getDomain() . $this->thumbnailLoc);
     }
 
     /**
@@ -487,7 +509,9 @@ class Video extends Extension
      */
     public function setExpirationDate($expirationDate): self
     {
-        $this->expirationDate = $this->processDateTime($expirationDate);
+        if ($dateTime = $this->processDateTime($expirationDate)) {
+            $this->expirationDate = $dateTime;
+        }
 
         return $this;
     }
@@ -549,7 +573,7 @@ class Video extends Extension
      */
     public function getPublicationDate(): ?string
     {
-        $this->publicationDate;
+        return $this->publicationDate;
     }
 
     /**
@@ -561,7 +585,10 @@ class Video extends Extension
      */
     public function setPublicationDate($publicationDate): self
     {
-        $this->publicationDate = $this->processDateTime($publicationDate);
+        if ($dateTime = $this->processDateTime($publicationDate)) {
+            $this->publicationDate = $dateTime;
+        }
+
         return $this;
     }
 

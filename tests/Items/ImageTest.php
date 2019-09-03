@@ -27,8 +27,6 @@ class ImageTest extends TestCase
 
         $this->assertEquals('https://example.com/image.png', $image->getLoc());
 
-        unset($image);
-
         $image = new Items\Image('/image.png');
         $image->setDomain('https://example.com');
 
@@ -63,11 +61,10 @@ class ImageTest extends TestCase
     {
         $image = new Items\Image('image.png');
         $image->setLicense('https://example/licence.txt');
-
         $this->assertEquals('https://example/licence.txt', $image->getLicense());
 
+        $image = new Items\Image('image.png');
         $image->setLicense('Invalid Licence');
-
         $this->assertNull($image->getLicense());
     }
 

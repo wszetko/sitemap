@@ -16,10 +16,11 @@ To do
 * Driver DataCollector MongoDB
 * Driver DataCollector CrunchDB (?)
 * Ability to generate sitemap without publishing
-* Ability to publish sitemap without celaring previous files
+* Ability to publish sitemap without clearing previous files
 * Logging compatible with PSR-3
-* Better LastMod date checking in Extensions
-* Move duplicate parts from Extensions to Triat
+* Ext. Video gallery_loc title support
+* Improve URL Normalization
+* More flexible input value (bool ==> yes/no etc.)
 
 ## License
 

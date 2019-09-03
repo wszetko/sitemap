@@ -115,7 +115,9 @@ class Url implements Item
      */
     public function setLastMod($lastMod): self
     {
-        $this->lastMod = $this->processDateTime($lastMod);
+        if ($lastMod = $this->processDateTime($lastMod)) {
+            $this->lastMod = $lastMod;
+        }
 
         return $this;
     }
@@ -137,8 +139,6 @@ class Url implements Item
     {
         if (in_array($changeFreq, Sitemap::CHANGEFREQ)) {
             $this->changeFreq = $changeFreq;
-        } else {
-            $this->changeFreq = null;
         }
 
         return $this;
@@ -161,8 +161,6 @@ class Url implements Item
     {
         if ($priority >= 0 && $priority <= 1) {
             $this->priority = $priority;
-        } else {
-            $this->priority = null;
         }
 
         return $this;

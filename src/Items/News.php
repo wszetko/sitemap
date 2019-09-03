@@ -214,8 +214,6 @@ class News extends Extension
     {
         if (in_array($access, ['Subscription', 'Registration'])) {
             $this->access = $access;
-        } else {
-            $this->access = null;
         }
 
         return $this;

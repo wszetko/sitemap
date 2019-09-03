@@ -102,13 +102,14 @@ class NewsTest extends TestCase
     public function testAccess()
     {
         $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
-
         $news->setAccess('Subscription');
         $this->assertEquals('Subscription', $news->getAccess());
 
+        $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
         $news->setAccess('Registration');
         $this->assertEquals('Registration', $news->getAccess());
 
+        $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
         $news->setAccess('Invalid');
         $this->assertNull($news->getAccess());
     }

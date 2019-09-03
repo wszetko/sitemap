@@ -199,8 +199,6 @@ class Image extends Extension
     {
         if ($license = \Wszetko\Sitemap\Helpers\Url::normalizeUrl($license)) {
             $this->license = $license;
-        } else {
-            $this->license = null;
         }
 
         return $this;

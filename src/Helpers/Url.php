@@ -23,7 +23,7 @@ class Url
         $encodedUrl = preg_replace_callback(
             '%[^:/@?&=#]+%usD',
             function ($matches) {
-                return urlencode($matches[0]);
+                return rawurlencode($matches[0]);
             },
             $url
         );
@@ -41,10 +41,42 @@ class Url
             return false;
         }
 
+        if (!empty($url['path'])) {
+            $url['path'] = explode('/', $url['path']);
+
+            $parts = [];
+
+            foreach ($url['path'] as $element) {
+                switch ($element) {
+                    case '.':
+                        break;
+                    case '..':
+                        array_pop($parts);
+                        break;
+                    default:
+                        $parts[] = rawurlencode($element);
+                        break;
+                }
+            }
+
+            $url['path'] = implode('/', $parts);
+        }
+
+        if (!empty($url['query'])) {
+            parse_str($url['query'], $query);
+
+            array_walk($query, function(&$val, &$var){
+                $var = rawurlencode($var);
+                $val = rawurlencode($val);
+            });
+
+            $url['query'] = http_build_query($query);
+        }
+
         return
             $url['scheme'] . '://'
             . (isset($url['user']) ? $url['user'] . ((isset($url['pass'])) ? ':' . $url['pass'] : '') . '@' : '')
-            . $url['host']
+            . strtolower($url['host'])
             . ((isset($url['port'])) ? ':' . $url['port'] : '')
             . ((isset($url['path'])) ? $url['path'] : '')
             . ((isset($url['query'])) ? '?' . $url['query'] : '')
@@ -58,6 +90,10 @@ class Url
      */
     public static function checkDomain(string $domain): bool
     {
+        if (substr($domain, -1) == '.' || substr($domain, 0, 1) == '.') {
+            return false;
+        }
+
         $domain = idn_to_ascii($domain, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46);
 
         return (bool) filter_var($domain, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME);

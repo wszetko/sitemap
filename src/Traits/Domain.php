@@ -19,9 +19,9 @@ trait Domain
     private $domainIsRequired = false;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getDomain(): string
+    public function getDomain(): ?string
     {
         return $this->domain;
     }

@@ -53,19 +53,21 @@ class UrlTest extends TestCase
         date_default_timezone_set('Europe/London');
 
         $url = new Items\Url('test');
-        $url->setDomain('https://example.com');
-
         $this->assertNull($url->getLastMod());
 
+        $url = new Items\Url('test');
         $url->setLastMod(new DateTime('2013-11-16'));
         $this->assertEquals('2013-11-16', $url->getLastMod());
 
+        $url = new Items\Url('test');
         $url->setLastMod(new DateTime('2013-11-16 19:00'));
         $this->assertEquals('2013-11-16T19:00:00+00:00', $url->getLastMod());
 
+        $url = new Items\Url('test');
         $url->setLastMod(new DateTime('0000-00-00 00:00'));
         $this->assertNull($url->getLastMod());
 
+        $url = new Items\Url('test');
         $url->setLastMod('2013-12-11');
         $this->assertEquals('2013-12-11', $url->getLastMod());
     }
@@ -73,11 +75,10 @@ class UrlTest extends TestCase
     public function testChangeFreq()
     {
         $url = new Items\Url('test');
-        $url->setDomain('https://example.com');
-
         $url->setChangeFreq('invalid');
-        $this->assertEquals(null, $url->getChangeFreq());
+        $this->assertNull($url->getChangeFreq());
 
+        $url = new Items\Url('test');
         $url->setChangeFreq('always');
         $this->assertEquals('always', $url->getChangeFreq());
     }
@@ -85,20 +86,22 @@ class UrlTest extends TestCase
     public function testPriority()
     {
         $url = new Items\Url('test');
-        $url->setDomain('https://example.com');
-
         $url->setPriority(1);
         $this->assertEquals('1.0', $url->getPriority());
 
+        $url = new Items\Url('test');
         $url->setPriority(0);
         $this->assertEquals(0.0, $url->getPriority());
 
+        $url = new Items\Url('test');
         $url->setPriority(.5);
         $this->assertEquals('0.5', $url->getPriority());
 
+        $url = new Items\Url('test');
         $url->setPriority(2);
         $this->assertEquals(null, $url->getPriority());
 
+        $url = new Items\Url('test');
         $url->setPriority(-1);
         $this->assertEquals(null, $url->getPriority());
     }
