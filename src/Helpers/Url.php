@@ -65,7 +65,7 @@ class Url
         if (!empty($url['query'])) {
             parse_str($url['query'], $query);
 
-            array_walk($query, function(&$val, &$var){
+            array_walk($query, function (&$val, &$var) {
                 $var = rawurlencode($var);
                 $val = rawurlencode($val);
             });

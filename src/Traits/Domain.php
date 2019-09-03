@@ -3,9 +3,7 @@
 
 namespace Wszetko\Sitemap\Traits;
 
-
 use InvalidArgumentException;
-use Wszetko\Sitemap\Items\Url;
 
 trait Domain
 {

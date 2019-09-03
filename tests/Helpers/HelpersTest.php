@@ -151,6 +151,5 @@ class HelpersTest extends TestCase
             $this->assertEquals($result, Url::normalizeUrl($test),
                 "Test 'NormalizeUrl' for '$test' should return '$result'.");
         }
-
     }
 }

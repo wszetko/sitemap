@@ -3,7 +3,6 @@
 
 namespace Wszetko\Sitemap\Traits;
 
-
 use DateTimeInterface;
 use InvalidArgumentException;
 
@@ -18,7 +17,7 @@ trait DateTime
      *
      * @return string|null
      */
-    private function processDateTime($dateTime, $required = FALSE): ?string
+    private function processDateTime($dateTime, $required = false): ?string
     {
         if (is_string($dateTime)) {
             $dateTime = date_create($dateTime);

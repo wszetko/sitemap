@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Wszetko\Sitemap\Items;
 
 use DateTimeInterface;
-use InvalidArgumentException;
 use Wszetko\Sitemap\Interfaces\Item;
 use Wszetko\Sitemap\Sitemap;
 use Wszetko\Sitemap\Traits\DateTime;
