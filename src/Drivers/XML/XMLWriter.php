@@ -84,7 +84,7 @@ class XMLWriter implements XML
 
     /**
      * @param string $sitemap
-     * @param array $extensions
+     * @param array  $extensions
      */
     public function openSitemap(string $sitemap, array $extensions = []): void
     {
@@ -94,9 +94,11 @@ class XMLWriter implements XML
         $this->getXMLWriter()->setIndent(true);
         $this->getXMLWriter()->startElement('urlset');
         $this->getXMLWriter()->writeAttribute('xmlns', Sitemap::SCHEMA);
+
         foreach ($extensions as $extension => $urlset) {
             $this->getXMLWriter()->writeAttribute('xmlns:' . $extension, $urlset);
         }
+
         $this->flushData();
     }
 
@@ -174,7 +176,6 @@ class XMLWriter implements XML
 
         do {
             $s = fread($sitemapFile, 1);
-
             if (ctype_space($s)) {
                 $truncate++;
                 fseek($sitemapFile, -2, SEEK_CUR);
@@ -193,6 +194,7 @@ class XMLWriter implements XML
     public function getSitemapSize(): int
     {
         clearstatcache(true, $this->getSitemapFileFullPath());
+
         return file_exists($this->getSitemapFileFullPath()) ? filesize($this->getSitemapFileFullPath()) : 0;
     }
 
@@ -252,7 +254,6 @@ class XMLWriter implements XML
             $this->addElementArrayNonAssoc($element, $value, $namespace);
         } else {
             $this->getXMLWriter()->startElement(($namespace ? $namespace . ':' : '') . $element);
-
             if (isset($value['_attributes'])) {
                 foreach ($value['_attributes'] as $attribute => $val) {
                     $this->getXMLWriter()->writeAttribute($attribute, $val);
@@ -276,15 +277,7 @@ class XMLWriter implements XML
                     }
                 }
             }
-
             $this->getXMLWriter()->endElement();
-        }
-    }
-
-    private function addElementArrayNonAssoc(string $element, $value, ?string $namespace = null): void
-    {
-        foreach ($value as $val) {
-            $this->addElement($element, $val, $namespace);
         }
     }
 
@@ -297,6 +290,13 @@ class XMLWriter implements XML
         }
 
         return false;
+    }
+
+    private function addElementArrayNonAssoc(string $element, $value, ?string $namespace = null): void
+    {
+        foreach ($value as $val) {
+            $this->addElement($element, $val, $namespace);
+        }
     }
 
     /**
@@ -332,11 +332,9 @@ class XMLWriter implements XML
     {
         $this->getXMLWriter()->startElement('sitemap');
         $this->getXMLWriter()->writeElement('loc', $sitemap);
-
         if (isset($lastmod)) {
             $this->getXMLWriter()->writeElement('lastmod', $lastmod);
         }
-
         $this->getXMLWriter()->endElement();
         $this->flushData();
     }
@@ -353,11 +351,10 @@ class XMLWriter implements XML
             $this->getXMLWriter()->writeElement($begin . $element, (string) $value);
         } else {
             if (isset($value['_namespace'])) {
-                $this->addElementNS($value);
+                $this->addElementNS($value['_element'], $value[$value['_element']], $value['_namespace']);
             } else {
                 if ($this->isAssoc($value)) {
                     $this->startElement($element, $namespace, null);
-
                     if (isset($value['_attributes'])) {
                         foreach ($value['_attributes'] as $attribute => $val) {
                             $this->getXMLWriter()->writeAttribute($attribute, $val);
@@ -381,7 +378,6 @@ class XMLWriter implements XML
                             }
                         }
                     }
-
                     $this->getXMLWriter()->endElement();
                 } else {
                     foreach ($value as $val) {

@@ -39,7 +39,7 @@ class Memory implements DataCollector
     }
 
     /**
-     * @param Url $item
+     * @param Url    $item
      * @param string $group
      */
     public function add(Url $item, string $group): void
@@ -49,7 +49,6 @@ class Memory implements DataCollector
         }
 
         $this->addExtension($item->getExtensions());
-
         $this->items[$group][] = $item->toArray();
     }
 

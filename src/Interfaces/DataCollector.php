@@ -20,7 +20,7 @@ interface DataCollector
     public function __construct(?array $config);
 
     /**
-     * @param Url $item
+     * @param Url    $item
      * @param string $group
      */
     public function add(Url $item, string $group): void;

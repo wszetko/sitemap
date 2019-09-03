@@ -15,7 +15,6 @@ use Wszetko\Sitemap\Interfaces\XML;
 
 /**
  * Sitemap
- *
  * This class used for generating Google Sitemap files
  *
  * @package    Sitemap
@@ -73,7 +72,6 @@ class Sitemap
      * Limit of Sitmeaps in SitemapsIndex
      *
      * @var int
-     *
      */
     const SITEMAP_PER_SITEMAPINDEX = 1000;
 
@@ -194,7 +192,7 @@ class Sitemap
     }
 
     /**
-     * @param Items\Url $item
+     * @param Items\Url   $item
      * @param string|null $group
      */
     public function addItem(Items\Url $item, ?string $group = null)
@@ -202,7 +200,6 @@ class Sitemap
         if ($group === null) {
             $group = $this->getDefaultFilename();
         }
-
         $group = strtolower(preg_replace('/\W+/', '', $group));
         $item->setDomain($this->getDomain());
         $this->getDataCollector()->add($item, $group);
@@ -336,7 +333,7 @@ class Sitemap
 
     /**
      * @param string $driver
-     * @param array $config
+     * @param array  $config
      */
     public function setXml(string $driver, array $config = []): void
     {
@@ -361,6 +358,7 @@ class Sitemap
     {
         if (is_dir($dir)) {
             $objects = scandir($dir);
+
             foreach ($objects as $object) {
                 if ($object != "." && $object != "..") {
                     if (filetype($dir . "/" . $object) == "dir") {
@@ -370,6 +368,7 @@ class Sitemap
                     }
                 }
             }
+
             rmdir($dir);
         }
     }
@@ -510,7 +509,7 @@ class Sitemap
 
     /**
      * @param string $dir
-     * @param array $files
+     * @param array  $files
      *
      * @throws Exception
      */
@@ -542,7 +541,6 @@ class Sitemap
             unlink($source);
             $newFiles[$gzFile] = $lastmod;
         }
-
         $files = $newFiles;
     }
 
@@ -550,7 +548,6 @@ class Sitemap
      * @param array $sitemaps
      *
      * @return array
-     *
      * @throws Exception
      */
     public function generateSitemapsIndex(array $sitemaps): array
@@ -561,7 +558,6 @@ class Sitemap
 
         $counter = 0;
         $files = [$this->getIndexFilename() . self::EXT => null];
-
         $this->getXml()->openSitemapIndex(array_key_last($files));
         $lastItem = array_key_last($sitemaps);
 
@@ -645,9 +641,7 @@ class Sitemap
             }
         }
 
-        //To create sitemaps directory
-        $this->getSitepamsDirectory();
-
+        $this->getSitepamsDirectory(); //To create sitemaps directory
         $dir = new RecursiveDirectoryIterator($this->getTempDirectory());
         $iterator = new RecursiveIteratorIterator($dir);
         $files = new RegexIterator($iterator,

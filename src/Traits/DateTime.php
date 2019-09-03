@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Wszetko\Sitemap\Traits;
 
 use DateTimeInterface;
@@ -8,6 +7,7 @@ use InvalidArgumentException;
 
 /**
  * Trait DateTime
+ *
  * @package Wszetko\Sitemap\Traits
  */
 trait DateTime

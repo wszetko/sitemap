@@ -14,7 +14,6 @@ class Url
      * @param string $url
      *
      * @return bool|string
-     *
      * @see https://bugs.php.net/bug.php?id=52923
      * @see https://www.php.net/manual/en/function.parse-url.php#114817
      */
@@ -43,7 +42,6 @@ class Url
 
         if (!empty($url['path'])) {
             $url['path'] = explode('/', $url['path']);
-
             $parts = [];
 
             foreach ($url['path'] as $element) {
@@ -64,12 +62,10 @@ class Url
 
         if (!empty($url['query'])) {
             parse_str($url['query'], $query);
-
             array_walk($query, function (&$val, &$var) {
                 $var = rawurlencode($var);
                 $val = rawurlencode($val);
             });
-
             $url['query'] = http_build_query($query);
         }
 

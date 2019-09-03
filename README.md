@@ -18,7 +18,6 @@ To do
 * Ability to generate sitemap without publishing
 * Ability to publish sitemap without clearing previous files
 * Logging compatible with PSR-3
-* Ext. Video gallery_loc title support
 * Improve URL Normalization
 * More flexible input value (bool ==> yes/no etc.)
 

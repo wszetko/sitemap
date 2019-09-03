@@ -82,14 +82,13 @@ class News extends Extension
      */
     protected $stockTickers;
 
-
     /**
      * News constructor.
      *
-     * @param string $publicationName
-     * @param string $publicationLanguage
+     * @param string                   $publicationName
+     * @param string                   $publicationLanguage
      * @param DateTimeInterface|string $publicationDate
-     * @param string $title
+     * @param string                   $title
      */
     public function __construct(
         string $publicationName,
@@ -112,7 +111,6 @@ class News extends Extension
         }
 
         $this->publicationDate = $this->processDateTime($publicationDate, true);
-
         $this->title = $title;
     }
 

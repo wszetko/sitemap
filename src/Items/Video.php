@@ -10,6 +10,7 @@ use Wszetko\Sitemap\Traits\DateTime;
 /**
  * Class Video
  *
+ * @todo    : add support for content_segment_loc tag
  * @package Wszetko\Sitemap\Items
  */
 class Video extends Extension
@@ -77,7 +78,6 @@ class Video extends Extension
 
     /**
      * String of space delimited platform values.
-     *
      * Allowed values are web, mobile, and tv.
      *
      * @var array
@@ -248,30 +248,28 @@ class Video extends Extension
                     if (!isset($array['video']['content_loc'])) {
                         $array['video']['content_loc'] = [];
                     }
-
                     $array['video']['content_loc'][] = $contentLoc;
                 }
             }
         }
 
         if (!empty($this->getPlayerLoc())) {
-           foreach ($this->getPlayerLoc() as $playerLoc) {
-               if ($playerLoc != $this->getDomain()) {
-                   if (!isset($array['video']['player_loc'])) {
-                       $array['video']['player_loc'] = [];
-                   }
-                   if (is_array($playerLoc)) {
-                       $loc = array_key_first($playerLoc);
-                       $array['video']['player_loc'][] = [
-                           '_attributes' => ['allow_embed' => $playerLoc[$loc]],
-                           '_value' => $loc
-                       ];
-                   } else {
-                       $array['video']['player_loc'][] = $playerLoc;
-                   }
-               }
-           }
-
+            foreach ($this->getPlayerLoc() as $playerLoc) {
+                if ($playerLoc != $this->getDomain()) {
+                    if (!isset($array['video']['player_loc'])) {
+                        $array['video']['player_loc'] = [];
+                    }
+                    if (is_array($playerLoc)) {
+                        $loc = array_key_first($playerLoc);
+                        $array['video']['player_loc'][] = [
+                            '_attributes' => ['allow_embed' => $playerLoc[$loc]],
+                            '_value' => $loc
+                        ];
+                    } else {
+                        $array['video']['player_loc'][] = $playerLoc;
+                    }
+                }
+            }
         }
 
         if (!empty($this->getDuration())) {
@@ -379,7 +377,6 @@ class Video extends Extension
      * URL pointing to the actual media file (mp4).
      *
      * @return array
-     *
      * @throws \InvalidArgumentException
      */
     public function getContentLoc(): ?array
@@ -387,7 +384,6 @@ class Video extends Extension
         if ($this->getDomain()) {
             if (!empty($this->contentLoc)) {
                 $result = [];
-
                 foreach ($this->contentLoc as $contentLoc) {
                     $result[] = \Wszetko\Sitemap\Helpers\Url::normalizeUrl($this->getDomain() . $contentLoc);
                 }
@@ -402,26 +398,9 @@ class Video extends Extension
     }
 
     /**
-     * URL pointing to the actual media file (mp4).
-     *
-     * @param string $contentLoc
-     *
-     * @return self
-     */
-    public function addContentLoc(string $contentLoc): self
-    {
-        if (!empty($contentLoc)) {
-            $this->contentLoc[] = '/' . ltrim($contentLoc, '/');
-        }
-
-        return $this;
-    }
-
-    /**
      * Player location information
      *
      * @return string|array
-     *
      * @throws \InvalidArgumentException
      */
     public function getPlayerLoc()
@@ -429,7 +408,6 @@ class Video extends Extension
         if ($this->getDomain()) {
             if (!empty($this->playerLoc)) {
                 $result = [];
-
                 foreach ($this->playerLoc as $playerLoc) {
                     if (is_string($playerLoc)) {
                         $result[] = \Wszetko\Sitemap\Helpers\Url::normalizeUrl($this->getDomain() . $playerLoc);
@@ -445,27 +423,6 @@ class Video extends Extension
         } else {
             throw new InvalidArgumentException('Domain is not set.');
         }
-    }
-
-    /**
-     * @param string $playerLoc
-     * @param mixed $allowEmbed
-     *
-     * @return self
-     */
-    public function addPlayerLoc(string $playerLoc, $allowEmbed = null): self
-    {
-        $playerLoc = '/' . ltrim($playerLoc, '/');
-
-        if (!empty($playerLoc)) {
-            if ($allowEmbed !== null) {
-                $this->playerLoc[] = [$playerLoc => $allowEmbed];
-            } else {
-                $this->playerLoc[] = $playerLoc;
-            }
-        }
-
-        return $this;
     }
 
     /**
@@ -511,13 +468,14 @@ class Video extends Extension
     /**
      * Duration of the video in seconds.
      *
-     * @param integer $duration
+     * @param int $duration
      *
      * @return self
+     * @todo: add support for adding time duration in different format (eg. ISO-8601)
      */
     public function setDuration($duration): self
     {
-        if ($duration >= 1 && $duration <= 28800) {
+        if ($duration >= 0 && $duration <= 28800) {
             $this->duration = $duration;
         }
 
@@ -566,6 +524,7 @@ class Video extends Extension
      * @param float $rating
      *
      * @return self
+     * @todo: support other formats like int, string
      */
     public function setRating(float $rating): self
     {
@@ -592,6 +551,7 @@ class Video extends Extension
      * @param integer $viewCount
      *
      * @return self
+     * @todo: support other format like string
      */
     public function setViewCount(int $viewCount): self
     {
@@ -639,6 +599,8 @@ class Video extends Extension
     /**
      * No if the video should be available only to users with SafeSearch turned off.
      *
+     * @todo: support other format like strings ('Yes', 'No, 'yes', 'no', 'y', 'n') or null
+     *
      * @param bool $familyFriendly
      *
      * @return self
@@ -681,7 +643,6 @@ class Video extends Extension
 
     /**
      * String of space delimited platform values.
-     *
      * Allowed values are web, mobile, and tv.
      *
      * @return array|null
@@ -693,7 +654,6 @@ class Video extends Extension
 
     /**
      * String of space delimited platform values.
-     *
      * Allowed values are web, mobile, and tv.
      *
      * @param string $relationship
@@ -725,12 +685,14 @@ class Video extends Extension
     /**
      * The price to download or view the video in ISO 4217 format.
      *
-     * @param float $price
+     * @param float  $price
      * @param string $currency
      * @param string $type
      * @param string $resolution
      *
      * @return self
+     * @todo: support more formats for price (rg. int, string)
+     * @todo: normalize output to one format
      */
     public function setPrice(float $price, string $currency, string $type = '', string $resolution = ''): self
     {
@@ -880,6 +842,7 @@ class Video extends Extension
     public function setCategory(string $category): self
     {
         $this->category = $category;
+
         return $this;
     }
 
@@ -916,6 +879,46 @@ class Video extends Extension
     {
         if (\Wszetko\Sitemap\Helpers\Url::normalizeUrl($galleryLoc)) {
             $this->galleryLoc = $galleryLoc;
+        }
+
+        return $this;
+    }
+
+    /**
+     * URL pointing to the actual media file (mp4).
+     *
+     * @param string $contentLoc
+     *
+     * @return self
+     */
+    public function addContentLoc(string $contentLoc): self
+    {
+        if (!empty($contentLoc)) {
+            $this->contentLoc[] = '/' . ltrim($contentLoc, '/');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add player location information
+     *
+     * @param string $playerLoc
+     * @param mixed  $allowEmbed
+     *
+     * @return self
+     * @todo: add support to autoplay attribute
+     */
+    public function addPlayerLoc(string $playerLoc, $allowEmbed = null): self
+    {
+        if (!empty($playerLoc)) {
+            $playerLoc = '/' . ltrim($playerLoc, '/');
+
+            if ($allowEmbed !== null) {
+                $this->playerLoc[] = [$playerLoc => $allowEmbed];
+            } else {
+                $this->playerLoc[] = $playerLoc;
+            }
         }
 
         return $this;

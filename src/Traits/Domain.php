@@ -1,9 +1,9 @@
 <?php
 
-
 namespace Wszetko\Sitemap\Traits;
 
 use InvalidArgumentException;
+use Wszetko\Sitemap\Helpers\Url;
 
 trait Domain
 {
@@ -31,7 +31,7 @@ trait Domain
      */
     public function setDomain(string $domain): self
     {
-        if ($domain = \Wszetko\Sitemap\Helpers\Url::normalizeUrl($domain)) {
+        if ($domain = Url::normalizeUrl($domain)) {
             $this->domain = rtrim($domain, '/');
         } elseif ($this->domainIsRequired) {
             throw new InvalidArgumentException('Domain name is not valid.');
