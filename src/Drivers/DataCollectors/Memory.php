@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Wszetko\Sitemap\Drivers\DataCollectors;
 
 use Wszetko\Sitemap\Interfaces\DataCollector;
-use Wszetko\Sitemap\Items\Extension;
 use Wszetko\Sitemap\Items\Url;
 
 /**
@@ -85,10 +84,6 @@ class Memory implements DataCollector
      */
     private function getGroupElement(string $group): ?int
     {
-        if (!isset($this->items[$group])) {
-            return null;
-        }
-
         if (!isset($this->element[$group])) {
             $this->element[$group] = 0;
         }

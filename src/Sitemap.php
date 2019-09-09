@@ -4,14 +4,13 @@ declare(strict_types=1);
 namespace Wszetko\Sitemap;
 
 use Exception;
-use InvalidArgumentException;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RegexIterator;
 use Wszetko\Sitemap\Drivers\XML\XMLWriter;
-use Wszetko\Sitemap\Helpers\Url;
 use Wszetko\Sitemap\Interfaces\DataCollector;
 use Wszetko\Sitemap\Interfaces\XML;
+use Wszetko\Sitemap\Traits\Domain;
 
 /**
  * Sitemap
@@ -25,6 +24,8 @@ use Wszetko\Sitemap\Interfaces\XML;
  */
 class Sitemap
 {
+    use Domain;
+
     /**
      * Avaliable values for changefreq tag
      *
@@ -81,20 +82,6 @@ class Sitemap
      * @var int
      */
     const SITEMAP_MAX_SIZE = 52000000;
-
-    /**
-     * Domain name of site
-     *
-     * @var string
-     */
-    private $domain = '';
-
-    /**
-     * Path to sitemap in domain
-     *
-     * @var string
-     */
-    private $path = '';
 
     /**
      * Path on disk to public directory.
@@ -172,34 +159,15 @@ class Sitemap
     }
 
     /**
-     * Set path to sitemap
-     *
-     * @return string
-     */
-    public function getPath(): string
-    {
-        return $this->path;
-    }
-
-    /**
-     * Get path to sitemap
-     *
-     * @param string $path
-     */
-    public function setPath(string $path): void
-    {
-        $this->path = $path;
-    }
-
-    /**
      * @param Items\Url   $item
      * @param string|null $group
      */
-    public function addItem(Items\Url $item, ?string $group = null)
+    public function addItem(Items\Url $item, ?string $group = null): void
     {
         if ($group === null) {
             $group = $this->getDefaultFilename();
         }
+
         $group = strtolower(preg_replace('/\W+/', '', $group));
         $item->setDomain($this->getDomain());
         $this->getDataCollector()->add($item, $group);
@@ -223,30 +191,6 @@ class Sitemap
     public function setDefaultFilename(string $defaultFilename): void
     {
         $this->defaultFilename = $defaultFilename;
-    }
-
-    /**
-     * Get domain name
-     *
-     * @return string
-     */
-    public function getDomain(): string
-    {
-        return $this->domain;
-    }
-
-    /**
-     * Set domain name
-     *
-     * @param string $domain
-     */
-    public function setDomain(string $domain): void
-    {
-        if ($domain = Url::normalizeUrl($domain)) {
-            $this->domain = rtrim($domain, '/');
-        } else {
-            throw new InvalidArgumentException('Parameter $domain need to be valid domain name.');
-        }
     }
 
     /**

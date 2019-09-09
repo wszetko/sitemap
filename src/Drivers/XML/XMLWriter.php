@@ -6,6 +6,7 @@ namespace Wszetko\Sitemap\Drivers\XML;
 use Exception;
 use Wszetko\Sitemap\Interfaces\XML;
 use Wszetko\Sitemap\Sitemap;
+use Wszetko\Sitemap\Traits\Domain;
 use Wszetko\Sitemap\Traits\IsAssoc;
 
 /**
@@ -16,6 +17,7 @@ use Wszetko\Sitemap\Traits\IsAssoc;
 class XMLWriter implements XML
 {
     use IsAssoc;
+    use Domain;
 
     /**
      * @var \XMLWriter
@@ -28,47 +30,25 @@ class XMLWriter implements XML
     private $currentSitemap;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $workDir;
-
-    /**
-     * @var string
-     */
-    private $domain;
 
     /**
      * XMLWriter constructor.
      *
      * @param array $config
      *
-     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
     public function __construct(array $config)
     {
-        $this->XMLWriter = new \XMLWriter();
-
         if (!isset($config['domain'])) {
-            throw new Exception('Domain is not set.');
+            throw new \InvalidArgumentException('Domain is not set.');
         }
 
+        $this->XMLWriter = new \XMLWriter();
         $this->setDomain($config['domain']);
-    }
-
-    /**
-     * @return string
-     */
-    public function getDomain(): string
-    {
-        return $this->domain;
-    }
-
-    /**
-     * @param string $domain
-     */
-    public function setDomain(string $domain): void
-    {
-        $this->domain = $domain;
     }
 
     /**
