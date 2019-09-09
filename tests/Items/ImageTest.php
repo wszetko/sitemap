@@ -23,22 +23,37 @@ class ImageTest extends TestCase
     public function testGetLoc()
     {
         $image = new Items\Image('image.png');
-        $image->setDomain('https://example.com');
-
-        $this->assertEquals('https://example.com/image.png', $image->getLoc());
+        $image->setDomain('https://example.com');;
+        $this->assertEquals('https://example.com/image.png', $image->getLoc(), 'Faild testGetLoc without leading slash.');
 
         $image = new Items\Image('/image.png');
         $image->setDomain('https://example.com');
-
-        $this->assertEquals('https://example.com/image.png', $image->getLoc());
+        $this->assertEquals('https://example.com/image.png', $image->getLoc(), 'Faild testGetLoc with leading slash.');
     }
 
     public function testCaption()
     {
         $image = new Items\Image('image.png');
         $image->setCaption('Test Caption');
-
         $this->assertEquals('Test Caption', $image->getCaption());
+
+        $image = new Items\Image('image.png');
+        $image->setCaption(100);
+        $this->assertEquals('100', $image->getCaption());
+
+        $image = new Items\Image('image.png');
+        $caption = new class {
+            public function __toString()
+            {
+                return 'Test';
+            }
+        };
+        $image->setCaption($caption);
+        $this->assertEquals('Test', $image->getCaption());
+
+        $image = new Items\Image('image.png');
+        $image->setCaption(new \stdClass());
+        $this->assertNull($image->getCaption());
     }
 
     public function testGeolocation()
@@ -60,12 +75,18 @@ class ImageTest extends TestCase
     public function testLicense()
     {
         $image = new Items\Image('image.png');
-        $image->setLicense('https://example/licence.txt');
-        $this->assertEquals('https://example/licence.txt', $image->getLicense());
+        $image->setDomain('https://example.com');
+        $image->setLicense('/licence.txt');
+        $this->assertEquals('https://example.com/licence.txt', $image->getLicense());
 
         $image = new Items\Image('image.png');
-        $image->setLicense('Invalid Licence');
-        $this->assertNull($image->getLicense());
+        $image->setLicense('https://creativecommons.org/licenses/by-sa/2.0/');
+        $this->assertEquals('https://creativecommons.org/licenses/by-sa/2.0/', $image->getLicense());
+
+        $image = new Items\Image('image.png');
+        $image->setDomain('https://example.com');
+        $image->setLicense('https://creativecommons.org/licenses/by-sa/2.0/');
+        $this->assertEquals('https://creativecommons.org/licenses/by-sa/2.0/', $image->getLicense());
     }
 
     public function testToArray()

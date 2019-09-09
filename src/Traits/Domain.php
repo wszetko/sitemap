@@ -5,6 +5,11 @@ namespace Wszetko\Sitemap\Traits;
 use InvalidArgumentException;
 use Wszetko\Sitemap\Helpers\Url;
 
+/**
+ * Trait Domain
+ *
+ * @package Wszetko\Sitemap\Traits
+ */
 trait Domain
 {
     /**
@@ -13,8 +18,6 @@ trait Domain
      * @var string
      */
     private $domain;
-
-    private $domainIsRequired = false;
 
     /**
      * @return string|null
@@ -25,15 +28,15 @@ trait Domain
     }
 
     /**
-     * @param string $domain
+     * @param string|null $domain
      *
      * @return self
      */
-    public function setDomain(string $domain): self
+    public function setDomain(?string $domain): self
     {
-        if ($domain = Url::normalizeUrl($domain)) {
+        if ($domain = Url::normalizeUrl((string) $domain)) {
             $this->domain = rtrim($domain, '/');
-        } elseif ($this->domainIsRequired) {
+        } else {
             throw new InvalidArgumentException('Domain name is not valid.');
         }
 

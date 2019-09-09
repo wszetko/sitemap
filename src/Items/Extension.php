@@ -11,17 +11,7 @@ use Wszetko\Sitemap\Traits\Domain;
  *
  * @package Wszetko\Sitemap\Items
  */
-abstract class Extension implements Item
+abstract class Extension extends AbstractItem implements Item
 {
     use Domain;
-
-    /**
-     * Name of Namescapce
-     */
-    const NAMESPACE_NAME = null;
-
-    /**
-     * Namescapce URL
-     */
-    const NAMESPACE_URL = null;
 }

@@ -23,6 +23,12 @@ class UrlTest extends TestCase
         $this->assertInstanceOf(Items\Url::class, $url);
     }
 
+    public function testPropertyNotExists()
+    {
+        $url = new Items\Url('test');
+        $this->assertNull($url->setNotExists('test'));
+    }
+
     public function testDomain()
     {
         $url = new Items\Url('test');
@@ -53,57 +59,68 @@ class UrlTest extends TestCase
         date_default_timezone_set('Europe/London');
 
         $url = new Items\Url('test');
-        $this->assertNull($url->getLastMod());
+        $this->assertNull($url->getLastmod());
 
         $url = new Items\Url('test');
-        $url->setLastMod(new DateTime('2013-11-16'));
-        $this->assertEquals('2013-11-16', $url->getLastMod());
+        $url->setLastmod(new DateTime('2013-11-16'));
+        $this->assertEquals('2013-11-16', $url->getLastmod());
 
         $url = new Items\Url('test');
-        $url->setLastMod(new DateTime('2013-11-16 19:00'));
-        $this->assertEquals('2013-11-16T19:00:00+00:00', $url->getLastMod());
+        $url->setLastmod(new DateTime('2013-11-16 19:00'));
+        $this->assertEquals('2013-11-16T19:00:00+00:00', $url->getLastmod());
 
         $url = new Items\Url('test');
-        $url->setLastMod(new DateTime('0000-00-00 00:00'));
-        $this->assertNull($url->getLastMod());
+        $url->setLastmod(new DateTime('0000-00-00 00:00'));
+        $this->assertNull($url->getLastmod());
 
         $url = new Items\Url('test');
-        $url->setLastMod('2013-12-11');
-        $this->assertEquals('2013-12-11', $url->getLastMod());
+        $url->setLastmod('2013-12-11');
+        $this->assertEquals('2013-12-11', $url->getLastmod());
     }
 
     public function testChangeFreq()
     {
-        $url = new Items\Url('test');
-        $url->setChangeFreq('invalid');
-        $this->assertNull($url->getChangeFreq());
+        $tests = [
+            ['input' => 'invalid', 'expected' => null],
+            ['input' => 'always', 'expected' => 'always'],
+            ['input' => 'hourly', 'expected' => 'hourly'],
+            ['input' => 'daily', 'expected' => 'daily'],
+            ['input' => 'weekly', 'expected' => 'weekly'],
+            ['input' => 'monthly', 'expected' => 'monthly'],
+            ['input' => 'yearly', 'expected' => 'yearly'],
+            ['input' => 'never', 'expected' => 'never']
+        ];
 
-        $url = new Items\Url('test');
-        $url->setChangeFreq('always');
-        $this->assertEquals('always', $url->getChangeFreq());
+        foreach ($tests as $test) {
+
+            $url = new Items\Url('test');
+            $url->setChangefreq($test['input']);
+            $this->assertEquals($test['expected'], $url->getChangefreq());
+        }
     }
 
     public function testPriority()
     {
-        $url = new Items\Url('test');
-        $url->setPriority(1);
-        $this->assertEquals('1.0', $url->getPriority());
+        $tests = [
+            ['input' => 1, 'expected' => '1.0'],
+            ['input' => 0, 'expected' => '0.0'],
+            ['input' => .5, 'expected' => '0.5'],
+            ['input' => 2, 'expected' => null],
+            ['input' => -1, 'expected' => null],
+            ['input' => "1", 'expected' => '1.0'],
+            ['input' => "0", 'expected' => '0.0'],
+            ['input' => ".5", 'expected' => '0.5'],
+            ['input' => "2", 'expected' => null],
+            ['input' => "-1", 'expected' => null],
+            ['input' => new \stdClass(), 'expected' => null],
+            ['input' => 'test', 'expected' => null]
+        ];
 
-        $url = new Items\Url('test');
-        $url->setPriority(0);
-        $this->assertEquals(0.0, $url->getPriority());
-
-        $url = new Items\Url('test');
-        $url->setPriority(.5);
-        $this->assertEquals('0.5', $url->getPriority());
-
-        $url = new Items\Url('test');
-        $url->setPriority(2);
-        $this->assertEquals(null, $url->getPriority());
-
-        $url = new Items\Url('test');
-        $url->setPriority(-1);
-        $this->assertEquals(null, $url->getPriority());
+        foreach ($tests as $test) {
+            $url = new Items\Url('test');
+            $url->setPriority($test['input']);
+            $this->assertEquals($test['expected'], $url->getPriority());
+        }
     }
 
     public function testAddExtensions()
@@ -128,19 +145,21 @@ class UrlTest extends TestCase
 
         $url = new Items\Url('test');
         $url->setDomain('https://example.com');
-        $url->setLastMod(new DateTime('2013-11-16'));
-        $url->setChangeFreq('always');
+        $url->setLastmod(new DateTime('2013-11-16'));
+        $url->setChangefreq('always');
         $url->setPriority(1);
         $extension = new Mobile();
         $url->addExtension($extension);
         $extension->setDomain($url->getDomain());
 
         $expectedResult = [
-            'loc' => 'https://example.com/test',
-            'lastmod' => '2013-11-16',
-            'changefreq' => 'always',
-            'priority' => '1.0',
-            $extension::NAMESPACE_NAME => $extension->toArray()
+            'url' => [
+                'loc' => 'https://example.com/test',
+                'lastmod' => '2013-11-16',
+                'changefreq' => 'always',
+                'priority' => '1.0',
+                $extension::NAMESPACE_NAME => $extension->toArray()
+            ],
         ];
 
         $this->assertEquals($expectedResult, $url->toArray());

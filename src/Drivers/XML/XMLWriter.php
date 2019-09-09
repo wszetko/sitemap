@@ -6,6 +6,7 @@ namespace Wszetko\Sitemap\Drivers\XML;
 use Exception;
 use Wszetko\Sitemap\Interfaces\XML;
 use Wszetko\Sitemap\Sitemap;
+use Wszetko\Sitemap\Traits\IsAssoc;
 
 /**
  * Class XMLWriter
@@ -14,6 +15,8 @@ use Wszetko\Sitemap\Sitemap;
  */
 class XMLWriter implements XML
 {
+    use IsAssoc;
+
     /**
      * @var \XMLWriter
      */
@@ -37,7 +40,9 @@ class XMLWriter implements XML
     /**
      * XMLWriter constructor.
      *
-     * @throws Exception
+     * @param array $config
+     *
+     * @throws \Exception
      */
     public function __construct(array $config)
     {
@@ -145,7 +150,7 @@ class XMLWriter implements XML
     }
 
     /**
-     *
+     * @throws \Exception
      */
     public function closeSitemap(): void
     {
@@ -203,13 +208,10 @@ class XMLWriter implements XML
      */
     public function addUrl(array $element): void
     {
-        $this->getXMLWriter()->startElement('url');
-
         foreach ($element as $el => $val) {
             $this->addElement($el, $val);
         }
 
-        $this->getXMLWriter()->endElement();
         $this->flushData();
     }
 
@@ -224,45 +226,11 @@ class XMLWriter implements XML
             $this->getXMLWriter()->writeElement(($namespace ? $namespace . ':' : '') . $element, (string) $value);
         } else {
             if (isset($value['_namespace'])) {
-                $this->addElementNS($value['_element'], $value[$value['_element']], $namespace);
+                $this->addElement($value['_element'], $value[$value['_element']], $value['_namespace']);
             } else {
                 $this->addElementArray($element, $value, $namespace);
             }
         }
-    }
-
-    /**
-     * @param string      $element
-     * @param             $value
-     * @param string|null $namespace
-     */
-    private function addElementNS(string $element, $value, ?string $namespace = null): void
-    {
-        $this->startElement($element, $namespace, null);
-
-        if (!empty($value)) {
-            $this->addElement($element, $value, $namespace);
-        }
-
-        $this->getXMLWriter()->endElement();
-    }
-
-    /**
-     * @param      $name
-     * @param null $namespace
-     * @param null $uri
-     *
-     * @return bool
-     */
-    private function startElement($name, $namespace = null, $uri = null): bool
-    {
-        if ($namespace) {
-            $result = $this->getXMLWriter()->startElementNS($namespace, $name, $uri);
-        } else {
-            $result = $this->getXMLWriter()->startElement($name);
-        }
-
-        return $result;
     }
 
     /**
@@ -304,22 +272,6 @@ class XMLWriter implements XML
     }
 
     /**
-     * @param array $array
-     *
-     * @return bool
-     */
-    private function isAssoc(array $array): bool
-    {
-        foreach ($array as $key => $val) {
-            if (!is_integer($key)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * @param string      $element
      * @param             $value
      * @param string|null $namespace
@@ -346,7 +298,7 @@ class XMLWriter implements XML
     }
 
     /**
-     *
+     * @throws \Exception
      */
     public function closeSitemapIndex(): void
     {
@@ -358,7 +310,7 @@ class XMLWriter implements XML
 
     /**
      * @param string $sitemap
-     * @param ?string $lastmod
+     * @param string|null $lastmod
      */
     public function addSitemap(string $sitemap, string $lastmod = null): void
     {
@@ -369,63 +321,5 @@ class XMLWriter implements XML
         }
         $this->getXMLWriter()->endElement();
         $this->flushData();
-    }
-
-    /**
-     * @param string      $element
-     * @param             $value
-     * @param string|null $namespace
-     */
-    private function _addElement(string $element, $value, ?string $namespace = null): void
-    {
-        $begin = '';
-
-        if ($namespace) {
-            $begin = $namespace . ':';
-        }
-
-        if (!is_array($value)) {
-            $this->getXMLWriter()->writeElement($begin . $element, (string) $value);
-        } else {
-            if (isset($value['_namespace'])) {
-                $this->addElementNS($value['_element'], $value[$value['_element']], $value['_namespace']);
-            } else {
-                if ($this->isAssoc($value)) {
-                    $this->startElement($element, $namespace, null);
-                    if (isset($value['_attributes'])) {
-                        foreach ($value['_attributes'] as $attribute => $val) {
-                            $this->getXMLWriter()->writeAttribute($attribute, $val);
-                        }
-
-                        if (isset($value['_value'])) {
-                            if (is_array($value['_value'])) {
-                                foreach ($value['_value'] as $el => $val) {
-                                    $this->addElement($el, $val);
-                                }
-                            } else {
-                                $this->getXMLWriter()->text((string) $value['_value']);
-                            }
-                        }
-                    } else {
-                        foreach ($value as $el => $val) {
-                            if (is_array($val)) {
-                                $this->addElement($el, $val, $namespace);
-                            } else {
-                                $this->getXMLWriter()->writeElement($begin . $el, $val);
-                            }
-                        }
-                    }
-                    $this->getXMLWriter()->endElement();
-                } else {
-                    foreach ($value as $val) {
-                        if (is_array($val)) {
-                            $this->addElement($element, $val, $namespace);
-                        } else {
-                            $this->getXMLWriter()->writeElement($begin . $element, $val);
-                        }
-                    }
-                }
-            }
-        }
     }
 }

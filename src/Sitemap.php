@@ -634,7 +634,7 @@ class Sitemap
         $publicDir = scandir($this->getPublicDirectory());
 
         foreach ($publicDir as $file) {
-            if (preg_match_all('/^(' . $this->getIndexFilename() . ')((-){1}[\d]+)?(' . $this->getExt() . ')$/',
+            if (preg_match_all('/^(' . $this->getIndexFilename() . ')((-)[\d]+)?(' . $this->getExt() . ')$/',
                 $file)) {
                 unlink($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $file);
             }

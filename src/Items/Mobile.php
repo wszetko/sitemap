@@ -21,16 +21,7 @@ class Mobile extends Extension
     const NAMESPACE_URL = 'http://www.google.com/schemas/sitemap-mobile/1.0';
 
     /**
-     * @return array
+     * Element name
      */
-    public function toArray(): array
-    {
-        $array = [
-            '_namespace' => static::NAMESPACE_NAME,
-            '_element' => 'mobile',
-            'mobile' => []
-        ];
-
-        return $array;
-    }
+    const ELEMENT_NAME = 'mobile';
 }

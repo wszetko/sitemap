@@ -9,6 +9,9 @@ use InvalidArgumentException;
  * Class HrefLang
  *
  * @package Wszetko\Sitemap\Items
+ * @method addHrefLang($hrefLang, $href)
+ * @method setHrefLang($hrefLang, $href)
+ * @method getHrefLang()
  */
 class HrefLang extends Extension
 {
@@ -23,39 +26,39 @@ class HrefLang extends Extension
     const NAMESPACE_URL = 'http://www.w3.org/1999/xhtml';
 
     /**
-     * @var array
+     * Element name
      */
-    private $hrefLang = [];
+    const ELEMENT_NAME = 'link';
+
+    /**
+     * @dataType \Wszetko\Sitemap\Items\DataTypes\StringType
+     * @attribute href
+     * @attributeDataType \Wszetko\Sitemap\Items\DataTypes\URLType
+     * @var \Wszetko\Sitemap\Items\DataTypes\ArrayType
+     */
+    protected $hrefLang;
 
     /**
      * @param string $hrefLang
      * @param string $href
      *
      * @return self
+     * @throws \ReflectionException
      */
     public function __construct(string $hrefLang, string $href)
     {
-        return $this->addHrefLang($hrefLang, $href);
-    }
+        parent::__construct();
 
-    /**
-     * @param string $hrefLang
-     * @param string $href
-     *
-     * @return self
-     */
-    public function addHrefLang(string $hrefLang, string $href): self
-    {
-        preg_match_all("/^(?'hreflang'([a-z]{2}|(x)){1}((-){1}([A-Za-z]{2}|[A-Z]{1}([a-z]{1}|[a-z]{3})|(default)))?)$/",
-            $hrefLang, $matches);
+        $this->hrefLang
+            ->getBaseDataType()
+            ->setRequired(true)
+            ->setValueRegex("/^(?'hreflang'([a-z]{2}|(x))((-)([A-Za-z]{2}|[A-Z]([a-z]|[a-z]{3})|(default)))?)$/", 'hreflang');
+        $this->hrefLang
+            ->getBaseDataType()
+            ->getAttribute('href')
+            ->setRequired(true);
 
-        if (!empty($matches['hreflang'])) {
-            $this->hrefLang[$hrefLang] = $href;
-        } else {
-            throw new InvalidArgumentException('Invalid hreflang parameter.');
-        }
-
-        return $this;
+        $this->addHrefLang($hrefLang, $href);
     }
 
     /**
@@ -69,28 +72,16 @@ class HrefLang extends Extension
             'link' => []
         ];
 
-        foreach ($this->getHrefLangs() as $hreflang => $href) {
+        foreach ($this->getHrefLang() as $hreflang => $lang) {
             $array['link'][] = [
                 '_attributes' => [
                     'rel' => 'alternate',
                     'hreflang' => $hreflang,
-                    'href' => $href
+                    'href' => $lang['href']
                 ]
             ];
         }
 
         return $array;
-    }
-
-    /**
-     * @return array
-     */
-    public function getHrefLangs(): array
-    {
-        foreach ($this->hrefLang as &$href) {
-            $href = $this->getDomain() . $href;
-        }
-
-        return $this->hrefLang;
     }
 }

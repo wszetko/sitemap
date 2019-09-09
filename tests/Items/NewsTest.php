@@ -36,14 +36,14 @@ class NewsTest extends TestCase
     public function testConstructorExceptionName()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid publication name parameter.');
+        $this->expectExceptionMessage('publicationName need to be set.');
         $news = new Items\News('', 'en', '2014-02-14', 'Title');
     }
 
     public function testConstructorExceptionLang()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid publication lang parameter.');
+        $this->expectExceptionMessage('publicationLanguage need to be set.');
         new Items\News('News name', 'invalid', '2014-02-14', 'Title');
     }
 
@@ -119,19 +119,16 @@ class NewsTest extends TestCase
         $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
 
         $news->addGenres('Blog');
-        $this->assertEquals('Blog', $news->getGenres());
+        $this->assertEquals(['Blog'], $news->getGenres());
 
         $news->addGenres('Invalid entry');
-        $this->assertEquals('Blog', $news->getGenres());
-
-        $news->addGenres('Invalid entries, more then one');
-        $this->assertEquals('Blog', $news->getGenres());
+        $this->assertEquals(['Blog'], $news->getGenres());
 
         $news->addGenres('PressRelease');
-        $this->assertEquals('Blog, PressRelease', $news->getGenres());
+        $this->assertEquals(['Blog', 'PressRelease'], $news->getGenres());
 
-        $news->addGenres('Opinion, UserGenerated');
-        $this->assertEquals('Blog, PressRelease, Opinion, UserGenerated', $news->getGenres());
+        $news->addGenres(['Opinion', 'UserGenerated']);
+        $this->assertEquals(['Blog', 'PressRelease', 'Opinion', 'UserGenerated'], $news->getGenres());
     }
 
     public function testKeywords()
@@ -139,10 +136,10 @@ class NewsTest extends TestCase
         $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
 
         $news->addKeywords('Test1');
-        $this->assertEquals('Test1', $news->getKeywords());
+        $this->assertEquals(['Test1'], $news->getKeywords());
 
-        $news->addKeywords('Test2, Test3,Test4');
-        $this->assertEquals('Test1, Test2, Test3, Test4', $news->getKeywords());
+        $news->addKeywords(['Test2', 'Test3', ' Test4']);
+        $this->assertEquals(['Test1', 'Test2', 'Test3', 'Test4'], $news->getKeywords());
     }
 
     public function testStockTickers()
@@ -150,13 +147,13 @@ class NewsTest extends TestCase
         $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
 
         $news->addStockTickers('NASDAQ:AMAT');
-        $this->assertEquals('NASDAQ:AMAT', $news->getStockTickers());
+        $this->assertEquals(['NASDAQ:AMAT'], $news->getStockTickers());
 
         $news->addStockTickers('BOM:500325');
-        $this->assertEquals('NASDAQ:AMAT, BOM:500325', $news->getStockTickers());
+        $this->assertEquals(['NASDAQ:AMAT', 'BOM:500325'], $news->getStockTickers());
 
-        $news->addStockTickers('NASDAQ:AMD, NASDAQ:GOOG,NASDAQ:MSFT, NASDAQ:AITX');
-        $this->assertEquals('NASDAQ:AMAT, BOM:500325, NASDAQ:AMD, NASDAQ:GOOG, NASDAQ:MSFT', $news->getStockTickers());
+        $news->addStockTickers(['NASDAQ:AMD', 'NASDAQ:GOOG', 'NASDAQ:MSFT', 'NASDAQ:AITX']);
+        $this->assertEquals(['NASDAQ:AMAT', 'BOM:500325', 'NASDAQ:AMD', 'NASDAQ:GOOG', 'NASDAQ:MSFT'], $news->getStockTickers());
     }
 
     public function testToArray()

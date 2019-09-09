@@ -14,6 +14,7 @@ trait DateTime
 {
     /**
      * @param DateTimeInterface|string $dateTime
+     * @param bool                     $required
      *
      * @return string|null
      */

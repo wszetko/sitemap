@@ -30,15 +30,6 @@ class Memory implements DataCollector
     private $extensions = [];
 
     /**
-     * Memory constructor.
-     *
-     * @param array|null $config
-     */
-    public function __construct(?array $config)
-    {
-    }
-
-    /**
      * @param Url    $item
      * @param string $group
      */
@@ -190,5 +181,14 @@ class Memory implements DataCollector
     public function getExtensions(): array
     {
         return $this->extensions;
+    }
+
+    /**
+     * DataCollector constructor.
+     *
+     * @param array|null $config
+     */
+    public function __construct(?array $config)
+    {
     }
 }

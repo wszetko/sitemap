@@ -25,9 +25,9 @@ try {
 
     // Create example item
     $item = new Wszetko\Sitemap\Items\Url("example-url");
-    $item->setLastMod(new DateTime('now'))
+    $item->setLastmod(new DateTime('now'))
         ->setPriority(1)
-        ->setChangeFreq('never');
+        ->setChangefreq('never');
 
     // Add Mobile extension
     $item->addExtension(new Wszetko\Sitemap\Items\Mobile());
@@ -55,10 +55,9 @@ try {
 
     // Add Video extension
     $video = (new Wszetko\Sitemap\Items\Video('/thumb.png', 'Video title', 'Video desc'))
-        ->addContentLoc('/video.avi')
-        ->addContentLoc('/video.mp4')
-        ->addPlayerLoc('player.swf', 'Yes')
-        ->addPlayerLoc('player2.swf')
+        ->setContentLoc('/video.avi')
+        ->setContentLoc('/video.mp4')
+        ->setPlayerLoc('player.swf', 'Yes')
         ->setPrice(10, 'PLN', 'rent', 'hd')
         ->setDuration(10)
         ->setExpirationDate(new DateTime('now'))
@@ -71,7 +70,7 @@ try {
         ->setRequiresSubscription(false)
         ->setUploader('Uploader', '/uploader-url')
         ->setLive(false)
-        ->setTags(['tag1', 'tag2'])
+        ->setTag(['tag1', 'tag2'])
         ->setCategory('Category')
         ->setGalleryLoc('/upload-gallery');
     $item->addExtension($video);

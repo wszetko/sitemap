@@ -10,5 +10,23 @@ namespace Wszetko\Sitemap\Interfaces;
  */
 interface Item
 {
+    /**
+     * Name of Namescapce
+     */
+    const NAMESPACE_NAME = null;
+
+    /**
+     * Namescapce URL
+     */
+    const NAMESPACE_URL = null;
+
+    /**
+     * Element name
+     */
+    const ELEMENT_NAME = null;
+
+    /**
+     * @return array
+     */
     public function toArray(): array;
 }

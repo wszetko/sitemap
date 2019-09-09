@@ -16,50 +16,59 @@ class HrefLangTest extends TestCase
 {
     public function testConstructor()
     {
-        $HrefLang = new HrefLang('pl-PL', '/');
-        $this->assertInstanceOf(HrefLang::class, $HrefLang);
+        $hrefLang = new HrefLang('pl-PL', '/');
+        $this->assertInstanceOf(HrefLang::class, $hrefLang);
 
-        $HrefLang = new HrefLang('fr-be', '/');
-        $this->assertInstanceOf(HrefLang::class, $HrefLang);
+        $hrefLang = new HrefLang('fr-be', '/');
+        $this->assertInstanceOf(HrefLang::class, $hrefLang);
 
-        $HrefLang = new HrefLang('en', '/');
-        $this->assertInstanceOf(HrefLang::class, $HrefLang);
+        $hrefLang = new HrefLang('en', '/');
+        $this->assertInstanceOf(HrefLang::class, $hrefLang);
 
-        $HrefLang = new HrefLang('x-default', '/');
-        $this->assertInstanceOf(HrefLang::class, $HrefLang);
+        $hrefLang = new HrefLang('x-default', '/');
+        $this->assertInstanceOf(HrefLang::class, $hrefLang);
 
-        $HrefLang = new HrefLang('zh-Hant', '/');
-        $this->assertInstanceOf(HrefLang::class, $HrefLang);
+        $hrefLang = new HrefLang('zh-Hant', '/');
+        $this->assertInstanceOf(HrefLang::class, $hrefLang);
 
-        $HrefLang = new HrefLang('zh-Hans', '/');
-        $this->assertInstanceOf(HrefLang::class, $HrefLang);
+        $hrefLang = new HrefLang('zh-Hans', '/');
+        $this->assertInstanceOf(HrefLang::class, $hrefLang);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid hreflang parameter.');
-        $HrefLang = new HrefLang('PL', '/');
+        $this->expectExceptionMessage('hrefLang need to be set.');
+        new HrefLang('PL', '/');
     }
 
     public function testHrefLang()
     {
-        $HrefLang = new HrefLang('pl-PL', '/');
-        $HrefLang->addHrefLang('en', '/en');
-        $HrefLang->setDomain('https://example.com');
+        $hrefLang = new HrefLang('pl-PL', '/');
+        $hrefLang->setDomain('https://example.com');
 
         $expectedResult = [
-            'pl-PL' => 'https://example.com/',
-            'en' => 'https://example.com/en'
+            'pl-PL' => ['href' => 'https://example.com/']
         ];
 
-        $this->assertEquals($expectedResult, $HrefLang->getHrefLangs());
+        $this->assertEquals($expectedResult, $hrefLang->getHrefLang());
+
+        $hrefLang = new HrefLang('pl-PL', '/');
+        $hrefLang->setDomain('https://example.com');
+        $hrefLang->addHrefLang('en', '/en');
+
+        $expectedResult = [
+            'pl-PL' => ['href' => 'https://example.com/'],
+            'en' => ['href' => 'https://example.com/en']
+        ];
+
+        $this->assertEquals($expectedResult, $hrefLang->getHrefLang());
     }
 
     public function testToArray()
     {
-        $HrefLang = new HrefLang('pl-PL', '/');
-        $HrefLang->setDomain('https://example.com');
+        $hrefLang = new HrefLang('pl-PL', '/');
+        $hrefLang->setDomain('https://example.com');
 
         $expectedResult = [
-            '_namespace' => $HrefLang::NAMESPACE_NAME,
+            '_namespace' => $hrefLang::NAMESPACE_NAME,
             '_element' => 'link',
             'link' => [
                 [
@@ -72,6 +81,6 @@ class HrefLangTest extends TestCase
             ]
         ];
 
-        $this->assertEquals($expectedResult, $HrefLang->toArray());
+        $this->assertEquals($expectedResult, $hrefLang->toArray());
     }
 }
