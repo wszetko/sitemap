@@ -24,6 +24,10 @@ class URLType extends StringType
      */
     public function getValue()
     {
+        if ($this->value === null) {
+            return null;
+        }
+
         if ($this->isExternal() && Url::normalizeUrl($this->value)) {
             $value = $this->value;
         } else {
@@ -31,19 +35,15 @@ class URLType extends StringType
 
             if (!empty($value)) {
                 $value = $this->getDomain() . '/' . ltrim($value, '/');
-            } else {
-                $value = null;
             }
         }
 
-        if (!empty($value)) {
-            $attributes = $this->getAttributes();
+        $attributes = $this->getAttributes();
 
-            if (!empty($attributes)) {
-                return [$value => $attributes];
-            } else {
-                return $value;
-            }
+        if (!empty($value) && !empty($attributes)) {
+            return [$value => $attributes];
+        } else {
+            return $value;
         }
     }
 

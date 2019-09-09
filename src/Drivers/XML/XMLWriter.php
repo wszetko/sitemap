@@ -241,7 +241,11 @@ class XMLWriter implements XML
     private function addElementArray(string $element, $value, ?string $namespace = null): void
     {
         if (!$this->isAssoc($value)) {
-            $this->addElementArrayNonAssoc($element, $value, $namespace);
+            if (!empty($value)) {
+                $this->addElementArrayNonAssoc($element, $value, $namespace);
+            } else {
+                $this->getXMLWriter()->writeElement(($namespace ? $namespace . ':' : '') . $element);
+            }
         } else {
             $this->getXMLWriter()->startElement(($namespace ? $namespace . ':' : '') . $element);
             if (isset($value['_attributes'])) {

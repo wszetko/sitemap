@@ -92,8 +92,10 @@ class Url extends AbstractItem
         $array = parent::toArray();
 
         foreach ($this->getExtensions() as $extension => $data) {
-            $data->setDomain($this->getDomain());
-            $array['url'][$extension] = $data->toArray();
+            foreach ($data as $ext) {
+                $ext->setDomain($this->getDomain());
+                $array['url'][$extension][] = $ext->toArray();
+            }
         }
 
         return $array;
@@ -114,7 +116,11 @@ class Url extends AbstractItem
      */
     public function addExtension(Extension $extension): self
     {
-        $this->extensions[$extension::NAMESPACE_NAME] = $extension;
+        if (!isset($this->extensions[$extension::NAMESPACE_NAME])) {
+            $this->extensions[$extension::NAMESPACE_NAME] = [];
+        }
+
+        $this->extensions[$extension::NAMESPACE_NAME][] = $extension;
 
         return $this;
     }

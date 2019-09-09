@@ -150,11 +150,11 @@ class StringType extends AbstractDataType
             }
         }
 
-        if ($this->getMinLength() && mb_strlen($value) < $this->getMinLength()) {
+        if ($this->getMinLength() !== null && mb_strlen($value) < $this->getMinLength()) {
             $value = null;
         }
 
-        if ($this->getMaxLength() && $value !== null && mb_strlen($value) > $this->getMaxLength()) {
+        if ($this->getMaxLength() !== null && $value !== null && mb_strlen($value) > $this->getMaxLength()) {
             $value = mb_substr($value, 0, $this->getMaxLength());
         }
 

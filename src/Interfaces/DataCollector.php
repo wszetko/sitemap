@@ -76,7 +76,7 @@ interface DataCollector
     /**
      * @param array $extensions
      */
-    public function addExtension(array $extensions): void;
+    public function addExtensions(array $extensions): void;
 
     /**
      * @return array

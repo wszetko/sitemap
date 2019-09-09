@@ -132,7 +132,7 @@ class UrlTest extends TestCase
         $url->addExtension($extension);
 
         $expectedResult = [
-            $extension::NAMESPACE_NAME => $extension
+            $extension::NAMESPACE_NAME => [$extension]
         ];
 
         $this->assertEquals($expectedResult, $url->getExtensions());
@@ -157,7 +157,7 @@ class UrlTest extends TestCase
                 'lastmod' => '2013-11-16',
                 'changefreq' => 'always',
                 'priority' => '1.0',
-                $extension::NAMESPACE_NAME => $extension->toArray()
+                $extension::NAMESPACE_NAME => [$extension->toArray()]
             ],
         ];
 

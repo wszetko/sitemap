@@ -16,7 +16,7 @@ interface DataType
      *
      * @return \Wszetko\Sitemap\Interfaces\DataType
      */
-    public function setValue($value, ...$parameters): self;
+    public function setValue($value, ...$parameters): DataType;
 
     /**
      * @return mixed

@@ -34,10 +34,15 @@ try {
 
     // Add Image extension
     $image = new Wszetko\Sitemap\Items\Image('/image.png');
-    $image->setCaption('Caption')
+    $image->setCaption('Caption for PNG')
         ->setLicense('https://example.com/licence')
         ->setGeoLocation('Gdynia')
         ->setTitle('Title');
+    $item->addExtension($image);
+
+    // Add another Image extension
+    $image = new Wszetko\Sitemap\Items\Image('/image.jpg');
+    $image->setCaption('Caption for JPG');
     $item->addExtension($image);
 
     // Add HrefLang extension

@@ -39,20 +39,19 @@ class Memory implements DataCollector
             $this->items[$group] = [];
         }
 
-        $this->addExtension($item->getExtensions());
+        $this->addExtensions($item->getExtensions());
         $this->items[$group][] = $item->toArray();
     }
 
     /**
      * @param Extension[] $extensions
      */
-    public function addExtension(array $extensions): void
+    public function addExtensions(array $extensions): void
     {
-        /**
-         * @var Extension $extension
-         */
         foreach ($extensions as $extension) {
-            $this->extensions[$extension::NAMESPACE_NAME] = $extension::NAMESPACE_URL;
+            foreach ($extension as $ext) {
+                $this->extensions[$ext::NAMESPACE_NAME] = $ext::NAMESPACE_URL;
+            }
         }
     }
 

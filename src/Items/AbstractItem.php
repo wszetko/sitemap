@@ -81,6 +81,8 @@ abstract class AbstractItem implements Item
 
     public function toArray(): array
     {
+        $array = [];
+
         if (static::NAMESPACE_NAME && static::ELEMENT_NAME) {
             $array = [
                 '_namespace' => static::NAMESPACE_NAME,
@@ -103,24 +105,20 @@ abstract class AbstractItem implements Item
                 $property = implode('_', $property);
                 $data = $this->$method();
 
-                if ($data) {
-                    if (is_array($data)) {
-//                        $array[static::ELEMENT_NAME][$property] = [];
+                if (is_array($data)) {if ($this->isAssoc($data)) {
+                        $item = array_key_first($data);
+                        $array[static::ELEMENT_NAME][$property]['_value'] = $item;
 
-                        if ($this->isAssoc($data)) {
-                            $item = array_key_first($data);
-                            $array[static::ELEMENT_NAME][$property]['_value'] = $item;
-                            foreach ($data[$item] as $attr => $val) {
-                                $array[static::ELEMENT_NAME][$property]['_attributes'][$attr] = $val;
-                            }
-                        } else {
-                            foreach ($data as $element) {
-                                $array[static::ELEMENT_NAME][$property][] = $element;
-                            }
+                        foreach ($data[$item] as $attr => $val) {
+                            $array[static::ELEMENT_NAME][$property]['_attributes'][$attr] = $val;
                         }
                     } else {
-                        $array[static::ELEMENT_NAME][$property] = $data;
+                        foreach ($data as $element) {
+                            $array[static::ELEMENT_NAME][$property][] = $element;
+                        }
                     }
+                } elseif (!empty($data)) {
+                    $array[static::ELEMENT_NAME][$property] = $data;
                 }
             }
         }
