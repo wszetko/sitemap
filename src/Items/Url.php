@@ -60,7 +60,7 @@ class Url extends AbstractItem
     /**
      * Array of used extensions
      *
-     * @var Extension[]
+     * @var array
      */
     private $extensions = [];
 
@@ -102,7 +102,7 @@ class Url extends AbstractItem
     }
 
     /**
-     * @return Extension[]
+     * @return array
      */
     public function getExtensions(): array
     {

@@ -105,7 +105,8 @@ abstract class AbstractItem implements Item
                 $property = implode('_', $property);
                 $data = $this->$method();
 
-                if (is_array($data)) {if ($this->isAssoc($data)) {
+                if (is_array($data)) {
+                    if ($this->isAssoc($data)) {
                         $item = array_key_first($data);
                         $array[static::ELEMENT_NAME][$property]['_value'] = $item;
 

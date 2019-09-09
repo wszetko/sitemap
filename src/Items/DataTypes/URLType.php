@@ -24,7 +24,7 @@ class URLType extends StringType
      */
     public function getValue()
     {
-        if ($this->value === null) {
+        if ($this->value === null || !is_string($this->value)) {
             return null;
         }
 

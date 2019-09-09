@@ -247,32 +247,37 @@ class XMLWriter implements XML
                 $this->getXMLWriter()->writeElement(($namespace ? $namespace . ':' : '') . $element);
             }
         } else {
-            $this->getXMLWriter()->startElement(($namespace ? $namespace . ':' : '') . $element);
-            if (isset($value['_attributes'])) {
-                foreach ($value['_attributes'] as $attribute => $val) {
-                    $this->getXMLWriter()->writeAttribute($attribute, $val);
-                }
+            $this->addElementArrayAssoc($element, $value, $namespace);
+        }
+    }
 
-                if (isset($value['_value'])) {
-                    if (is_array($value['_value'])) {
-                        foreach ($value['_value'] as $el => $val) {
-                            $this->addElement($el, $val);
-                        }
-                    } else {
-                        $this->getXMLWriter()->text((string) $value['_value']);
+    private function addElementArrayAssoc(string $element, $value, ?string $namespace = null): void
+    {
+        $this->getXMLWriter()->startElement(($namespace ? $namespace . ':' : '') . $element);
+        if (isset($value['_attributes'])) {
+            foreach ($value['_attributes'] as $attribute => $val) {
+                $this->getXMLWriter()->writeAttribute($attribute, $val);
+            }
+
+            if (isset($value['_value'])) {
+                if (is_array($value['_value'])) {
+                    foreach ($value['_value'] as $el => $val) {
+                        $this->addElement($el, $val);
                     }
-                }
-            } else {
-                foreach ($value as $el => $val) {
-                    if (is_array($val)) {
-                        $this->addElement($el, $val, $namespace);
-                    } else {
-                        $this->getXMLWriter()->writeElement(($namespace ? $namespace . ':' : '') . $el, (string) $val);
-                    }
+                } else {
+                    $this->getXMLWriter()->text((string) $value['_value']);
                 }
             }
-            $this->getXMLWriter()->endElement();
+        } else {
+            foreach ($value as $el => $val) {
+                if (is_array($val)) {
+                    $this->addElement($el, $val, $namespace);
+                } else {
+                    $this->getXMLWriter()->writeElement(($namespace ? $namespace . ':' : '') . $el, (string) $val);
+                }
+            }
         }
+        $this->getXMLWriter()->endElement();
     }
 
     /**

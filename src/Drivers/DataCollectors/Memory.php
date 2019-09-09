@@ -44,7 +44,7 @@ class Memory implements DataCollector
     }
 
     /**
-     * @param Extension[] $extensions
+     * @param array $extensions
      */
     public function addExtensions(array $extensions): void
     {
