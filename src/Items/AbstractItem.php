@@ -34,8 +34,7 @@ abstract class AbstractItem implements Item
 
             if (!empty($data['type']) &&
                 class_exists($data['type']) &&
-                in_array('Wszetko\Sitemap\Interfaces\DataType', class_implements($data['type'])))
-            {
+                in_array('Wszetko\Sitemap\Interfaces\DataType', class_implements($data['type']))) {
                 if (!empty($data['dataType']) && class_exists($data['dataType'])) {
                     $this->{$property->getName()} = new ArrayType($property->getName(), $data['dataType']);
                     $this->{$property->getName()}->getBaseDataType()->addAttributes($data['attributes']);
@@ -119,7 +118,6 @@ abstract class AbstractItem implements Item
                                 $array[static::ELEMENT_NAME][$property][] = $element;
                             }
                         }
-
                     } else {
                         $array[static::ELEMENT_NAME][$property] = $data;
                     }
@@ -138,7 +136,7 @@ abstract class AbstractItem implements Item
      */
     public function __call($name, $arguments)
     {
-        $operation = substr($name, 0 ,3);
+        $operation = substr($name, 0, 3);
         $property = lcfirst(substr($name, 3));
 
         if (property_exists($this, $property) &&

@@ -23,7 +23,7 @@ class ImageTest extends TestCase
     public function testGetLoc()
     {
         $image = new Items\Image('image.png');
-        $image->setDomain('https://example.com');;
+        $image->setDomain('https://example.com');
         $this->assertEquals('https://example.com/image.png', $image->getLoc(), 'Faild testGetLoc without leading slash.');
 
         $image = new Items\Image('/image.png');

@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Wszetko\Sitemap\Items\DataTypes;
 
 use Wszetko\Sitemap\Helpers\Url;
-use Wszetko\Sitemap\Traits\Domain;
 
 /**
  * Class URLType

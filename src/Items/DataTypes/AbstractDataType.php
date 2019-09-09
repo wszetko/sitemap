@@ -76,7 +76,6 @@ abstract class AbstractDataType implements DataType
         $this->value = $value;
 
         foreach ($parameters[0] as $key => $attribute) {
-
             if (!empty($attribute)) {
                 $attr = array_keys($this->attributes)[$key] ?? null;
 

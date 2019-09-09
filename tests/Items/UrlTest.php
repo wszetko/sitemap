@@ -92,7 +92,6 @@ class UrlTest extends TestCase
         ];
 
         foreach ($tests as $test) {
-
             $url = new Items\Url('test');
             $url->setChangefreq($test['input']);
             $this->assertEquals($test['expected'], $url->getChangefreq());

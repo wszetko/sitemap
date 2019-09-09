@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Wszetko\Sitemap\Items;
 
 use InvalidArgumentException as InvalidArgumentException;
-use Wszetko\Sitemap\Items\DataTypes\StringType;
 use Wszetko\Sitemap\Traits\DateTime;
 use Wszetko\Sitemap\Traits\IsAssoc;
 

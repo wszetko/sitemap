@@ -125,8 +125,7 @@ class StringType extends AbstractDataType
      */
     public function getValueRegex(): ?array
     {
-        if (!empty($this->regex) && !empty($this->regexGroup))
-        {
+        if (!empty($this->regex) && !empty($this->regexGroup)) {
             return [$this->regexGroup => $this->regex];
         }
 
@@ -179,8 +178,7 @@ class StringType extends AbstractDataType
             }
         }
 
-        if (empty($value) && $this->isRequired())
-        {
+        if (empty($value) && $this->isRequired()) {
             throw new InvalidArgumentException($this->getName() . ' need to be set.');
         }
 

@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Wszetko\Sitemap\Items;
 
-use InvalidArgumentException;
-
 /**
  * Class HrefLang
  *
