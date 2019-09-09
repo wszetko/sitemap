@@ -19,11 +19,6 @@ To do
 * Ability to publish sitemap without clearing previous files
 * Logging compatible with PSR-3
 * Improve URL Normalization
-<<<<<<< Updated upstream
-* More flexible input value (bool ==> yes/no etc.)
-=======
-* universalize toArray Method
->>>>>>> Stashed changes
 
 ## License
 
