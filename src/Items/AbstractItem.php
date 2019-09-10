@@ -8,6 +8,7 @@ use ReflectionProperty;
 use Wszetko\Sitemap\Interfaces\DataType;
 use Wszetko\Sitemap\Interfaces\Item;
 use Wszetko\Sitemap\Items\DataTypes\ArrayType;
+use Wszetko\Sitemap\Traits\Domain;
 use Wszetko\Sitemap\Traits\IsAssoc;
 
 /**
@@ -18,6 +19,7 @@ use Wszetko\Sitemap\Traits\IsAssoc;
 abstract class AbstractItem implements Item
 {
     use IsAssoc;
+    use Domain;
 
     /**
      * AbstractItem constructor.
@@ -153,11 +155,9 @@ abstract class AbstractItem implements Item
                 case 'add':
                     $this->$property->addValue($arguments[0], array_slice($arguments, 1));
                     return $this;
-                    break;
                 case 'set':
                     $this->$property->setValue($arguments[0], array_slice($arguments, 1));
                     return $this;
-                    break;
                 case 'get':
                     if (method_exists($this, 'getDomain') &&
                         method_exists($this->$property, 'setDomain') &&
@@ -167,7 +167,6 @@ abstract class AbstractItem implements Item
                     }
 
                     return $this->$property->getValue();
-                    break;
             }
         }
     }

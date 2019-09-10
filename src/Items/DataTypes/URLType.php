@@ -28,7 +28,7 @@ class URLType extends StringType
             return null;
         }
 
-        if ($this->isExternal() && Url::normalizeUrl($this->value)) {
+        if ($this->isExternal() && Url::normalizeUrl($this->value) !== false) {
             $value = $this->value;
         } else {
             $value = str_replace($this->getDomain(), '', $this->value);

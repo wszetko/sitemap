@@ -170,6 +170,5 @@ class XMLWriterTest extends TestCase
   </video:video>
  </url>
 </urlset>", file_get_contents($dir . DIRECTORY_SEPARATOR . 'sitemap.xml'));
-
     }
 }

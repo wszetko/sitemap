@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Wszetko\Sitemap\Items;
 
 use Wszetko\Sitemap\Sitemap;
-use Wszetko\Sitemap\Traits\Domain;
 
 /**
  * Class Url
@@ -22,8 +21,6 @@ use Wszetko\Sitemap\Traits\Domain;
  */
 class Url extends AbstractItem
 {
-    use Domain;
-
     /**
      * Element name
      */

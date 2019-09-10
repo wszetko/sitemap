@@ -153,7 +153,7 @@ class Sitemap
      */
     public function __construct(string $domain = null)
     {
-        if ($domain) {
+        if ($domain !== null) {
             $this->setDomain($domain);
         }
     }

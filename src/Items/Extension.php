@@ -13,5 +13,4 @@ use Wszetko\Sitemap\Traits\Domain;
  */
 abstract class Extension extends AbstractItem implements Item
 {
-    use Domain;
 }

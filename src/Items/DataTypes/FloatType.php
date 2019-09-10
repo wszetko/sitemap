@@ -119,7 +119,7 @@ class FloatType extends AbstractDataType
             return $this;
         }
 
-        if ($this->getPrecision()) {
+        if ($this->getPrecision() !== null) {
             $value = round($value, $this->getPrecision());
             $value = number_format($value, $this->getPrecision(), '.', '');
         }

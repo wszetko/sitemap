@@ -136,12 +136,16 @@ class News extends Extension
         $this->setTitle($title);
         $this->access
             ->setAllowedValues('Subscription, Registration');
-        $this->genres
-            ->getBaseDataType()
+        $generesValue = $this->genres
+            ->getBaseDataType();
+        /** @var $generesValue \Wszetko\Sitemap\Items\DataTypes\StringType */
+        $generesValue
             ->setAllowedValues('PressRelease, Satire, Blog, OpEd, Opinion, UserGenerated');
-        $this->stockTickers
+        $stickTickersValue = $this->stockTickers
             ->setMaxElements(5)
-            ->getBaseDataType()
+            ->getBaseDataType();
+        /** @var $stickTickersValue \Wszetko\Sitemap\Items\DataTypes\StringType */
+        $stickTickersValue
             ->setValueRegex("/^(?'stockTickers'\w+:\w+)?$/", 'stockTickers');
     }
 

@@ -87,7 +87,7 @@ class ArrayType extends AbstractDataType
      * @param       $value
      * @param mixed ...$parameters
      */
-    public function addValue($value, ...$parameters)
+    public function addValue($value, ...$parameters): void
     {
         if (is_array($value)) {
             foreach ($value as $val) {
@@ -116,19 +116,21 @@ class ArrayType extends AbstractDataType
 
         $result = [];
 
-        foreach ($values as $element) {
-            $this->propagateDomain($element);
-            $value = $element->getValue();
+        if (is_array($values)) {
+            foreach ($values as $element) {
+                $this->propagateDomain($element);
+                $value = $element->getValue();
 
-            if (is_array($value) && !empty(array_values($value)[0])) {
-                $result[array_key_first($value)] = array_values($value)[0];
-            } elseif (!empty($value)) {
-                $result[] = $value;
+                if (is_array($value) && !empty(array_values($value)[0])) {
+                    $result[array_key_first($value)] = array_values($value)[0];
+                } elseif (!empty($value)) {
+                    $result[] = $value;
+                }
             }
-        }
 
-        if ($this->getMaxElements()) {
-            $result = array_slice($result, 0, $this->getMaxElements());
+            if ($this->getMaxElements() !== null) {
+                $result = array_slice($result, 0, $this->getMaxElements());
+            }
         }
 
         return $result;
