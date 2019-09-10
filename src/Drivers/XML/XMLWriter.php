@@ -88,6 +88,17 @@ class XMLWriter implements XML
     }
 
     /**
+     * @throws \Exception
+     */
+    public function closeSitemap(): void
+    {
+        $this->getXMLWriter()->endElement();
+        $this->getXMLWriter()->endDocument();
+        $this->flushData();
+        $this->endFile();
+    }
+
+    /**
      * @return \XMLWriter
      */
     private function getXMLWriter(): \XMLWriter
@@ -130,17 +141,6 @@ class XMLWriter implements XML
     }
 
     /**
-     * @throws \Exception
-     */
-    public function closeSitemap(): void
-    {
-        $this->getXMLWriter()->endElement();
-        $this->getXMLWriter()->endDocument();
-        $this->flushData();
-        $this->endFile();
-    }
-
-    /**
      * Remove whitespace chars from end of file (Google don't like them)
      *
      * @return void
@@ -149,10 +149,6 @@ class XMLWriter implements XML
     private function endFile(): void
     {
         $sitemapFile = fopen($this->getSitemapFileFullPath(), 'r+');
-
-        if ($sitemapFile === false) {
-            throw new Exception("Unable to open file.");
-        }
 
         fseek($sitemapFile, -1, SEEK_END);
         $truncate = 0;
