@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Wszetko\Sitemap\Drivers\XML;
 
@@ -6,6 +7,11 @@ use Wszetko\Sitemap\Interfaces\XML;
 use Wszetko\Sitemap\Traits\Domain;
 use Wszetko\Sitemap\Traits\IsAssoc;
 
+/**
+ * Class AbstractXML
+ *
+ * @package Wszetko\Sitemap\Drivers\XML
+ */
 abstract class AbstractXML implements XML
 {
     use IsAssoc;
