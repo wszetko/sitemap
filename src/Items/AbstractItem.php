@@ -46,6 +46,11 @@ abstract class AbstractItem implements Item
         }
     }
 
+    /**
+     * @param \ReflectionProperty $property
+     *
+     * @return array
+     */
     private function grabData(ReflectionProperty $property): array
     {
         preg_match_all('/@var\s+(?\'type\'[^\s]+)|@dataType\s+(?\'dataType\'[^\s]+)|@attribute\s+(?\'attribute\'[^\s]+)|@attributeDataType\s+(?\'attributeDataType\'[^\s]+)/m', $property->getDocComment(), $matches);
@@ -79,6 +84,9 @@ abstract class AbstractItem implements Item
         return $results;
     }
 
+    /**
+     * @return array
+     */
     public function toArray(): array
     {
         $array = [];

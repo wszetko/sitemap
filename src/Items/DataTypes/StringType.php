@@ -140,15 +140,26 @@ class StringType extends AbstractDataType
      */
     public function setValue($value, ...$parameters): DataType
     {
-        if (is_numeric($value)) {
+        if ($value !== null) {
             $value = strval($value);
-        } elseif (is_object($value)) {
-            if (method_exists($value, '__toString')) {
-                $value = strval($value);
-            } else {
-                $value = null;
-            }
+            $this->checkValue($value);
         }
+
+        if (empty($value) && $this->isRequired()) {
+            throw new InvalidArgumentException($this->getName() . ' need to be set.');
+        }
+
+        parent::setValue($value, $parameters[0] ?? []);
+
+        return $this;
+    }
+
+    /**
+     * @param $value
+     */
+    private function checkValue(&$value)
+    {
+        $value = trim($value);
 
         if ($this->getMinLength() !== null && mb_strlen($value) < $this->getMinLength()) {
             $value = null;
@@ -177,15 +188,5 @@ class StringType extends AbstractDataType
                 $value = null;
             }
         }
-
-        if (empty($value) && $this->isRequired()) {
-            throw new InvalidArgumentException($this->getName() . ' need to be set.');
-        }
-
-        $value = is_string($value) ? trim($value) : $value;
-
-        parent::setValue($value, $parameters[0] ?? []);
-
-        return $this;
     }
 }

@@ -88,6 +88,11 @@ abstract class AbstractDataType implements DataType
         return $this;
     }
 
+    /**
+     * @param $attributes
+     *
+     * @return \Wszetko\Sitemap\Items\DataTypes\AbstractDataType
+     */
     public function addAttributes($attributes): self
     {
         foreach ($attributes as $name => $dataType) {
@@ -97,11 +102,19 @@ abstract class AbstractDataType implements DataType
         return $this;
     }
 
+    /**
+     * @param $name
+     *
+     * @return mixed|null
+     */
     public function getAttribute($name)
     {
         return isset($this->attributes[$name]) ? $this->attributes[$name] : null;
     }
 
+    /**
+     * @return array
+     */
     public function getAttributes(): array
     {
         $attributes = [];
@@ -117,6 +130,9 @@ abstract class AbstractDataType implements DataType
         return $attributes;
     }
 
+    /**
+     * @param object $target
+     */
     public function propagateDomain(object &$target): void
     {
         if ($this->getDomain() !== null) {

@@ -50,10 +50,6 @@ class ImageTest extends TestCase
         };
         $image->setCaption($caption);
         $this->assertEquals('Test', $image->getCaption());
-
-        $image = new Items\Image('image.png');
-        $image->setCaption(new \stdClass());
-        $this->assertNull($image->getCaption());
     }
 
     public function testGeolocation()
