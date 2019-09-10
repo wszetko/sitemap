@@ -40,19 +40,18 @@ class HrefLang extends Extension
      * @param string $hrefLang
      * @param string $href
      *
-     * @return self
      * @throws \ReflectionException
      */
     public function __construct(string $hrefLang, string $href)
     {
         parent::__construct();
 
-        $this->hrefLang
-            ->getBaseDataType()
+        $hrefLangValue = $this->hrefLang
+            ->getBaseDataType();
+        /** @var $hrefLang \Wszetko\Sitemap\Items\DataTypes\StringType */
+        $hrefLangValue
             ->setRequired(true)
-            ->setValueRegex("/^(?'hreflang'([a-z]{2}|(x))((-)([A-Za-z]{2}|[A-Z]([a-z]|[a-z]{3})|(default)))?)$/", 'hreflang');
-        $this->hrefLang
-            ->getBaseDataType()
+            ->setValueRegex("/^(?'hreflang'([a-z]{2}|(x))((-)([A-Za-z]{2}|[A-Z]([a-z]|[a-z]{3})|(default)))?)$/", 'hreflang')
             ->getAttribute('href')
             ->setRequired(true);
 

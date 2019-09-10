@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Wszetko\Sitemap\Items;
 
 use Wszetko\Sitemap\Interfaces\Item;
-use Wszetko\Sitemap\Traits\Domain;
 
 /**
  * Class Extension

@@ -10,7 +10,7 @@ trait IsAssoc
      *
      * @return bool
      */
-    private function isAssoc(array $array): bool
+    protected function isAssoc(array $array): bool
     {
         foreach ($array as $key => $val) {
             if (!is_integer($key)) {

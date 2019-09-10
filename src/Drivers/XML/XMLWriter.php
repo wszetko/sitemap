@@ -4,36 +4,16 @@ declare(strict_types=1);
 namespace Wszetko\Sitemap\Drivers\XML;
 
 use Exception;
-use Wszetko\Sitemap\Interfaces\XML;
 use Wszetko\Sitemap\Sitemap;
-use Wszetko\Sitemap\Traits\Domain;
-use Wszetko\Sitemap\Traits\IsAssoc;
 
 /**
  * Class XMLWriter
  *
  * @package Wszetko\Sitemap\Drivers\XML
+ * @method getXMLWriter(): \XMLWriter
  */
-class XMLWriter implements XML
+class XMLWriter extends AbstractXML
 {
-    use IsAssoc;
-    use Domain;
-
-    /**
-     * @var \XMLWriter
-     */
-    private $XMLWriter;
-
-    /**
-     * @var string
-     */
-    private $currentSitemap;
-
-    /**
-     * @var string|null
-     */
-    private $workDir;
-
     /**
      * XMLWriter constructor.
      *
@@ -49,22 +29,6 @@ class XMLWriter implements XML
 
         $this->XMLWriter = new \XMLWriter();
         $this->setDomain($config['domain']);
-    }
-
-    /**
-     * @return string
-     */
-    public function getCurrentSitemap(): string
-    {
-        return $this->currentSitemap;
-    }
-
-    /**
-     * @param string $currentSitemap
-     */
-    public function setCurrentSitemap(string $currentSitemap): void
-    {
-        $this->currentSitemap = $currentSitemap;
     }
 
     /**
@@ -99,14 +63,6 @@ class XMLWriter implements XML
     }
 
     /**
-     * @return \XMLWriter
-     */
-    private function getXMLWriter(): \XMLWriter
-    {
-        return $this->XMLWriter;
-    }
-
-    /**
      * Save from buffer to file
      *
      * @return void
@@ -114,30 +70,6 @@ class XMLWriter implements XML
     private function flushData(): void
     {
         file_put_contents($this->getSitemapFileFullPath(), $this->getXMLWriter()->flush(true), FILE_APPEND);
-    }
-
-    /**
-     * @return string
-     */
-    private function getSitemapFileFullPath(): string
-    {
-        return $this->getWorkDir() . DIRECTORY_SEPARATOR . $this->currentSitemap;
-    }
-
-    /**
-     * @return string
-     */
-    public function getWorkDir(): string
-    {
-        return $this->workDir;
-    }
-
-    /**
-     * @param string $dir
-     */
-    public function setWorkDir(string $dir): void
-    {
-        $this->workDir = $dir;
     }
 
     /**
