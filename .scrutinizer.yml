@@ -6,13 +6,13 @@ build:
           - 'true'
       environment:
         php:
-          version: 7.2
+          version: 7.3
       tests:
         override:
           -
             command: 'composer phpunit'
             coverage:
-              file: 'build/logs/clover.xml'
+              file: 'build/clover.xml'
               format: 'clover'
 checks:
   php:
