@@ -1,12 +1,23 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Items;
 
 /**
- * Class HrefLang
+ * Class HrefLang.
  *
  * @package Wszetko\Sitemap\Items
+ *
  * @method addHrefLang($hrefLang, $href)
  * @method setHrefLang($hrefLang, $href)
  * @method getHrefLang()
@@ -14,24 +25,25 @@ namespace Wszetko\Sitemap\Items;
 class HrefLang extends Extension
 {
     /**
-     * Name of Namescapce
+     * Name of Namescapce.
      */
-    const NAMESPACE_NAME = 'xhtml';
+    public const NAMESPACE_NAME = 'xhtml';
 
     /**
-     * Namespace URL
+     * Namespace URL.
      */
-    const NAMESPACE_URL = 'http://www.w3.org/1999/xhtml';
+    public const NAMESPACE_URL = 'http://www.w3.org/1999/xhtml';
 
     /**
-     * Element name
+     * Element name.
      */
-    const ELEMENT_NAME = 'link';
+    public const ELEMENT_NAME = 'link';
 
     /**
      * @dataType \Wszetko\Sitemap\Items\DataTypes\StringType
      * @attribute href
      * @attributeDataType \Wszetko\Sitemap\Items\DataTypes\URLType
+     *
      * @var \Wszetko\Sitemap\Items\DataTypes\ArrayType
      */
     protected $hrefLang;
@@ -47,13 +59,15 @@ class HrefLang extends Extension
         parent::__construct();
 
         $hrefLangValue = $this->hrefLang
-            ->getBaseDataType();
-        /** @var $hrefLangValue \Wszetko\Sitemap\Items\DataTypes\StringType */
+            ->getBaseDataType()
+        ;
+        // @var $hrefLangValue \Wszetko\Sitemap\Items\DataTypes\StringType
         $hrefLangValue
             ->setRequired(true)
             ->setValueRegex("/^(?'hreflang'([a-z]{2}|(x))((-)([A-Za-z]{2}|[A-Z]([a-z]|[a-z]{3})|(default)))?)$/", 'hreflang')
             ->getAttribute('href')
-            ->setRequired(true);
+            ->setRequired(true)
+        ;
 
         $this->addHrefLang($hrefLang, $href);
     }
@@ -66,7 +80,7 @@ class HrefLang extends Extension
         $array = [
             '_namespace' => static::NAMESPACE_NAME,
             '_element' => 'link',
-            'link' => []
+            'link' => [],
         ];
 
         foreach ($this->getHrefLang() as $hreflang => $lang) {
@@ -74,8 +88,8 @@ class HrefLang extends Extension
                 '_attributes' => [
                     'rel' => 'alternate',
                     'hreflang' => $hreflang,
-                    'href' => $lang['href']
-                ]
+                    'href' => $lang['href'],
+                ],
             ];
         }
 

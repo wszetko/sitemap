@@ -1,5 +1,15 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Tests;
 
@@ -8,6 +18,10 @@ use Wszetko\Sitemap\Drivers\DataCollectors\Memory;
 use Wszetko\Sitemap\Items\Mobile;
 use Wszetko\Sitemap\Items\Url;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class MemoryTest extends TestCase
 {
     public function testConstructor()

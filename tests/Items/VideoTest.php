@@ -1,5 +1,15 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Tests;
 
@@ -8,9 +18,12 @@ use PHPUnit\Framework\TestCase;
 use Wszetko\Sitemap\Items\Video;
 
 /**
- * Class VideoTest
+ * Class VideoTest.
  *
  * @package Wszetko\Sitemap\Tests
+ *
+ * @internal
+ * @coversNothing
  */
 class VideoTest extends TestCase
 {
@@ -175,39 +188,39 @@ class VideoTest extends TestCase
         $this->assertNull($video->getRating());
 
         $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating("0");
+        $video->setRating('0');
         $this->assertEquals('0.0', $video->getRating());
 
         $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating("5");
+        $video->setRating('5');
         $this->assertEquals('5.0', $video->getRating());
 
         $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating("2.5");
+        $video->setRating('2.5');
         $this->assertEquals('2.5', $video->getRating());
 
         $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating("2.333");
+        $video->setRating('2.333');
         $this->assertEquals('2.3', $video->getRating());
 
         $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating("2.666");
+        $video->setRating('2.666');
         $this->assertEquals('2.7', $video->getRating());
 
         $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating("10");
+        $video->setRating('10');
         $this->assertNull($video->getRating());
 
         $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating("-1");
+        $video->setRating('-1');
         $this->assertNull($video->getRating());
 
         $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating("Error");
+        $video->setRating('Error');
         $this->assertNull($video->getRating());
 
         $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating("");
+        $video->setRating('');
         $this->assertNull($video->getRating());
 
         $video = new Video('thumb.png', 'Video', 'Description');
@@ -225,7 +238,7 @@ class VideoTest extends TestCase
         $this->assertEquals('10', $video->getViewCount());
 
         $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setViewCount("10");
+        $video->setViewCount('10');
         $this->assertEquals('10', $video->getViewCount());
 
         $video = new Video('thumb.png', 'Video', 'Description');
@@ -233,15 +246,15 @@ class VideoTest extends TestCase
         $this->assertEquals('10', $video->getViewCount());
 
         $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setViewCount("10.1");
+        $video->setViewCount('10.1');
         $this->assertEquals('10', $video->getViewCount());
 
         $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setViewCount("");
+        $video->setViewCount('');
         $this->assertNull($video->getViewCount());
 
         $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setViewCount("Bad");
+        $video->setViewCount('Bad');
         $this->assertNull($video->getViewCount());
 
         $video = new Video('thumb.png', 'Video', 'Description');
@@ -380,8 +393,8 @@ class VideoTest extends TestCase
         $this->assertEquals(['tag'], $video->getTag());
 
         $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setTag(['1' ,'2', '3', '4', '5', '6', '7', '8', '9', '10', '11' ,'12', '13', '14', '15', '16', '17', '18', '19', '20','21' ,'22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33']);
-        $this->assertEquals(['1' ,'2', '3', '4', '5', '6', '7', '8', '9', '10', '11' ,'12', '13', '14', '15', '16', '17', '18', '19', '20','21' ,'22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32'], $video->getTag());
+        $video->setTag(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33']);
+        $this->assertEquals(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32'], $video->getTag());
     }
 
     public function testCategory()
@@ -455,9 +468,9 @@ class VideoTest extends TestCase
                 'player_loc' => [
                     '_attributes' => [
                         'allow_embed' => 'Yes',
-                        'autoplay' => 'autoplay'
+                        'autoplay' => 'autoplay',
                     ],
-                    '_value' => 'https://example.com/player.swf'
+                    '_value' => 'https://example.com/player.swf',
                 ],
                 'duration' => '60',
                 'expiration_date' => '2020-01-01',
@@ -467,32 +480,32 @@ class VideoTest extends TestCase
                 'family_friendly' => 'Yes',
                 'restriction' => [
                     '_attributes' => ['relationship' => 'allow'],
-                    '_value' => 'GB DE'
+                    '_value' => 'GB DE',
                 ],
                 'platform' => [
                     '_attributes' => ['relationship' => 'allow'],
-                    '_value' => 'web'
+                    '_value' => 'web',
                 ],
                 'price' => [
                     '_attributes' => [
                         'currency' => 'USD',
                         'type' => 'rent',
-                        'resolution' => 'SD'
+                        'resolution' => 'SD',
                     ],
-                    '_value' => '10.00'
+                    '_value' => '10.00',
                 ],
                 'requires_subscription' => 'No',
                 'uploader' => [
                     '_attributes' => [
-                        'info' => 'https://example.com/username'
+                        'info' => 'https://example.com/username',
                     ],
-                    '_value' => 'UserName'
+                    '_value' => 'UserName',
                 ],
                 'live' => 'No',
                 'tag' => ['tag'],
                 'category' => 'Travel',
-                'gallery_loc' => 'https://example.com/gallery'
-            ]
+                'gallery_loc' => 'https://example.com/gallery',
+            ],
         ], $video->toArray());
 
         $video = new Video('thumb.png', 'Video', 'Description');
@@ -508,8 +521,8 @@ class VideoTest extends TestCase
                 'title' => 'Video',
                 'description' => 'Description',
                 'player_loc' => 'https://example.com/player.swf',
-                'uploader' => 'UserName'
-            ]
+                'uploader' => 'UserName',
+            ],
         ], $video->toArray());
 
         $video = new Video('thumb.png', 'Video', 'Description');

@@ -1,12 +1,23 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Items;
 
 /**
- * Class Image
+ * Class Image.
  *
  * @package Wszetko\Sitemap\Items
+ *
  * @method setLoc($vloc)
  * @method getLoc()
  * @method setCaption($caption)
@@ -21,22 +32,22 @@ namespace Wszetko\Sitemap\Items;
 class Image extends Extension
 {
     /**
-     * Name of Namescapce
+     * Name of Namescapce.
      */
-    const NAMESPACE_NAME = 'image';
+    public const NAMESPACE_NAME = 'image';
 
     /**
-     * Namespace URL
+     * Namespace URL.
      */
-    const NAMESPACE_URL = 'http://www.google.com/schemas/sitemap-image/1.1';
+    public const NAMESPACE_URL = 'http://www.google.com/schemas/sitemap-image/1.1';
 
     /**
-     * Element name
+     * Element name.
      */
-    const ELEMENT_NAME = 'image';
+    public const ELEMENT_NAME = 'image';
 
     /**
-     * Location
+     * Location.
      *
      * @var \Wszetko\Sitemap\Items\DataTypes\URLType
      */
@@ -71,7 +82,7 @@ class Image extends Extension
     protected $license;
 
     /**
-     * Image constructor
+     * Image constructor.
      *
      * @param string $loc
      *

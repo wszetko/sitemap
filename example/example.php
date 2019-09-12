@@ -1,8 +1,17 @@
 <?php
 
-/*
- * Simple... No... VERY simple example of usage
+declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
+
+// Simple example how to use this library
 
 // Load Composer autoloader
 require_once '../vendor/autoload.php';
@@ -20,14 +29,15 @@ try {
     // Set up Sitemap configuration
     $sitemap->setPublicDirectory(__DIR__ . DIRECTORY_SEPARATOR . 'sitemap');
     $sitemap->setSitepamsDirectory('sitemaps');
-    $sitemap->setDataCollector("Memory");
+    $sitemap->setDataCollector('Memory');
     $sitemap->setUseCompression(false);
 
     // Create example item
-    $item = new Wszetko\Sitemap\Items\Url("example-url");
+    $item = new Wszetko\Sitemap\Items\Url('example-url');
     $item->setLastmod(new DateTime('now'))
         ->setPriority(1)
-        ->setChangefreq('never');
+        ->setChangefreq('never')
+    ;
 
     // Add Mobile extension
     $item->addExtension(new Wszetko\Sitemap\Items\Mobile());
@@ -37,7 +47,8 @@ try {
     $image->setCaption('Caption for PNG')
         ->setLicense('https://example.com/licence')
         ->setGeoLocation('Gdynia')
-        ->setTitle('Title');
+        ->setTitle('Title')
+    ;
     $item->addExtension($image);
 
     // Add another Image extension
@@ -55,7 +66,8 @@ try {
         ->setAccess('Subscription')
         ->addGenres('PressRelease, Blog')
         ->addKeywords('Keyword1, keyword2')
-        ->addStockTickers('NASDAQ:AMAT');
+        ->addStockTickers('NASDAQ:AMAT')
+    ;
     $item->addExtension($news);
 
     // Add Video extension
@@ -77,7 +89,8 @@ try {
         ->setLive(false)
         ->setTag(['tag1', 'tag2'])
         ->setCategory('Category')
-        ->setGalleryLoc('/upload-gallery');
+        ->setGalleryLoc('/upload-gallery')
+    ;
     $item->addExtension($video);
 
     // Add Item to Sitemap
@@ -87,5 +100,5 @@ try {
     $sitemap->generate();
 } catch (Exception $e) {
     echo $e->getMessage() . PHP_EOL;
-    echo $e->getFile() . " : " . $e->getLine() . PHP_EOL;
+    echo $e->getFile() . ' : ' . $e->getLine() . PHP_EOL;
 }

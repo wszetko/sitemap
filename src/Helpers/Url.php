@@ -1,10 +1,20 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Helpers;
 
 /**
- * Class Url
+ * Class Url.
  *
  * @package Wszetko\Sitemap\Helpers
  */
@@ -14,6 +24,7 @@ class Url
      * @param string $url
      *
      * @return bool|string
+     *
      * @see https://bugs.php.net/bug.php?id=52923
      * @see https://www.php.net/manual/en/function.parse-url.php#114817
      */
@@ -50,9 +61,11 @@ class Url
                         break;
                     case '..':
                         array_pop($parts);
+
                         break;
                     default:
                         $parts[] = rawurlencode($element);
+
                         break;
                 }
             }
@@ -72,7 +85,7 @@ class Url
         return
             $url['scheme'] . '://'
             . (isset($url['user']) ? $url['user'] . ((isset($url['pass'])) ? ':' . $url['pass'] : '') . '@' : '')
-            . strtolower($url['host'])
+            . mb_strtolower($url['host'])
             . ((isset($url['port'])) ? ':' . $url['port'] : '')
             . ((isset($url['path'])) ? $url['path'] : '')
             . ((isset($url['query'])) ? '?' . $url['query'] : '')
@@ -86,7 +99,7 @@ class Url
      */
     public static function checkDomain(string $domain): bool
     {
-        if (substr($domain, -1) == '.' || substr($domain, 0, 1) == '.') {
+        if ('.' == mb_substr($domain, -1) || '.' == mb_substr($domain, 0, 1)) {
             return false;
         }
 

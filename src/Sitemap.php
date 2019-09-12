@@ -1,5 +1,15 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap;
 
@@ -14,74 +24,76 @@ use Wszetko\Sitemap\Traits\Domain;
 
 /**
  * Sitemap
- * This class used for generating Google Sitemap files
+ * This class used for generating Google Sitemap files.
  *
  * @package    Sitemap
+ *
  * @author     Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
  * @copyright  2019 Paweł Kłopotek-Głowczewski (https://pawelkg.com/)
  * @license    https://opensource.org/licenses/MIT MIT License
- * @link       https://github.com/wszetko/sitemap
+ *
+ * @see       https://github.com/wszetko/sitemap
  */
 class Sitemap
 {
     use Domain;
 
     /**
-     * Avaliable values for changefreq tag
+     * Avaliable values for changefreq tag.
      *
      * @var array
      */
-    const CHANGEFREQ = [
+    public const CHANGEFREQ = [
         'always',
         'hourly',
         'daily',
         'weekly',
         'monthly',
         'yearly',
-        'never'
+        'never',
     ];
 
     /**
-     * Extension for sitemap file
+     * Extension for sitemap file.
      *
      * @var string
      */
-    const EXT = '.xml';
+    public const EXT = '.xml';
 
     /**
-     * Extension for gzipped sitemap file
+     * Extension for gzipped sitemap file.
      *
      * @var string
      */
-    const GZ_EXT = '.xml.gz';
+    public const GZ_EXT = '.xml.gz';
 
     /**
-     * URL to Sitemap Schema
+     * URL to Sitemap Schema.
      *
      * @var string
      */
-    const SCHEMA = 'http://www.sitemaps.org/schemas/sitemap/0.9';
+    public const SCHEMA = 'http://www.sitemaps.org/schemas/sitemap/0.9';
 
     /**
-     * Limit of items in Sitemap files
+     * Limit of items in Sitemap files.
      *
      * @var int
      */
-    const ITEM_PER_SITEMAP = 50000;
+    public const ITEM_PER_SITEMAP = 50000;
 
     /**
-     * Limit of Sitmeaps in SitemapsIndex
+     * Limit of Sitmeaps in SitemapsIndex.
      *
      * @var int
      */
-    const SITEMAP_PER_SITEMAPINDEX = 1000;
+    public const SITEMAP_PER_SITEMAPINDEX = 1000;
 
     /**
-     * Limit of single files size
+     * Limit of single files size.
      *
      * @var int
      */
-    const SITEMAP_MAX_SIZE = 52000000;
+    public const SITEMAP_MAX_SIZE = 52000000;
 
     /**
      * Path on disk to public directory.
@@ -105,76 +117,76 @@ class Sitemap
     private $sitemapTempDirectory = '';
 
     /**
-     * Default filename for sitemap file
+     * Default filename for sitemap file.
      *
      * @var string
      */
     private $defaultFilename = 'sitemap';
 
     /**
-     * Name of index file
+     * Name of index file.
      *
      * @var string
      */
     private $indexFilename = 'index';
 
     /**
-     * DataCollector instance
+     * DataCollector instance.
      *
-     * @var  DataCollector
+     * @var DataCollector
      */
-    private $dataCollector = null;
+    private $dataCollector;
 
     /**
-     * Use compression
+     * Use compression.
      *
      * @var bool
      */
     private $useCompression = false;
 
     /**
-     * XML Writer object
+     * XML Writer object.
      *
      * @var XML
      */
     private $xml;
 
     /**
-     * Separator to be used in Sitemap filenames
+     * Separator to be used in Sitemap filenames.
      *
      * @var string
      */
     private $separator = '-'; // ~49,6MB - to have some limit to close file
 
     /**
-     * Construktor
+     * Construktor.
      *
      * @param string $domain
      */
     public function __construct(string $domain = null)
     {
-        if ($domain !== null) {
+        if (null !== $domain) {
             $this->setDomain($domain);
         }
     }
 
     /**
      * @param Items\Url   $item
-     * @param string|null $group
+     * @param null|string $group
      */
     public function addItem(Items\Url $item, ?string $group = null): void
     {
-        if ($group === null) {
+        if (null === $group) {
             $group = $this->getDefaultFilename();
         }
 
-        $group = strtolower(preg_replace('/\W+/', '', $group));
+        $group = mb_strtolower(preg_replace('/\W+/', '', $group));
         $item->setDomain($this->getDomain());
         $this->getDataCollector()->add($item, $group);
     }
 
     /**
-     * Get default filename for sitemap file
+     * Get default filename for sitemap file.
      *
      * @return string
      */
@@ -184,7 +196,7 @@ class Sitemap
     }
 
     /**
-     * Set default filename for sitemap file
+     * Set default filename for sitemap file.
      *
      * @param string $defaultFilename
      */
@@ -194,9 +206,9 @@ class Sitemap
     }
 
     /**
-     * Get DataCollecotr Object
+     * Get DataCollecotr Object.
      *
-     * @return DataCollector|null
+     * @return null|DataCollector
      */
     public function getDataCollector(): ?DataCollector
     {
@@ -206,6 +218,7 @@ class Sitemap
     /**
      * @param string $driver
      * @param mixed
+     * @param null|mixed $config
      */
     public function setDataCollector(string $driver, $config = null): void
     {
@@ -221,15 +234,15 @@ class Sitemap
      */
     public function generate()
     {
-        if ($this->getPublicDirectory() === '') {
+        if ('' === $this->getPublicDirectory()) {
             throw new Exception('Public directory is not set.');
         }
 
-        if ($this->getDomain() === '') {
+        if ('' === $this->getDomain()) {
             throw new Exception('Domain is not set.');
         }
 
-        if ($this->getDataCollector() === null) {
+        if (null === $this->getDataCollector()) {
             throw new Exception('DataCollector is not set.');
         }
 
@@ -268,7 +281,7 @@ class Sitemap
     }
 
     /**
-     * @return XML|null
+     * @return null|XML
      */
     public function getXml(): ?XML
     {
@@ -295,28 +308,6 @@ class Sitemap
     }
 
     /**
-     * @param string $dir
-     */
-    private function removeDir($dir)
-    {
-        if (is_dir($dir)) {
-            $objects = scandir($dir);
-
-            foreach ($objects as $object) {
-                if ($object != "." && $object != "..") {
-                    if (filetype($dir . "/" . $object) == "dir") {
-                        $this->removeDir($dir . "/" . $object);
-                    } else {
-                        unlink($dir . "/" . $object);
-                    }
-                }
-            }
-
-            rmdir($dir);
-        }
-    }
-
-    /**
      * @return string
      */
     public function getTempDirectory(): string
@@ -339,8 +330,11 @@ class Sitemap
     public function getSitepamsTempDirectory(): string
     {
         if (!($directory = realpath($this->getTempDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory))) {
-            mkdir($this->getTempDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory,
-                0777, true);
+            mkdir(
+                $this->getTempDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory,
+                0777,
+                true
+            );
             $directory = realpath($this->getTempDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory);
         }
 
@@ -354,7 +348,7 @@ class Sitemap
     {
         $totalItems = $this->getDataCollector()->getCount();
 
-        if ($totalItems == 0) {
+        if (0 == $totalItems) {
             return [];
         }
 
@@ -365,16 +359,18 @@ class Sitemap
         foreach ($groups as $group) {
             $groupNo = 0;
             $filesInGroup = 0;
-            $currentGroup++;
+            ++$currentGroup;
 
             if ($this->getDataCollector()->getGroupCount($group) > 0) {
-                $this->getXml()->openSitemap($group . $this->getSeparator() . $groupNo . self::EXT,
-                    $this->getDataCollector()->getExtensions());
+                $this->getXml()->openSitemap(
+                    $group . $this->getSeparator() . $groupNo . self::EXT,
+                    $this->getDataCollector()->getExtensions()
+                );
                 $files[$group . $this->getSeparator() . $groupNo . self::EXT] = null;
 
                 while ($element = $this->getDataCollector()->fetch($group)) {
                     $this->getXml()->addUrl($element);
-                    $filesInGroup++;
+                    ++$filesInGroup;
 
                     if (isset($element['lastmod'])) {
                         if ($files[$group . $this->getSeparator() . $groupNo . self::EXT]) {
@@ -391,10 +387,12 @@ class Sitemap
                         $this->getXml()->closeSitemap();
 
                         if (!$this->getDataCollector()->isLast($group)) {
-                            $groupNo++;
+                            ++$groupNo;
                             $filesInGroup = 0;
-                            $this->getXml()->openSitemap($group . $this->getSeparator() . $groupNo . self::EXT,
-                                $this->getDataCollector()->getExtensions());
+                            $this->getXml()->openSitemap(
+                                $group . $this->getSeparator() . $groupNo . self::EXT,
+                                $this->getDataCollector()->getExtensions()
+                            );
                             $files[$group . $this->getSeparator() . $groupNo . self::EXT] = null;
                         }
                     }
@@ -428,7 +426,7 @@ class Sitemap
     }
 
     /**
-     * Check if compression is used
+     * Check if compression is used.
      *
      * @return bool
      */
@@ -438,7 +436,7 @@ class Sitemap
     }
 
     /**
-     * Set whether to use compression or not
+     * Set whether to use compression or not.
      *
      * @param bool $useCompression
      */
@@ -451,51 +449,15 @@ class Sitemap
     }
 
     /**
-     * @param string $dir
-     * @param array  $files
-     *
-     * @throws Exception
-     */
-    private function compressFiles(string $dir, array &$files)
-    {
-        $newFiles = [];
-
-        foreach ($files as $file => $lastmod) {
-            $source = $dir . DIRECTORY_SEPARATOR . $file;
-            $gzFile = substr($file, 0, strlen($file) - 4) . self::GZ_EXT;
-            $output = $dir . DIRECTORY_SEPARATOR . $gzFile;
-            $out = gzopen($output, 'wb9');
-            $in = fopen($source, 'rb');
-
-            if (!$out) {
-                throw new Exception('Can\'t create GZip archive.');
-            }
-
-            if (!$in) {
-                throw new Exception('Can\'t open xml file.');
-            }
-
-            while (!feof($in)) {
-                gzwrite($out, fread($in, 524288));
-            }
-
-            fclose($in);
-            gzclose($out);
-            unlink($source);
-            $newFiles[$gzFile] = $lastmod;
-        }
-        $files = $newFiles;
-    }
-
-    /**
      * @param array $sitemaps
      *
-     * @return array
      * @throws Exception
+     *
+     * @return array
      */
     public function generateSitemapsIndex(array $sitemaps): array
     {
-        if (count($sitemaps) === 0) {
+        if (0 === count($sitemaps)) {
             return [];
         }
 
@@ -505,9 +467,12 @@ class Sitemap
         $lastItem = array_key_last($sitemaps);
 
         foreach ($sitemaps as $sitemap => $lastmod) {
-            $this->getXml()->addSitemap($this->getDomain() . '/' . ltrim(str_replace($this->getPublicDirectory(), '',
-                    $this->getSitepamsDirectory()), DIRECTORY_SEPARATOR) . '/' . $sitemap, $lastmod);
-            $counter++;
+            $this->getXml()->addSitemap($this->getDomain() . '/' . ltrim(str_replace(
+                $this->getPublicDirectory(),
+                '',
+                $this->getSitepamsDirectory()
+            ), DIRECTORY_SEPARATOR) . '/' . $sitemap, $lastmod);
+            ++$counter;
 
             if ($counter >= self::SITEMAP_PER_SITEMAPINDEX) {
                 $this->getXml()->closeSitemapIndex();
@@ -531,7 +496,7 @@ class Sitemap
     }
 
     /**
-     * Get filename of sitemap index file
+     * Get filename of sitemap index file.
      *
      * @return string
      */
@@ -541,7 +506,7 @@ class Sitemap
     }
 
     /**
-     * Set filename of sitemap index file
+     * Set filename of sitemap index file.
      *
      * @param string $indexFilename
      */
@@ -571,6 +536,65 @@ class Sitemap
         $this->sitepamsDirectory = $sitepamsDirectory;
     }
 
+    /**
+     * @param string $dir
+     */
+    private function removeDir($dir)
+    {
+        if (is_dir($dir)) {
+            $objects = scandir($dir);
+
+            foreach ($objects as $object) {
+                if ('.' != $object && '..' != $object) {
+                    if ('dir' == filetype($dir . '/' . $object)) {
+                        $this->removeDir($dir . '/' . $object);
+                    } else {
+                        unlink($dir . '/' . $object);
+                    }
+                }
+            }
+
+            rmdir($dir);
+        }
+    }
+
+    /**
+     * @param string $dir
+     * @param array  $files
+     *
+     * @throws Exception
+     */
+    private function compressFiles(string $dir, array &$files)
+    {
+        $newFiles = [];
+
+        foreach ($files as $file => $lastmod) {
+            $source = $dir . DIRECTORY_SEPARATOR . $file;
+            $gzFile = mb_substr($file, 0, mb_strlen($file) - 4) . self::GZ_EXT;
+            $output = $dir . DIRECTORY_SEPARATOR . $gzFile;
+            $out = gzopen($output, 'wb9');
+            $in = fopen($source, 'rb');
+
+            if (!$out) {
+                throw new Exception('Can\'t create GZip archive.');
+            }
+
+            if (!$in) {
+                throw new Exception('Can\'t open xml file.');
+            }
+
+            while (!feof($in)) {
+                gzwrite($out, fread($in, 524288));
+            }
+
+            fclose($in);
+            gzclose($out);
+            unlink($source);
+            $newFiles[$gzFile] = $lastmod;
+        }
+        $files = $newFiles;
+    }
+
     private function publishSitemap()
     {
         // Clear previous sitemaps
@@ -578,8 +602,10 @@ class Sitemap
         $publicDir = scandir($this->getPublicDirectory());
 
         foreach ($publicDir as $file) {
-            if (preg_match_all('/^(' . $this->getIndexFilename() . ')((-)[\d]+)?(' . $this->getExt() . ')$/',
-                $file)) {
+            if (preg_match_all(
+                '/^(' . $this->getIndexFilename() . ')((-)[\d]+)?(' . $this->getExt() . ')$/',
+                $file
+            )) {
                 unlink($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $file);
             }
         }
@@ -587,9 +613,11 @@ class Sitemap
         $this->getSitepamsDirectory(); //To create sitemaps directory
         $dir = new RecursiveDirectoryIterator($this->getTempDirectory());
         $iterator = new RecursiveIteratorIterator($dir);
-        $files = new RegexIterator($iterator,
-            "/^(?'path'(([a-zA-Z]:)|((\\\\|\/){1,2}\w+)?)((\\\\|\/)(\w[\w ]*.*))+({$this->getExt()}){1})$/",
-            RegexIterator::GET_MATCH);
+        $files = new RegexIterator(
+            $iterator,
+            "/^(?'path'(([a-zA-Z]:)|((\\\\|\\/){1,2}\\w+)?)((\\\\|\\/)(\\w[\\w ]*.*))+({$this->getExt()}){1})$/",
+            RegexIterator::GET_MATCH
+        );
         $fileList = [];
 
         foreach ($files as $file) {
@@ -601,7 +629,7 @@ class Sitemap
         $currentFile = 0;
 
         foreach ($fileList as $file) {
-            $currentFile++;
+            ++$currentFile;
             $destination = str_replace($this->getTempDirectory(), $this->getPublicDirectory(), $file);
             rename($file, $destination);
         }
@@ -616,8 +644,8 @@ class Sitemap
     {
         if ($this->isUseCompression()) {
             return self::GZ_EXT;
-        } else {
-            return self::EXT;
         }
+
+        return self::EXT;
     }
 }

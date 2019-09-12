@@ -1,5 +1,15 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Tests;
 
@@ -10,9 +20,12 @@ use Wszetko\Sitemap\Items;
 use Wszetko\Sitemap\Items\Mobile;
 
 /**
- * Class UrlTest
+ * Class UrlTest.
  *
  * @package Wszetko\Sitemap\Tests
+ *
+ * @internal
+ * @coversNothing
  */
 class UrlTest extends TestCase
 {
@@ -88,7 +101,7 @@ class UrlTest extends TestCase
             ['input' => 'weekly', 'expected' => 'weekly'],
             ['input' => 'monthly', 'expected' => 'monthly'],
             ['input' => 'yearly', 'expected' => 'yearly'],
-            ['input' => 'never', 'expected' => 'never']
+            ['input' => 'never', 'expected' => 'never'],
         ];
 
         foreach ($tests as $test) {
@@ -106,13 +119,13 @@ class UrlTest extends TestCase
             ['input' => .5, 'expected' => '0.5'],
             ['input' => 2, 'expected' => null],
             ['input' => -1, 'expected' => null],
-            ['input' => "1", 'expected' => '1.0'],
-            ['input' => "0", 'expected' => '0.0'],
-            ['input' => ".5", 'expected' => '0.5'],
-            ['input' => "2", 'expected' => null],
-            ['input' => "-1", 'expected' => null],
+            ['input' => '1', 'expected' => '1.0'],
+            ['input' => '0', 'expected' => '0.0'],
+            ['input' => '.5', 'expected' => '0.5'],
+            ['input' => '2', 'expected' => null],
+            ['input' => '-1', 'expected' => null],
             ['input' => new \stdClass(), 'expected' => null],
-            ['input' => 'test', 'expected' => null]
+            ['input' => 'test', 'expected' => null],
         ];
 
         foreach ($tests as $test) {
@@ -132,7 +145,7 @@ class UrlTest extends TestCase
         $url->addExtension($extension);
 
         $expectedResult = [
-            $extension::NAMESPACE_NAME => [$extension]
+            $extension::NAMESPACE_NAME => [$extension],
         ];
 
         $this->assertEquals($expectedResult, $url->getExtensions());
@@ -157,7 +170,7 @@ class UrlTest extends TestCase
                 'lastmod' => '2013-11-16',
                 'changefreq' => 'always',
                 'priority' => '1.0',
-                $extension::NAMESPACE_NAME => [$extension->toArray()]
+                $extension::NAMESPACE_NAME => [$extension->toArray()],
             ],
         ];
 

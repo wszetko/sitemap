@@ -1,12 +1,22 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Interfaces;
 
 use Wszetko\Sitemap\Items\Url;
 
 /**
- * Interface DataCollector
+ * Interface DataCollector.
  *
  * @package Wszetko\Sitemap\Interfaces
  */
@@ -15,7 +25,7 @@ interface DataCollector
     /**
      * DataCollector constructor.
      *
-     * @param array|null $config
+     * @param null|array $config
      */
     public function __construct(?array $config);
 

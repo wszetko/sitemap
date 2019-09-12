@@ -1,5 +1,15 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Drivers\DataCollectors;
 
@@ -7,7 +17,7 @@ use Wszetko\Sitemap\Interfaces\DataCollector;
 use Wszetko\Sitemap\Items\Url;
 
 /**
- * Class Memory
+ * Class Memory.
  *
  * @package Wszetko\Sitemap\Drivers\DataCollectors
  */
@@ -27,6 +37,15 @@ class Memory implements DataCollector
      * @var array
      */
     private $extensions = [];
+
+    /**
+     * DataCollector constructor.
+     *
+     * @param null|array $config
+     */
+    public function __construct(?array $config)
+    {
+    }
 
     /**
      * @param Url    $item
@@ -80,35 +99,11 @@ class Memory implements DataCollector
     /**
      * @param string $group
      *
-     * @return int|null
-     */
-    private function getGroupElement(string $group): ?int
-    {
-        if (!isset($this->element[$group])) {
-            $this->element[$group] = 0;
-        }
-
-        return $this->element[$group];
-    }
-
-    /**
-     * @param string $group
-     *
      * @return int
      */
     public function getGroupCount(string $group): int
     {
         return count($this->items[$group]);
-    }
-
-    /**
-     * @param string $group
-     */
-    private function incrementGroupElement(string $group): void
-    {
-        if (isset($this->element[$group])) {
-            $this->element[$group]++;
-        }
     }
 
     /**
@@ -178,11 +173,26 @@ class Memory implements DataCollector
     }
 
     /**
-     * DataCollector constructor.
+     * @param string $group
      *
-     * @param array|null $config
+     * @return null|int
      */
-    public function __construct(?array $config)
+    private function getGroupElement(string $group): ?int
     {
+        if (!isset($this->element[$group])) {
+            $this->element[$group] = 0;
+        }
+
+        return $this->element[$group];
+    }
+
+    /**
+     * @param string $group
+     */
+    private function incrementGroupElement(string $group): void
+    {
+        if (isset($this->element[$group])) {
+            ++$this->element[$group];
+        }
     }
 }

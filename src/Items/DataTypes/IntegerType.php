@@ -1,22 +1,32 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Items\DataTypes;
 
 /**
- * Class IntegerType
+ * Class IntegerType.
  *
  * @package Wszetko\Sitemap\Items\DataTypes
  */
 class IntegerType extends FloatType
 {
     /**
-     * @return mixed|string|null
+     * @return null|mixed|string
      */
     public function getValue()
     {
         $value = parent::getValue();
 
-        return is_null($value) ? null : strval(intval(round($value)));
+        return null === $value ? null : (string) ((int) (round($value)));
     }
 }

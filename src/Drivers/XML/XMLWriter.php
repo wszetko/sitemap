@@ -1,5 +1,15 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Drivers\XML;
 
@@ -7,9 +17,10 @@ use Exception;
 use Wszetko\Sitemap\Sitemap;
 
 /**
- * Class XMLWriter
+ * Class XMLWriter.
  *
  * @package Wszetko\Sitemap\Drivers\XML
+ *
  * @method getXMLWriter(): \XMLWriter
  */
 class XMLWriter extends AbstractXML
@@ -63,45 +74,6 @@ class XMLWriter extends AbstractXML
     }
 
     /**
-     * Save from buffer to file
-     *
-     * @return void
-     */
-    private function flushData(): void
-    {
-        file_put_contents($this->getSitemapFileFullPath(), $this->getXMLWriter()->flush(true), FILE_APPEND);
-    }
-
-    /**
-     * Remove whitespace chars from end of file (Google don't like them)
-     *
-     * @return void
-     * @throws Exception
-     */
-    private function endFile(): void
-    {
-        $sitemapFile = fopen($this->getSitemapFileFullPath(), 'r+');
-
-        fseek($sitemapFile, -1, SEEK_END);
-        $truncate = 0;
-        $length = $this->getSitemapSize();
-        $end = false;
-
-        do {
-            $s = fread($sitemapFile, 1);
-            if (ctype_space($s)) {
-                $truncate++;
-                fseek($sitemapFile, -2, SEEK_CUR);
-            } else {
-                $end = true;
-            }
-        } while (!$end);
-
-        ftruncate($sitemapFile, $length - $truncate);
-        fclose($sitemapFile);
-    }
-
-    /**
      * @return int
      */
     public function getSitemapSize(): int
@@ -124,9 +96,89 @@ class XMLWriter extends AbstractXML
     }
 
     /**
+     * @param string $sitemap
+     */
+    public function openSitemapIndex(string $sitemap): void
+    {
+        $this->setCurrentSitemap($sitemap);
+        $this->getXMLWriter()->openMemory();
+        $this->getXMLWriter()->startDocument('1.0', 'UTF-8');
+        $this->getXMLWriter()->setIndent(true);
+        $this->getXMLWriter()->startElement('sitemapindex');
+        $this->getXMLWriter()->writeAttribute('xmlns', Sitemap::SCHEMA);
+        $this->flushData();
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function closeSitemapIndex(): void
+    {
+        $this->getXMLWriter()->endElement();
+        $this->getXMLWriter()->endDocument();
+        $this->flushData();
+        $this->endFile();
+    }
+
+    /**
+     * @param string      $sitemap
+     * @param null|string $lastmod
+     */
+    public function addSitemap(string $sitemap, string $lastmod = null): void
+    {
+        $this->getXMLWriter()->startElement('sitemap');
+        $this->getXMLWriter()->writeElement('loc', $sitemap);
+        if (isset($lastmod)) {
+            $this->getXMLWriter()->writeElement('lastmod', $lastmod);
+        }
+        $this->getXMLWriter()->endElement();
+        $this->flushData();
+    }
+
+    /**
+     * Save from buffer to file.
+     *
+     * @return void
+     */
+    private function flushData(): void
+    {
+        file_put_contents($this->getSitemapFileFullPath(), $this->getXMLWriter()->flush(true), FILE_APPEND);
+    }
+
+    /**
+     * Remove whitespace chars from end of file (Google don't like them).
+     *
+     * @throws Exception
+     *
+     * @return void
+     */
+    private function endFile(): void
+    {
+        $sitemapFile = fopen($this->getSitemapFileFullPath(), 'r+');
+
+        fseek($sitemapFile, -1, SEEK_END);
+        $truncate = 0;
+        $length = $this->getSitemapSize();
+        $end = false;
+
+        do {
+            $s = fread($sitemapFile, 1);
+            if (ctype_space($s)) {
+                ++$truncate;
+                fseek($sitemapFile, -2, SEEK_CUR);
+            } else {
+                $end = true;
+            }
+        } while (!$end);
+
+        ftruncate($sitemapFile, $length - $truncate);
+        fclose($sitemapFile);
+    }
+
+    /**
      * @param string      $element
      * @param             $value
-     * @param string|null $namespace
+     * @param null|string $namespace
      */
     private function addElement(string $element, $value, ?string $namespace = null): void
     {
@@ -144,7 +196,7 @@ class XMLWriter extends AbstractXML
     /**
      * @param string      $element
      * @param             $value
-     * @param string|null $namespace
+     * @param null|string $namespace
      */
     private function addElementArray(string $element, $value, ?string $namespace = null): void
     {
@@ -191,52 +243,12 @@ class XMLWriter extends AbstractXML
     /**
      * @param string      $element
      * @param             $value
-     * @param string|null $namespace
+     * @param null|string $namespace
      */
     private function addElementArrayNonAssoc(string $element, $value, ?string $namespace = null): void
     {
         foreach ($value as $val) {
             $this->addElement($element, $val, $namespace);
         }
-    }
-
-    /**
-     * @param string $sitemap
-     */
-    public function openSitemapIndex(string $sitemap): void
-    {
-        $this->setCurrentSitemap($sitemap);
-        $this->getXMLWriter()->openMemory();
-        $this->getXMLWriter()->startDocument('1.0', 'UTF-8');
-        $this->getXMLWriter()->setIndent(true);
-        $this->getXMLWriter()->startElement('sitemapindex');
-        $this->getXMLWriter()->writeAttribute('xmlns', Sitemap::SCHEMA);
-        $this->flushData();
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function closeSitemapIndex(): void
-    {
-        $this->getXMLWriter()->endElement();
-        $this->getXMLWriter()->endDocument();
-        $this->flushData();
-        $this->endFile();
-    }
-
-    /**
-     * @param string $sitemap
-     * @param string|null $lastmod
-     */
-    public function addSitemap(string $sitemap, string $lastmod = null): void
-    {
-        $this->getXMLWriter()->startElement('sitemap');
-        $this->getXMLWriter()->writeElement('loc', $sitemap);
-        if (isset($lastmod)) {
-            $this->getXMLWriter()->writeElement('lastmod', $lastmod);
-        }
-        $this->getXMLWriter()->endElement();
-        $this->flushData();
     }
 }

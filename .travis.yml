@@ -1,18 +1,31 @@
 language: php
 
-os:
-  - linux
-
-php:
-  - 7.2
-  - 7.3
-  - 7.4snapshot
-
-# We don't want to run linux commands as super user
 sudo: false
 
+matrix:
+    include:
+        - php: 7.2
+          env:
+              - IGNORE_PLATFORMS=false
+        - php: 7.3
+          env:
+              - IGNORE_PLATFORMS=true
+        - php: 7.4snapshot
+          env:
+              - IGNORE_PLATFORMS=true
+        - php: nightly
+          env:
+              - IGNORE_PLATFORMS=true
+    allow_failures:
+        - php: 7.4snapshot
+        - php: nightly
+
+before_install:
+    travis_retry composer self-update
+
 install:
-  composer install
+    - if [ "$IGNORE_PLATFORMS" == "true" ]; then travis_retry composer update --ignore-platform-reqs; fi
+    - if [ "$IGNORE_PLATFORMS" == "false" ]; then travis_retry composer update; fi
 
 script:
-  - vendor/bin/phpunit
+  - composer phpunit

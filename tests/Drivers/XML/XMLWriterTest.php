@@ -1,5 +1,15 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Tests;
 
@@ -7,6 +17,10 @@ use PHPUnit\Framework\TestCase;
 use Wszetko\Sitemap\Drivers\XML\XMLWriter;
 use Wszetko\Sitemap\Items\Mobile;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class XMLWriterTest extends TestCase
 {
     public function testConstructor()
@@ -45,18 +59,18 @@ class XMLWriterTest extends TestCase
     public function testSitemapIndex()
     {
         $driver = new XMLWriter(['domain' => 'https://example.com']);
-        $dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemapTest' . date("Y-m-d_H_i_s");
+        $dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemapTest' . date('Y-m-d_H_i_s');
         mkdir($dir);
         $driver->setWorkDir($dir);
         $driver->openSitemapIndex('test.xml');
         $driver->addSitemap('sitemap.xml');
         $driver->closeSitemapIndex();
-        $this->assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<sitemapindex xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">
+        $this->assertEquals('<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
  <sitemap>
   <loc>sitemap.xml</loc>
  </sitemap>
-</sitemapindex>", file_get_contents($dir . DIRECTORY_SEPARATOR . 'test.xml'));
+</sitemapindex>', file_get_contents($dir . DIRECTORY_SEPARATOR . 'test.xml'));
         unlink($dir . DIRECTORY_SEPARATOR . 'test.xml');
 
         $driver = new XMLWriter(['domain' => 'https://example.com']);
@@ -64,13 +78,13 @@ class XMLWriterTest extends TestCase
         $driver->openSitemapIndex('test.xml');
         $driver->addSitemap('sitemap.xml', '2019-02-20');
         $driver->closeSitemapIndex();
-        $this->assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<sitemapindex xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">
+        $this->assertEquals('<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
  <sitemap>
   <loc>sitemap.xml</loc>
   <lastmod>2019-02-20</lastmod>
  </sitemap>
-</sitemapindex>", file_get_contents($dir . DIRECTORY_SEPARATOR . 'test.xml'));
+</sitemapindex>', file_get_contents($dir . DIRECTORY_SEPARATOR . 'test.xml'));
         unlink($dir . DIRECTORY_SEPARATOR . 'test.xml');
         rmdir($dir);
     }
@@ -78,24 +92,24 @@ class XMLWriterTest extends TestCase
     public function testSitemap()
     {
         $driver = new XMLWriter(['domain' => 'https://example.com']);
-        $dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemapTest' . date("Y-m-d_H_i_s");
+        $dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemapTest' . date('Y-m-d_H_i_s');
         mkdir($dir);
         $driver->setWorkDir($dir);
         $driver->openSitemap('sitemap.xml');
         $driver->closeSitemap();
-        $this->assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\"/>", file_get_contents($dir . DIRECTORY_SEPARATOR . 'sitemap.xml'));
+        $this->assertEquals('<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>', file_get_contents($dir . DIRECTORY_SEPARATOR . 'sitemap.xml'));
         unlink($dir . DIRECTORY_SEPARATOR . 'sitemap.xml');
 
         $driver = new XMLWriter(['domain' => 'https://example.com']);
-        $dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemapTest' . date("Y-m-d_H_i_s");
+        $dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemapTest' . date('Y-m-d_H_i_s');
         $driver->setWorkDir($dir);
         $extensions = ['mobile' => Mobile::NAMESPACE_URL];
         $driver->openSitemap('sitemap.xml', $extensions);
         $driver->closeSitemap();
 
-        $this->assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\" xmlns:mobile=\"".Mobile::NAMESPACE_URL."\"/>", file_get_contents($dir . DIRECTORY_SEPARATOR . 'sitemap.xml'));
+        $this->assertEquals('<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:mobile="' . Mobile::NAMESPACE_URL . '"/>', file_get_contents($dir . DIRECTORY_SEPARATOR . 'sitemap.xml'));
         unlink($dir . DIRECTORY_SEPARATOR . 'sitemap.xml');
         rmdir($dir);
     }
@@ -103,17 +117,18 @@ class XMLWriterTest extends TestCase
     public function testUrl()
     {
         $driver = new XMLWriter(['domain' => 'https://example.com']);
-        $dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemapTest' . date("Y-m-d_H_i_s");
+        $dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemapTest' . date('Y-m-d_H_i_s');
         mkdir($dir);
         $driver->setWorkDir($dir);
         $driver->openSitemap('sitemap.xml');
-        $item = new \Wszetko\Sitemap\Items\Url("example-url");
+        $item = new \Wszetko\Sitemap\Items\Url('example-url');
         $item->setDomain('https://example.com');
         $image = new \Wszetko\Sitemap\Items\Image('/image.png');
         $image->setCaption('Caption for PNG')
             ->setLicense('https://example.com/licence')
             ->setGeoLocation('Gdynia')
-            ->setTitle('Title');
+            ->setTitle('Title')
+        ;
         $item->addExtension($image);
         $video = (new \Wszetko\Sitemap\Items\Video('/thumb.png', 'Video title', 'Video desc'))
             ->setContentLoc('/video.avi')
@@ -132,12 +147,13 @@ class XMLWriterTest extends TestCase
             ->setLive(false)
             ->setTag(['tag1', 'tag2'])
             ->setCategory('Category')
-            ->setGalleryLoc('/upload-gallery');
+            ->setGalleryLoc('/upload-gallery')
+        ;
         $item->addExtension($video);
         $driver->addUrl($item->toArray());
         $driver->closeSitemap();
-        $this->assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">
+        $this->assertEquals('<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
  <url>
   <loc>https://example.com/example-url</loc>
   <image:image>
@@ -152,12 +168,12 @@ class XMLWriterTest extends TestCase
    <video:title>Video title</video:title>
    <video:description>Video desc</video:description>
    <video:content_loc>https://example.com/video.mp4</video:content_loc>
-   <video:player_loc allow_embed=\"Yes\">https://example.com/player.swf</video:player_loc>
+   <video:player_loc allow_embed="Yes">https://example.com/player.swf</video:player_loc>
    <video:live>No</video:live>
    <video:duration>10</video:duration>
    <video:platform>allow</video:platform>
    <video:requires_subscription>No</video:requires_subscription>
-   <video:price currency=\"PLN\" type=\"rent\" resolution=\"HD\">10.00</video:price>
+   <video:price currency="PLN" type="rent" resolution="HD">10.00</video:price>
    <video:gallery_loc>https://example.com/upload-gallery</video:gallery_loc>
    <video:tag>tag1</video:tag>
    <video:tag>tag2</video:tag>
@@ -165,10 +181,10 @@ class XMLWriterTest extends TestCase
    <video:family_friendly>Yes</video:family_friendly>
    <video:publication_date>2019-02-20</video:publication_date>
    <video:view_count>10</video:view_count>
-   <video:uploader info=\"https://example.com/uploader-url\">Uploader</video:uploader>
+   <video:uploader info="https://example.com/uploader-url">Uploader</video:uploader>
    <video:rating>4.5</video:rating>
   </video:video>
  </url>
-</urlset>", file_get_contents($dir . DIRECTORY_SEPARATOR . 'sitemap.xml'));
+</urlset>', file_get_contents($dir . DIRECTORY_SEPARATOR . 'sitemap.xml'));
     }
 }

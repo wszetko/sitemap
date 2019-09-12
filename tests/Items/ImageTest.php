@@ -1,5 +1,15 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Tests;
 
@@ -7,9 +17,12 @@ use PHPUnit\Framework\TestCase;
 use Wszetko\Sitemap\Items;
 
 /**
- * Class ImageTest
+ * Class ImageTest.
  *
  * @package Wszetko\Sitemap\Tests
+ *
+ * @internal
+ * @coversNothing
  */
 class ImageTest extends TestCase
 {
@@ -42,7 +55,7 @@ class ImageTest extends TestCase
         $this->assertEquals('100', $image->getCaption());
 
         $image = new Items\Image('image.png');
-        $caption = new class {
+        $caption = new class() {
             public function __toString()
             {
                 return 'Test';
@@ -102,8 +115,8 @@ class ImageTest extends TestCase
                 'caption' => 'Test Caption',
                 'geo_location' => 'Gdynia, Poland',
                 'title' => 'Title example',
-                'license' => 'https://example/licence.txt'
-            ]
+                'license' => 'https://example/licence.txt',
+            ],
         ];
 
         $this->assertEquals($expectedResult, $image->toArray());

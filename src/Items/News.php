@@ -1,14 +1,25 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Items;
 
 use DateTimeInterface;
 
 /**
- * Class News
+ * Class News.
  *
  * @package Wszetko\Sitemap\Items
+ *
  * @method setPublicationDate($publicationDate)
  * @method getPublicationDate()
  * @method setPublicationName($publicationName)
@@ -32,19 +43,19 @@ use DateTimeInterface;
 class News extends Extension
 {
     /**
-     * Name of Namescapce
+     * Name of Namescapce.
      */
-    const NAMESPACE_NAME = 'news';
+    public const NAMESPACE_NAME = 'news';
 
     /**
-     * Namespace URL
+     * Namespace URL.
      */
-    const NAMESPACE_URL = 'http://www.google.com/schemas/sitemap-news/0.9';
+    public const NAMESPACE_URL = 'http://www.google.com/schemas/sitemap-news/0.9';
 
     /**
-     * Element name
+     * Element name.
      */
-    const ELEMENT_NAME = 'news';
+    public const ELEMENT_NAME = 'news';
 
     /**
      * Publication name.
@@ -71,6 +82,7 @@ class News extends Extension
      * List of genres, comma-separated string values.
      *
      * @dataType \Wszetko\Sitemap\Items\DataTypes\StringType
+     *
      * @var \Wszetko\Sitemap\Items\DataTypes\ArrayType
      */
     protected $genres;
@@ -93,6 +105,7 @@ class News extends Extension
      * Key words, comma-separated string values.
      *
      * @dataType \Wszetko\Sitemap\Items\DataTypes\StringType
+     *
      * @var \Wszetko\Sitemap\Items\DataTypes\ArrayType
      */
     protected $keywords;
@@ -101,6 +114,7 @@ class News extends Extension
      * Key words, comma-separated string values.
      *
      * @dataType \Wszetko\Sitemap\Items\DataTypes\StringType
+     *
      * @var \Wszetko\Sitemap\Items\DataTypes\ArrayType
      */
     protected $stockTickers;
@@ -124,29 +138,37 @@ class News extends Extension
         parent::__construct();
 
         $this->publicationName
-            ->setRequired(true);
+            ->setRequired(true)
+        ;
         $this->setPublicationName($publicationName);
         $this->publicationLanguage
             ->setValueRegex("/^(?'lang'zh-cn|zh-tw|([a-z]{2,3}))?$/", 'lang')
-            ->setRequired(true);
+            ->setRequired(true)
+        ;
         $this->publicationDate
-            ->setRequired(true);
+            ->setRequired(true)
+        ;
         $this->setPublicationLanguage($publicationLanguage);
         $this->setPublicationDate($publicationDate);
         $this->setTitle($title);
         $this->access
-            ->setAllowedValues('Subscription, Registration');
+            ->setAllowedValues('Subscription, Registration')
+        ;
         $generesValue = $this->genres
-            ->getBaseDataType();
-        /** @var $generesValue \Wszetko\Sitemap\Items\DataTypes\StringType */
+            ->getBaseDataType()
+        ;
+        // @var $generesValue \Wszetko\Sitemap\Items\DataTypes\StringType
         $generesValue
-            ->setAllowedValues('PressRelease, Satire, Blog, OpEd, Opinion, UserGenerated');
+            ->setAllowedValues('PressRelease, Satire, Blog, OpEd, Opinion, UserGenerated')
+        ;
         $stickTickersValue = $this->stockTickers
             ->setMaxElements(5)
-            ->getBaseDataType();
-        /** @var $stickTickersValue \Wszetko\Sitemap\Items\DataTypes\StringType */
+            ->getBaseDataType()
+        ;
+        // @var $stickTickersValue \Wszetko\Sitemap\Items\DataTypes\StringType
         $stickTickersValue
-            ->setValueRegex("/^(?'stockTickers'\w+:\w+)?$/", 'stockTickers');
+            ->setValueRegex("/^(?'stockTickers'\\w+:\\w+)?$/", 'stockTickers')
+        ;
     }
 
     /**
@@ -160,11 +182,11 @@ class News extends Extension
             'news' => [
                 'publication' => [
                     'name' => $this->getPublicationName(),
-                    'language' => $this->getPublicationLanguage()
+                    'language' => $this->getPublicationLanguage(),
                 ],
                 'publication_date' => $this->getPublicationDate(),
-                'title' => $this->getTitle()
-            ]
+                'title' => $this->getTitle(),
+            ],
         ];
 
         if ($this->getAccess()) {

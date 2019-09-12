@@ -1,12 +1,22 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Items\DataTypes;
 
 use Wszetko\Sitemap\Interfaces\DataType;
 
 /**
- * Class YesNoType
+ * Class YesNoType.
  *
  * @package Wszetko\Sitemap\Items\DataTypes
  */
@@ -20,9 +30,9 @@ class YesNoType extends AbstractDataType
      */
     public function setValue($value, ...$parameters): DataType
     {
-        if ((is_string($value) && preg_grep("/$value/i", ['Yes', 'y', '1'])) || $value == true) {
+        if ((is_string($value) && preg_grep("/{$value}/i", ['Yes', 'y', '1'])) || true == $value) {
             $this->value = 'Yes';
-        } elseif ((is_string($value) && preg_grep("/$value/i", ['No', 'n', '0'])) || $value == false) {
+        } elseif ((is_string($value) && preg_grep("/{$value}/i", ['No', 'n', '0'])) || false == $value) {
             $this->value = 'No';
         }
 

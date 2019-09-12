@@ -1,34 +1,43 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Items\DataTypes;
 
 use Wszetko\Sitemap\Interfaces\DataType;
 
 /**
- * Class FloatType
+ * Class FloatType.
  *
  * @package Wszetko\Sitemap\Items\DataTypes
  */
 class FloatType extends AbstractDataType
 {
     /**
-     * @var int|float
+     * @var int
+     */
+    protected $precision;
+    /**
+     * @var float|int
      */
     private $minValue;
 
     /**
-     * @var int|float
+     * @var float|int
      */
     private $maxValue;
 
     /**
-     * @var int
-     */
-    protected $precision = null;
-
-    /**
-     * @return float|null
+     * @return null|float
      */
     public function getMinValue(): ?float
     {
@@ -48,7 +57,7 @@ class FloatType extends AbstractDataType
     }
 
     /**
-     * @return float|null
+     * @return null|float
      */
     public function getMaxValue(): ?float
     {
@@ -68,7 +77,7 @@ class FloatType extends AbstractDataType
     }
 
     /**
-     * @return int|null
+     * @return null|int
      */
     public function getPrecision(): ?int
     {
@@ -88,14 +97,14 @@ class FloatType extends AbstractDataType
     }
 
     /**
-     * @param int|float|string|null $value
+     * @param null|float|int|string $value
      * @param array                 $parameters
      *
      * @return \Wszetko\Sitemap\Interfaces\DataType
      */
     public function setValue($value, ...$parameters): DataType
     {
-        if (is_null($value)) {
+        if (null === $value) {
             $this->value = null;
 
             return $this;
@@ -103,7 +112,7 @@ class FloatType extends AbstractDataType
 
         if (is_string($value)) {
             if (is_numeric($value)) {
-                $value = floatval($value);
+                $value = (float) $value;
             } else {
                 return $this;
             }
@@ -111,15 +120,15 @@ class FloatType extends AbstractDataType
             return $this;
         }
 
-        if ($this->getMinValue() !== null && $value < $this->getMinValue()) {
+        if (null !== $this->getMinValue() && $value < $this->getMinValue()) {
             return $this;
         }
 
-        if ($this->getMaxValue() !== null && $value > $this->getMaxValue()) {
+        if (null !== $this->getMaxValue() && $value > $this->getMaxValue()) {
             return $this;
         }
 
-        if ($this->getPrecision() !== null) {
+        if (null !== $this->getPrecision()) {
             $value = round($value, $this->getPrecision());
             $value = number_format($value, $this->getPrecision(), '.', '');
         }

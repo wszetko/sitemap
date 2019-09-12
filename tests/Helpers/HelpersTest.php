@@ -1,10 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Wszetko\Sitemap\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Wszetko\Sitemap\Helpers\Url;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class HelpersTest extends TestCase
 {
     public function testCheckDomainValids()
@@ -26,19 +41,20 @@ class HelpersTest extends TestCase
             'sub.example.com',
             'sub.example.com',
             'sub.sub.example.com',
-            'xn--fsqu00a.xn--0zwm56d'
+            'xn--fsqu00a.xn--0zwm56d',
         ];
 
         foreach ($testCaseValid as $test) {
-            $this->assertTrue(Url::checkDomain($test),
-                "Test 'CheckDomain' for '$test' should return TRUE. FALSE was returned.");
+            $this->assertTrue(
+                Url::checkDomain($test),
+                "Test 'CheckDomain' for '{$test}' should return TRUE. FALSE was returned."
+            );
         }
     }
 
     public function testCheckDomainInvalids()
     {
         $testCaseInvalid = [
-            '',
             ' ',
             '-',
             '.',
@@ -53,12 +69,14 @@ class HelpersTest extends TestCase
             'example..com',
             'example.com ',
             ' example.com',
-            'ex ample.com'
+            'ex ample.com',
         ];
 
         foreach ($testCaseInvalid as $test) {
-            $this->assertFalse(Url::checkDomain($test),
-                "Test 'CheckDomain' for '$test' should return FALSE. TRUE was returned.");
+            $this->assertFalse(
+                Url::checkDomain($test),
+                "Test 'CheckDomain' for '{$test}' should return FALSE. TRUE was returned."
+            );
         }
     }
 
@@ -85,14 +103,17 @@ class HelpersTest extends TestCase
             'https://example.com?param=value#anchor',
             'https://example.com/path?param=value#anchor',
             'https://user:password@example.com:8080/path/path.html?param=value&param2=value#anchor',
-//            'http://2001:0db8:85a3:0000:0000:8a2e:0370:7334/',
-//            'http://2001:0db8:85a3::8a2e:0370:7334/',
+            //            'http://2001:0db8:85a3:0000:0000:8a2e:0370:7334/',
+            //            'http://2001:0db8:85a3::8a2e:0370:7334/',
             'http://0.0.0.0',
         ];
 
         foreach ($testCasesValid as $test) {
-            $this->assertEquals($test, Url::normalizeUrl($test),
-                "Test 'NormalizeUrl' for '$test' should return '$test'.");
+            $this->assertEquals(
+                $test,
+                Url::normalizeUrl($test),
+                "Test 'NormalizeUrl' for '{$test}' should return '{$test}'."
+            );
         }
     }
 
@@ -120,16 +141,16 @@ class HelpersTest extends TestCase
             'http://-error-.invalid/',
             'http://-a.b.co',
             'http://a.b-.co',
-//            'http://3628126748',
+            //            'http://3628126748',
             'http://.www.foo.bar/',
             'http://www.foo.bar./',
             'http://.www.foo.bar./',
-//            'https://user@password@example.com',
-            'https://toolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolong.com'
+            //            'https://user@password@example.com',
+            'https://toolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolong.com',
         ];
 
         foreach ($testCasesInvalid as $test) {
-            $this->assertFalse(Url::normalizeUrl($test), "Test 'NormalizeUrl' for '$test' should return FALSE.");
+            $this->assertFalse(Url::normalizeUrl($test), "Test 'NormalizeUrl' for '{$test}' should return FALSE.");
         }
     }
 
@@ -143,13 +164,16 @@ class HelpersTest extends TestCase
             'https://example.com/żółty' => 'https://example.com/%C5%BC%C3%B3%C5%82ty',
             'https://example.com/test/../index.html' => 'https://example.com/index.html',
             'https://example.com/test/./index.html' => 'https://example.com/test/index.html',
-//            'https://example.com?q=Spaces should be encoded' => 'http://example.com?q=Spaces%20should%20be%20encoded',
-//            'https://example.com/foo(bar)baz quux' => 'https://example.com/foo%28bar%29baz+quux'
+            //            'https://example.com?q=Spaces should be encoded' => 'http://example.com?q=Spaces%20should%20be%20encoded',
+            //            'https://example.com/foo(bar)baz quux' => 'https://example.com/foo%28bar%29baz+quux'
         ];
 
         foreach ($testCaseNormalized as $test => $result) {
-            $this->assertEquals($result, Url::normalizeUrl($test),
-                "Test 'NormalizeUrl' for '$test' should return '$result'.");
+            $this->assertEquals(
+                $result,
+                Url::normalizeUrl($test),
+                "Test 'NormalizeUrl' for '{$test}' should return '{$result}'."
+            );
         }
     }
 }

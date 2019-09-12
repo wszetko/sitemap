@@ -1,5 +1,15 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Items;
 
@@ -12,7 +22,7 @@ use Wszetko\Sitemap\Traits\Domain;
 use Wszetko\Sitemap\Traits\IsAssoc;
 
 /**
- * Class AbstractItem
+ * Class AbstractItem.
  *
  * @package Wszetko\Sitemap\Items
  */
@@ -49,41 +59,39 @@ abstract class AbstractItem implements Item
     }
 
     /**
-     * @param \ReflectionProperty $property
+     * @param $name
+     * @param $arguments
      *
-     * @return array
+     * @return mixed
      */
-    private function grabData(ReflectionProperty $property): array
+    public function __call($name, $arguments)
     {
-        preg_match_all('/@var\s+(?\'type\'[^\s]+)|@dataType\s+(?\'dataType\'[^\s]+)|@attribute\s+(?\'attribute\'[^\s]+)|@attributeDataType\s+(?\'attributeDataType\'[^\s]+)/m', $property->getDocComment(), $matches);
+        $operation = mb_substr($name, 0, 3);
+        $property = lcfirst(mb_substr($name, 3));
 
-        $results = [
-            'type' => null,
-            'dataType' => null,
-            'attributes' => []
-        ];
+        if (property_exists($this, $property) &&
+            in_array($operation, ['add', 'set', 'get']) &&
+            ($this->{$property} instanceof DataType)) {
+            switch ($operation) {
+                case 'add':
+                    $this->{$property}->addValue($arguments[0], array_slice($arguments, 1));
 
-        foreach ($matches['type'] as $match) {
-            if (!empty($match)) {
-                $results['type'] = $match;
-                break;
+                    return $this;
+                case 'set':
+                    $this->{$property}->setValue($arguments[0], array_slice($arguments, 1));
+
+                    return $this;
+                case 'get':
+                    if (method_exists($this, 'getDomain') &&
+                        method_exists($this->{$property}, 'setDomain') &&
+                        null !== $this->getDomain()
+                        ) {
+                        $this->{$property}->setDomain($this->getDomain());
+                    }
+
+                    return $this->{$property}->getValue();
             }
         }
-
-        foreach ($matches['dataType'] as $match) {
-            if (!empty($match)) {
-                $results['dataType'] = $match;
-                break;
-            }
-        }
-
-        foreach ($matches['attribute'] as $key => $match) {
-            if (!empty($match) && !empty($matches['attributeDataType'][$key + 1])) {
-                $results['attributes'][$match] = $matches['attributeDataType'][$key + 1];
-            }
-        }
-
-        return $results;
     }
 
     /**
@@ -103,17 +111,17 @@ abstract class AbstractItem implements Item
         $array[static::ELEMENT_NAME] = [];
 
         foreach (get_object_vars($this) as $property => $value) {
-            if (is_object($this->$property)) {
+            if (is_object($this->{$property})) {
                 $method = 'get' . ucfirst($property);
                 preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $property, $matches);
                 $property = $matches[0];
 
                 foreach ($property as &$match) {
-                    $match = $match == strtoupper($match) ? strtolower($match) : lcfirst($match);
+                    $match = $match == mb_strtoupper($match) ? mb_strtolower($match) : lcfirst($match);
                 }
 
                 $property = implode('_', $property);
-                $data = $this->$method();
+                $data = $this->{$method}();
 
                 if (is_array($data)) {
                     if ($this->isAssoc($data)) {
@@ -138,36 +146,42 @@ abstract class AbstractItem implements Item
     }
 
     /**
-     * @param $name
-     * @param $arguments
+     * @param \ReflectionProperty $property
      *
-     * @return mixed
+     * @return array
      */
-    public function __call($name, $arguments)
+    private function grabData(ReflectionProperty $property): array
     {
-        $operation = substr($name, 0, 3);
-        $property = lcfirst(substr($name, 3));
+        preg_match_all('/@var\s+(?\'type\'[^\s]+)|@dataType\s+(?\'dataType\'[^\s]+)|@attribute\s+(?\'attribute\'[^\s]+)|@attributeDataType\s+(?\'attributeDataType\'[^\s]+)/m', $property->getDocComment(), $matches);
 
-        if (property_exists($this, $property) &&
-            in_array($operation, ['add', 'set', 'get']) &&
-            ($this->$property instanceof DataType)) {
-            switch ($operation) {
-                case 'add':
-                    $this->$property->addValue($arguments[0], array_slice($arguments, 1));
-                    return $this;
-                case 'set':
-                    $this->$property->setValue($arguments[0], array_slice($arguments, 1));
-                    return $this;
-                case 'get':
-                    if (method_exists($this, 'getDomain') &&
-                        method_exists($this->$property, 'setDomain') &&
-                        $this->getDomain() !== null
-                        ) {
-                        $this->$property->setDomain($this->getDomain());
-                    }
+        $results = [
+            'type' => null,
+            'dataType' => null,
+            'attributes' => [],
+        ];
 
-                    return $this->$property->getValue();
+        foreach ($matches['type'] as $match) {
+            if (!empty($match)) {
+                $results['type'] = $match;
+
+                break;
             }
         }
+
+        foreach ($matches['dataType'] as $match) {
+            if (!empty($match)) {
+                $results['dataType'] = $match;
+
+                break;
+            }
+        }
+
+        foreach ($matches['attribute'] as $key => $match) {
+            if (!empty($match) && !empty($matches['attributeDataType'][$key + 1])) {
+                $results['attributes'][$match] = $matches['attributeDataType'][$key + 1];
+            }
+        }
+
+        return $results;
     }
 }

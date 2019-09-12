@@ -1,12 +1,22 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Items;
 
 use Wszetko\Sitemap\Sitemap;
 
 /**
- * Class Url
+ * Class Url.
  *
  * @package Wszetko\Sitemap\Items
  *
@@ -22,40 +32,40 @@ use Wszetko\Sitemap\Sitemap;
 class Url extends AbstractItem
 {
     /**
-     * Element name
+     * Element name.
      */
-    const ELEMENT_NAME = 'url';
+    public const ELEMENT_NAME = 'url';
 
     /**
-     * Location (URL)
+     * Location (URL).
      *
      * @var \Wszetko\Sitemap\Items\DataTypes\URLType
      */
     protected $loc;
 
     /**
-     * Last modified time
+     * Last modified time.
      *
      * @var \Wszetko\Sitemap\Items\DataTypes\DateTimeType
      */
     protected $lastmod;
 
     /**
-     * Change frequency of the location
+     * Change frequency of the location.
      *
      * @var \Wszetko\Sitemap\Items\DataTypes\StringType
      */
     protected $changefreq;
 
     /**
-     * Priority of page importance
+     * Priority of page importance.
      *
      * @var \Wszetko\Sitemap\Items\DataTypes\FloatType
      */
     protected $priority;
 
     /**
-     * Array of used extensions
+     * Array of used extensions.
      *
      * @var array
      */
@@ -78,7 +88,8 @@ class Url extends AbstractItem
         $this->priority
             ->setMinValue(0)
             ->setMaxValue(1)
-            ->setPrecision(1);
+            ->setPrecision(1)
+        ;
     }
 
     /**

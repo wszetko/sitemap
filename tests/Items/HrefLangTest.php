@@ -1,5 +1,15 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Tests;
 
@@ -8,9 +18,12 @@ use PHPUnit\Framework\TestCase;
 use Wszetko\Sitemap\Items\HrefLang;
 
 /**
- * Class HrefLangTest
+ * Class HrefLangTest.
  *
  * @package Wszetko\Sitemap\Tests
+ *
+ * @internal
+ * @coversNothing
  */
 class HrefLangTest extends TestCase
 {
@@ -45,7 +58,7 @@ class HrefLangTest extends TestCase
         $hrefLang->setDomain('https://example.com');
 
         $expectedResult = [
-            'pl-PL' => ['href' => 'https://example.com/']
+            'pl-PL' => ['href' => 'https://example.com/'],
         ];
 
         $this->assertEquals($expectedResult, $hrefLang->getHrefLang());
@@ -56,7 +69,7 @@ class HrefLangTest extends TestCase
 
         $expectedResult = [
             'pl-PL' => ['href' => 'https://example.com/'],
-            'en' => ['href' => 'https://example.com/en']
+            'en' => ['href' => 'https://example.com/en'],
         ];
 
         $this->assertEquals($expectedResult, $hrefLang->getHrefLang());
@@ -75,10 +88,10 @@ class HrefLangTest extends TestCase
                     '_attributes' => [
                         'rel' => 'alternate',
                         'hreflang' => 'pl-PL',
-                        'href' => 'https://example.com/'
-                    ]
-                ]
-            ]
+                        'href' => 'https://example.com/',
+                    ],
+                ],
+            ],
         ];
 
         $this->assertEquals($expectedResult, $hrefLang->toArray());

@@ -1,5 +1,15 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Items\DataTypes;
 
@@ -8,7 +18,7 @@ use Wszetko\Sitemap\Traits\Domain;
 use Wszetko\Sitemap\Traits\Required;
 
 /**
- * Class AbstractDataType
+ * Class AbstractDataType.
  *
  * @package Wszetko\Sitemap\Items\DataTypes
  */
@@ -16,11 +26,6 @@ abstract class AbstractDataType implements DataType
 {
     use Required;
     use Domain;
-
-    /**
-     * @var string
-     */
-    private $name;
 
     /**
      * @var
@@ -33,6 +38,11 @@ abstract class AbstractDataType implements DataType
     protected $attributes = [];
 
     /**
+     * @var string
+     */
+    private $name;
+
+    /**
      * AbstractDataType constructor.
      *
      * @param $name
@@ -40,6 +50,18 @@ abstract class AbstractDataType implements DataType
     public function __construct($name)
     {
         $this->name = $name;
+    }
+
+    /**
+     * To clone properties of object with no reference.
+     */
+    public function __clone()
+    {
+        foreach ($this->attributes as $attribute => $value) {
+            if ('object' == gettype($value)) {
+                $this->attributes[$attribute] = clone $this->attributes[$attribute];
+            }
+        }
     }
 
     /**
@@ -60,9 +82,9 @@ abstract class AbstractDataType implements DataType
 
         if (!empty($attributes)) {
             return [$value => $attributes];
-        } else {
-            return $value;
         }
+
+        return $value;
     }
 
     /**
@@ -105,7 +127,7 @@ abstract class AbstractDataType implements DataType
     /**
      * @param $name
      *
-     * @return mixed|null
+     * @return null|mixed
      */
     public function getAttribute($name)
     {
@@ -135,20 +157,8 @@ abstract class AbstractDataType implements DataType
      */
     public function propagateDomain(object &$target): void
     {
-        if ($this->getDomain() !== null) {
+        if (null !== $this->getDomain()) {
             $target->setDomain($this->getDomain());
-        }
-    }
-
-    /**
-     * To clone properties of object with no reference
-     */
-    public function __clone()
-    {
-        foreach ($this->attributes as $attribute => $value) {
-            if (gettype($value) == 'object') {
-                $this->attributes[$attribute] = clone $this->attributes[$attribute];
-            }
         }
     }
 }

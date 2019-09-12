@@ -1,26 +1,35 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Items\DataTypes;
 
 use Wszetko\Sitemap\Interfaces\DataType;
 
 /**
- * Class ArrayType
+ * Class ArrayType.
  *
  * @package Wszetko\Sitemap\Items\DataTypes
  */
 class ArrayType extends AbstractDataType
 {
     /**
-     * @var \Wszetko\Sitemap\Items\DataTypes\AbstractDataType
-     */
-    private $baseDataType;
-
-    /**
      * @var int
      */
     protected $maxElements;
+    /**
+     * @var \Wszetko\Sitemap\Items\DataTypes\AbstractDataType
+     */
+    private $baseDataType;
 
     /**
      * ArrayType constructor.
@@ -45,7 +54,7 @@ class ArrayType extends AbstractDataType
     }
 
     /**
-     * @return int|null
+     * @return null|int
      */
     public function getMaxElements(): ?int
     {
@@ -97,7 +106,7 @@ class ArrayType extends AbstractDataType
             $var = clone $this->getBaseDataType();
             $var->setValue($value, $parameters[0]);
 
-            if (!is_null($var->getValue())) {
+            if (null !== $var->getValue()) {
                 $this->value[] = $var;
             }
         }
@@ -128,7 +137,7 @@ class ArrayType extends AbstractDataType
                 }
             }
 
-            if ($this->getMaxElements() !== null) {
+            if (null !== $this->getMaxElements()) {
                 $result = array_slice($result, 0, $this->getMaxElements());
             }
         }

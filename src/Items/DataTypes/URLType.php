@@ -1,34 +1,44 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Items\DataTypes;
 
 use Wszetko\Sitemap\Helpers\Url;
 
 /**
- * Class URLType
+ * Class URLType.
  *
  * @package Wszetko\Sitemap\Items\DataTypes
  */
 class URLType extends StringType
 {
     /**
-     * Determine if URL CAN be external
+     * Determine if URL CAN be external.
      *
      * @var bool
      */
     protected $external = false;
 
     /**
-     * @return mixed|string|null
+     * @return null|mixed|string
      */
     public function getValue()
     {
-        if ($this->value === null || !is_string($this->value)) {
+        if (null === $this->value || !is_string($this->value)) {
             return null;
         }
 
-        if ($this->isExternal() && Url::normalizeUrl($this->value) !== false) {
+        if ($this->isExternal() && false !== Url::normalizeUrl($this->value)) {
             $value = $this->value;
         } else {
             $value = str_replace($this->getDomain(), '', $this->value);
@@ -42,9 +52,9 @@ class URLType extends StringType
 
         if (!empty($value) && !empty($attributes)) {
             return [$value => $attributes];
-        } else {
-            return $value;
         }
+
+        return $value;
     }
 
     /**

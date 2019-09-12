@@ -1,5 +1,15 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Items\DataTypes;
 
@@ -7,7 +17,7 @@ use InvalidArgumentException;
 use Wszetko\Sitemap\Interfaces\DataType;
 
 /**
- * Class StringType
+ * Class StringType.
  *
  * @package Wszetko\Sitemap\Items\DataTypes
  */
@@ -24,9 +34,9 @@ class StringType extends AbstractDataType
     protected $maxLength;
 
     /**
-     * @var array|null
+     * @var null|array
      */
-    protected $allowedValues = null;
+    protected $allowedValues;
 
     /**
      * @var string
@@ -39,7 +49,7 @@ class StringType extends AbstractDataType
     protected $regexGroup;
 
     /**
-     * @return int|null
+     * @return null|int
      */
     public function getMinLength(): ?int
     {
@@ -59,7 +69,7 @@ class StringType extends AbstractDataType
     }
 
     /**
-     * @return int|null
+     * @return null|int
      */
     public function getMaxLength(): ?int
     {
@@ -79,7 +89,7 @@ class StringType extends AbstractDataType
     }
 
     /**
-     * @return array|null
+     * @return null|array
      */
     public function getAllowedValues(): ?array
     {
@@ -87,7 +97,7 @@ class StringType extends AbstractDataType
     }
 
     /**
-     * @param string|array|null $allowedValues
+     * @param null|array|string $allowedValues
      *
      * @return \Wszetko\Sitemap\Items\DataTypes\StringType
      */
@@ -121,7 +131,7 @@ class StringType extends AbstractDataType
     }
 
     /**
-     * @return array|null
+     * @return null|array
      */
     public function getValueRegex(): ?array
     {
@@ -133,15 +143,15 @@ class StringType extends AbstractDataType
     }
 
     /**
-     * @param string|int|float|object|null $value
+     * @param null|float|int|object|string $value
      * @param array                        $parameters
      *
      * @return self
      */
     public function setValue($value, ...$parameters): DataType
     {
-        if ($value !== null) {
-            $value = strval($value);
+        if (null !== $value) {
+            $value = (string) $value;
             $this->checkValue($value);
         }
 
@@ -161,16 +171,16 @@ class StringType extends AbstractDataType
     {
         $value = trim($value);
 
-        if ($this->getMinLength() !== null && mb_strlen($value) < $this->getMinLength()) {
+        if (null !== $this->getMinLength() && mb_strlen($value) < $this->getMinLength()) {
             $value = null;
         }
 
-        if ($this->getMaxLength() !== null && $value !== null && mb_strlen($value) > $this->getMaxLength()) {
+        if (null !== $this->getMaxLength() && null !== $value && mb_strlen($value) > $this->getMaxLength()) {
             $value = mb_substr($value, 0, $this->getMaxLength());
         }
 
         if (!empty($this->getAllowedValues())) {
-            $match = preg_grep("/$value/i", $this->getAllowedValues());
+            $match = preg_grep("/{$value}/i", $this->getAllowedValues());
 
             if (empty($match)) {
                 $value = null;

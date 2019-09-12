@@ -1,5 +1,15 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Drivers\XML;
 
@@ -8,7 +18,7 @@ use Wszetko\Sitemap\Traits\Domain;
 use Wszetko\Sitemap\Traits\IsAssoc;
 
 /**
- * Class AbstractXML
+ * Class AbstractXML.
  *
  * @package Wszetko\Sitemap\Drivers\XML
  */
@@ -28,7 +38,7 @@ abstract class AbstractXML implements XML
     private $currentSitemap;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $workDir;
 
@@ -49,22 +59,6 @@ abstract class AbstractXML implements XML
     }
 
     /**
-     * @return mixed
-     */
-    protected function getXMLWriter()
-    {
-        return $this->XMLWriter;
-    }
-
-    /**
-     * @return string
-     */
-    protected function getSitemapFileFullPath(): string
-    {
-        return $this->getWorkDir() . DIRECTORY_SEPARATOR . $this->currentSitemap;
-    }
-
-    /**
      * @return string
      */
     public function getWorkDir(): string
@@ -78,5 +72,21 @@ abstract class AbstractXML implements XML
     public function setWorkDir(string $dir): void
     {
         $this->workDir = $dir;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getXMLWriter()
+    {
+        return $this->XMLWriter;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getSitemapFileFullPath(): string
+    {
+        return $this->getWorkDir() . DIRECTORY_SEPARATOR . $this->currentSitemap;
     }
 }

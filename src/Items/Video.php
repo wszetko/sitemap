@@ -1,5 +1,15 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Items;
 
@@ -8,12 +18,14 @@ use Wszetko\Sitemap\Traits\DateTime;
 use Wszetko\Sitemap\Traits\IsAssoc;
 
 /**
- * Class Video
+ * Class Video.
  *
  * @todo    : add support for content_segment_loc tag
  * @todo    : add support for tvshow tag
  * @todo    : add support for id tag
+ *
  * @package Wszetko\Sitemap\Items
+ *
  * @method setThumbnailLoc($thumbnail)
  * @method getThumbnailLoc()
  * @method setTitle($title)
@@ -62,19 +74,19 @@ class Video extends Extension
     use IsAssoc;
 
     /**
-     * Name of Namescapce
+     * Name of Namescapce.
      */
-    const NAMESPACE_NAME = 'video';
+    public const NAMESPACE_NAME = 'video';
 
     /**
-     * Namespace URL
+     * Namespace URL.
      */
-    const NAMESPACE_URL = 'http://www.google.com/schemas/sitemap-video/1.1';
+    public const NAMESPACE_URL = 'http://www.google.com/schemas/sitemap-video/1.1';
 
     /**
-     * Element name
+     * Element name.
      */
-    const ELEMENT_NAME = 'video';
+    public const ELEMENT_NAME = 'video';
 
     /**
      * URL pointing to an image thumbnail.
@@ -111,6 +123,7 @@ class Video extends Extension
      * @attributeDataType \Wszetko\Sitemap\Items\DataTypes\YesNoType
      * @attribute autoplay
      * @attributeDataType \Wszetko\Sitemap\Items\DataTypes\StringType
+     *
      * @var \Wszetko\Sitemap\Items\DataTypes\URLType
      */
     protected $playerLoc;
@@ -135,6 +148,7 @@ class Video extends Extension
      *
      * @attribute relationship
      * @attributeDataType \Wszetko\Sitemap\Items\DataTypes\StringType
+     *
      * @var \Wszetko\Sitemap\Items\DataTypes\StringType
      */
     protected $platform;
@@ -153,6 +167,7 @@ class Video extends Extension
      * @attributeDataType \Wszetko\Sitemap\Items\DataTypes\StringType
      * @attribute resolution
      * @attributeDataType \Wszetko\Sitemap\Items\DataTypes\StringType
+     *
      * @var \Wszetko\Sitemap\Items\DataTypes\FloatType
      */
     protected $price;
@@ -169,6 +184,7 @@ class Video extends Extension
      *
      * @attribute relationship
      * @attributeDataType \Wszetko\Sitemap\Items\DataTypes\StringType
+     *
      * @var \Wszetko\Sitemap\Items\DataTypes\StringType
      */
     protected $restriction;
@@ -177,6 +193,7 @@ class Video extends Extension
      * A tag associated with the video.
      *
      * @dataType \Wszetko\Sitemap\Items\DataTypes\StringType
+     *
      * @var \Wszetko\Sitemap\Items\DataTypes\ArrayType
      */
     protected $tag;
@@ -214,6 +231,7 @@ class Video extends Extension
      *
      * @attribute info
      * @attributeDataType \Wszetko\Sitemap\Items\DataTypes\URLType
+     *
      * @var \Wszetko\Sitemap\Items\DataTypes\StringType
      */
     protected $uploader;
@@ -226,7 +244,7 @@ class Video extends Extension
     protected $rating;
 
     /**
-     * The date after which the video will no longer be available
+     * The date after which the video will no longer be available.
      *
      * @var \Wszetko\Sitemap\Items\DataTypes\DateTimeType
      */
@@ -247,51 +265,67 @@ class Video extends Extension
         parent::__construct();
 
         $this->thumbnailLoc
-            ->setRequired(true);
+            ->setRequired(true)
+        ;
         $this->setThumbnailLoc($thumbnailLoc);
         $this->title
             ->setMinLength(1)
-            ->setMaxLength(100);
+            ->setMaxLength(100)
+        ;
         $this->setTitle($title);
         $this->description
             ->setMinLength(1)
-            ->setMaxLength(2048);
+            ->setMaxLength(2048)
+        ;
         $this->setDescription($description);
         $this->rating
             ->setMinValue(0)
             ->setMaxValue(5)
-            ->setPrecision(1);
+            ->setPrecision(1)
+        ;
         $this->viewCount
-            ->setMinValue(0);
+            ->setMinValue(0)
+        ;
         $this->duration
             ->setMinValue(0)
-            ->setMaxValue(28800);
+            ->setMaxValue(28800)
+        ;
         $this->restriction
-            ->setValueRegex("/^(?'countries'[A-Z]{2}( +[A-Z]{2})*)?$/", 'countries');
+            ->setValueRegex("/^(?'countries'[A-Z]{2}( +[A-Z]{2})*)?$/", 'countries')
+        ;
         $this->restriction
             ->getAttribute('relationship')
-            ->setAllowedValues('allow, deny');
+            ->setAllowedValues('allow, deny')
+        ;
         $this->platform
-            ->setValueRegex("/^(?'platform'(web|mobile|tv)( (web|mobile|tv))*)?/", 'platform');
+            ->setValueRegex("/^(?'platform'(web|mobile|tv)( (web|mobile|tv))*)?/", 'platform')
+        ;
         $this->platform
             ->getAttribute('relationship')
-            ->setAllowedValues('allow, deny');
+            ->setAllowedValues('allow, deny')
+        ;
         $this->price
             ->setMinValue(0)
-            ->setPrecision(2);
+            ->setPrecision(2)
+        ;
         $this->price
             ->getAttribute('currency')
-            ->setValueRegex("/^(?'currency'[A-Z]{3})$/", 'currency');
+            ->setValueRegex("/^(?'currency'[A-Z]{3})$/", 'currency')
+        ;
         $this->price
             ->getAttribute('type')
-            ->setAllowedValues('rent, purchase');
+            ->setAllowedValues('rent, purchase')
+        ;
         $this->price
             ->getAttribute('resolution')
-            ->setAllowedValues('SD, HD');
+            ->setAllowedValues('SD, HD')
+        ;
         $this->tag
-            ->setMaxElements(32);
+            ->setMaxElements(32)
+        ;
         $this->category
-            ->setMaxLength(256);
+            ->setMaxLength(256)
+        ;
     }
 
     /**

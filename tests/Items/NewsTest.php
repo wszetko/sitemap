@@ -1,5 +1,15 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Tests;
 
@@ -9,9 +19,12 @@ use PHPUnit\Framework\TestCase;
 use Wszetko\Sitemap\Items;
 
 /**
- * Class NewsTest
+ * Class NewsTest.
  *
  * @package Wszetko\Sitemap\Tests
+ *
+ * @internal
+ * @coversNothing
  */
 class NewsTest extends TestCase
 {
@@ -172,15 +185,15 @@ class NewsTest extends TestCase
             'news' => [
                 'publication' => [
                     'name' => 'News name',
-                    'language' => 'pl'
+                    'language' => 'pl',
                 ],
                 'publication_date' => '2014-08-01',
                 'title' => 'Title',
                 'access' => 'Subscription',
                 'genres' => 'Blog',
                 'keywords' => 'Test1',
-                'stock_tickers' => 'NASDAQ:AMAT'
-            ]
+                'stock_tickers' => 'NASDAQ:AMAT',
+            ],
         ];
 
         $this->assertEquals($expectedResult, $news->toArray());

@@ -1,10 +1,20 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of Wszetko Sitemap.
+ *
+ * (c) Paweł Kłopotek-Główczewski <pawelkg@pawelkg.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
 namespace Wszetko\Sitemap\Interfaces;
 
 /**
- * Interface XML
+ * Interface XML.
  *
  * @package Wszetko\Sitemap\Interfaces
  */
@@ -38,9 +48,6 @@ interface XML
      */
     public function openSitemap(string $sitemap, array $extensions): void;
 
-    /**
-     *
-     */
     public function closeSitemap(): void;
 
     /**
@@ -55,14 +62,11 @@ interface XML
      */
     public function openSitemapIndex(string $sitemap): void;
 
-    /**
-     *
-     */
     public function closeSitemapIndex(): void;
 
     /**
      * @param string      $sitemap
-     * @param string|null $lastmod
+     * @param null|string $lastmod
      *
      * @return mixed
      */
