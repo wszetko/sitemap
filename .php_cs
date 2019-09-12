@@ -36,5 +36,6 @@ return PhpCsFixer\Config::create()
         'phpdoc_no_empty_return' => false,
         'phpdoc_no_package' => false,
         'psr4' => true,
+        'single_line_comment_style' => ['comment_types' => ['hash']],
     ])
     ->setFinder($finder);

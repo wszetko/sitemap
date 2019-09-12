@@ -61,7 +61,7 @@ class HrefLang extends Extension
         $hrefLangValue = $this->hrefLang
             ->getBaseDataType()
         ;
-        // @var $hrefLangValue \Wszetko\Sitemap\Items\DataTypes\StringType
+        /** @var $hrefLangValue \Wszetko\Sitemap\Items\DataTypes\StringType */
         $hrefLangValue
             ->setRequired(true)
             ->setValueRegex("/^(?'hreflang'([a-z]{2}|(x))((-)([A-Za-z]{2}|[A-Z]([a-z]|[a-z]{3})|(default)))?)$/", 'hreflang')

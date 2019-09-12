@@ -157,7 +157,7 @@ class News extends Extension
         $generesValue = $this->genres
             ->getBaseDataType()
         ;
-        // @var $generesValue \Wszetko\Sitemap\Items\DataTypes\StringType
+        /** @var $generesValue \Wszetko\Sitemap\Items\DataTypes\StringType */
         $generesValue
             ->setAllowedValues('PressRelease, Satire, Blog, OpEd, Opinion, UserGenerated')
         ;
@@ -165,7 +165,7 @@ class News extends Extension
             ->setMaxElements(5)
             ->getBaseDataType()
         ;
-        // @var $stickTickersValue \Wszetko\Sitemap\Items\DataTypes\StringType
+        /** @var $stickTickersValue \Wszetko\Sitemap\Items\DataTypes\StringType */
         $stickTickersValue
             ->setValueRegex("/^(?'stockTickers'\\w+:\\w+)?$/", 'stockTickers')
         ;
