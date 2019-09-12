@@ -1,47 +1,49 @@
 {
-  "name": "wszetko/sitemap",
-  "type": "library",
-  "description": "Sitemap generator",
-  "keywords": [
-    "sitemap",
-    "sitemaps",
-    "generator"
-  ],
-  "homepage": "https://wszetko.pl",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Paweł Kłopotek-Główczewski",
-      "email": "pawelkg@pawelkg.com",
-      "homepage": "https://pawelkg.com",
-      "role": "Developer"
-    }
-  ],
-  "require": {
-    "php": ">=7.0.2",
-    "ext-intl": "*",
-    "ext-mbstring": "*"
-  },
-  "suggest": {
-    "ext-xmlwriter": "*",
-    "ext-zlib": "*"
-  },
-  "require-dev": {
-    "phpunit/phpunit": "^8.3",
-    "friendsofphp/php-cs-fixer": "^2.15"
-  },
-  "autoload": {
-    "psr-4": {
-      "Wszetko\\Sitemap\\": "src"
+    "name": "wszetko/sitemap",
+    "type": "library",
+    "description": "Sitemap generator",
+    "keywords": [
+        "sitemap",
+        "sitemaps",
+        "generator"
+    ],
+    "homepage": "https://wszetko.pl",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Paweł Kłopotek-Główczewski",
+            "email": "pawelkg@pawelkg.com",
+            "homepage": "https://pawelkg.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=7.0.2",
+        "ext-intl": "*",
+        "ext-mbstring": "*"
     },
-    "files" : ["src/Compatibility/array_key_first.php"]
-  },
-  "scripts": {
-    "phpcs": "php-cs-fixer fix -v --diff --dry-run",
-    "phpunit": "phpunit",
-    "test": [
-      "@phpcs",
-      "@phpunit"
-    ]
-  }
+    "suggest": {
+        "ext-xmlwriter": "*",
+        "ext-zlib": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.3",
+        "friendsofphp/php-cs-fixer": "^2.15"
+    },
+    "autoload": {
+        "psr-4": {
+            "Wszetko\\Sitemap\\": "src"
+        },
+        "files": [
+            "src/Compatibility/array_key_first.php"
+        ]
+    },
+    "scripts": {
+        "phpcs": "php-cs-fixer fix -v --diff --dry-run",
+        "phpunit": "phpunit",
+        "test": [
+            "@phpcs",
+            "@phpunit"
+        ]
+    }
 }
