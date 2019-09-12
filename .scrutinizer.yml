@@ -38,4 +38,3 @@ coding_style:
     spaces:
       around_operators:
         concatenation: true
-language: php
