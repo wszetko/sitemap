@@ -11,7 +11,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Wszetko\Sitemap\Tests;
+namespace Wszetko\Sitemap\Tests\Items;
 
 use DateTime;
 use InvalidArgumentException;
@@ -25,116 +25,198 @@ use Wszetko\Sitemap\Items\Mobile;
  * @package Wszetko\Sitemap\Tests
  *
  * @internal
- * @coversNothing
  */
 class UrlTest extends TestCase
 {
+    /**
+     * @throws \ReflectionException
+     */
     public function testConstructor()
     {
         $url = new Items\Url('test');
-
         $this->assertInstanceOf(Items\Url::class, $url);
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function testPropertyNotExists()
     {
         $url = new Items\Url('test');
         $this->assertNull($url->setNotExists('test'));
     }
 
-    public function testDomain()
+    /**
+     * @dataProvider domainProvider
+     *
+     * @param $domain
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testDomain($domain, $expected)
     {
         $url = new Items\Url('test');
-        $url->setDomain('https://example.com');
+        $url->setDomain($domain);
+        $this->assertEquals($expected, $url->getDomain());
+    }
 
-        $this->assertEquals('https://example.com', $url->getDomain());
-
-        $url->setDomain('https://example.com/');
-
-        $this->assertEquals('https://example.com', $url->getDomain());
-
+    /**
+     * @throws \ReflectionException
+     */
+    public function testDomainException()
+    {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Domain name is not valid.');
-
+        $url = new Items\Url('test');
         $url->setDomain('broken|domain');
     }
 
-    public function testGetLoc()
+    /**
+     * @return array
+     */
+    public function domainProvider()
     {
-        $url = new Items\Url('test');
-        $url->setDomain('https://example.com');
-
-        $this->assertEquals('https://example.com/test', $url->getLoc());
+        return [
+            ['https://example.com', 'https://example.com'],
+            ['https://example.com/', 'https://example.com'],
+        ];
     }
 
-    public function testLastMod()
+    /**
+     * @dataProvider getLocProvider
+     *
+     * @param $loc
+     * @param $excepted
+     *
+     * @throws \ReflectionException
+     */
+    public function testGetLoc($loc, $excepted)
+    {
+        $url = new Items\Url($loc);
+        $url->setDomain('https://example.com');
+        $this->assertEquals($excepted, $url->getLoc());
+    }
+
+    /**
+     * @return array
+     */
+    public function getLocProvider()
+    {
+        return [
+            ['test', 'https://example.com/test'],
+            ['/test', 'https://example.com/test'],
+            ['test/path', 'https://example.com/test/path'],
+            ['test/path', 'https://example.com/test/path'],
+            ['test.html', 'https://example.com/test.html'],
+            ['test.html?param=value', 'https://example.com/test.html?param=value'],
+        ];
+    }
+
+    /**
+     * @dataProvider lastModProvider
+     *
+     * @param $lastMod
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testLastMod($lastMod, $expected)
+    {
+        $url = new Items\Url('test');
+        $url->setLastmod($lastMod);
+        $this->assertEquals($expected, $url->getLastmod());
+    }
+
+    /**
+     * @throws \Exception
+     *
+     * @return array
+     */
+    public function lastModProvider()
     {
         date_default_timezone_set('Europe/London');
 
-        $url = new Items\Url('test');
-        $this->assertNull($url->getLastmod());
-
-        $url = new Items\Url('test');
-        $url->setLastmod(new DateTime('2013-11-16'));
-        $this->assertEquals('2013-11-16', $url->getLastmod());
-
-        $url = new Items\Url('test');
-        $url->setLastmod(new DateTime('2013-11-16 19:00'));
-        $this->assertEquals('2013-11-16T19:00:00+00:00', $url->getLastmod());
-
-        $url = new Items\Url('test');
-        $url->setLastmod(new DateTime('0000-00-00 00:00'));
-        $this->assertNull($url->getLastmod());
-
-        $url = new Items\Url('test');
-        $url->setLastmod('2013-12-11');
-        $this->assertEquals('2013-12-11', $url->getLastmod());
-    }
-
-    public function testChangeFreq()
-    {
-        $tests = [
-            ['input' => 'invalid', 'expected' => null],
-            ['input' => 'always', 'expected' => 'always'],
-            ['input' => 'hourly', 'expected' => 'hourly'],
-            ['input' => 'daily', 'expected' => 'daily'],
-            ['input' => 'weekly', 'expected' => 'weekly'],
-            ['input' => 'monthly', 'expected' => 'monthly'],
-            ['input' => 'yearly', 'expected' => 'yearly'],
-            ['input' => 'never', 'expected' => 'never'],
+        return [
+            [null, null],
+            [new DateTime('2013-11-16'), '2013-11-16'],
+            [new DateTime('2013-11-16 19:00'), '2013-11-16T19:00:00+00:00'],
+            [new DateTime('0000-00-00 00:00'), null],
+            ['2013-12-11', '2013-12-11'],
         ];
-
-        foreach ($tests as $test) {
-            $url = new Items\Url('test');
-            $url->setChangefreq($test['input']);
-            $this->assertEquals($test['expected'], $url->getChangefreq());
-        }
     }
 
-    public function testPriority()
+    /**
+     * @dataProvider changeFreqProvider
+     *
+     * @param $changeFreq
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testChangeFreq($changeFreq, $expected)
     {
-        $tests = [
-            ['input' => 1, 'expected' => '1.0'],
-            ['input' => 0, 'expected' => '0.0'],
-            ['input' => .5, 'expected' => '0.5'],
-            ['input' => 2, 'expected' => null],
-            ['input' => -1, 'expected' => null],
-            ['input' => '1', 'expected' => '1.0'],
-            ['input' => '0', 'expected' => '0.0'],
-            ['input' => '.5', 'expected' => '0.5'],
-            ['input' => '2', 'expected' => null],
-            ['input' => '-1', 'expected' => null],
-            ['input' => new \stdClass(), 'expected' => null],
-            ['input' => 'test', 'expected' => null],
-        ];
-
-        foreach ($tests as $test) {
-            $url = new Items\Url('test');
-            $url->setPriority($test['input']);
-            $this->assertEquals($test['expected'], $url->getPriority());
-        }
+        $url = new Items\Url('test');
+        $url->setChangefreq($changeFreq);
+        $this->assertEquals($expected, $url->getChangefreq());
     }
 
+    /**
+     * @return array
+     */
+    public function changeFreqProvider()
+    {
+        return [
+            ['invalid', null],
+            ['always', 'always'],
+            ['hourly', 'hourly'],
+            ['daily', 'daily'],
+            ['weekly', 'weekly'],
+            ['monthly', 'monthly'],
+            ['yearly', 'yearly'],
+            ['never', 'never'],
+        ];
+    }
+
+    /**
+     * @dataProvider priorityProvider
+     *
+     * @param $priority
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testPriority($priority, $expected)
+    {
+        $url = new Items\Url('test');
+        $url->setPriority($priority);
+        $this->assertEquals($expected, $url->getPriority());
+    }
+
+    /**
+     * @return array
+     */
+    public function priorityProvider()
+    {
+        return [
+            [1, '1.0'],
+            [0, '0.0'],
+            [.5, '0.5'],
+            [2, null],
+            [-1, null],
+            ['1', '1.0'],
+            ['0', '0.0'],
+            ['.5', '0.5'],
+            ['2', null],
+            ['-1', null],
+            [new \stdClass(), null],
+            ['test', null],
+        ];
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
     public function testAddExtensions()
     {
         $url = new Items\Url('test');
@@ -151,6 +233,9 @@ class UrlTest extends TestCase
         $this->assertEquals($expectedResult, $url->getExtensions());
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function testToArray()
     {
         date_default_timezone_set('Europe/London');

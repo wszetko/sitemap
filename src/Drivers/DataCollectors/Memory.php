@@ -107,10 +107,20 @@ class Memory implements DataCollector
     }
 
     /**
-     * @return array
+     * @param null|string $group
+     *
+     * @return null|array
      */
-    public function fetchAll(): array
+    public function fetchAll(?string $group = null): ?array
     {
+        if ($group) {
+            if (isset($this->items[$group])) {
+                return $this->items[$group];
+            }
+
+            return null;
+        }
+
         return $this->items;
     }
 

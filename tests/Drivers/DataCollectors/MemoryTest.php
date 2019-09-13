@@ -11,7 +11,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Wszetko\Sitemap\Tests;
+namespace Wszetko\Sitemap\Tests\Drivers\DataCollectors;
 
 use PHPUnit\Framework\TestCase;
 use Wszetko\Sitemap\Drivers\DataCollectors\Memory;
@@ -19,8 +19,11 @@ use Wszetko\Sitemap\Items\Mobile;
 use Wszetko\Sitemap\Items\Url;
 
 /**
+ * Class MemoryTest.
+ *
+ * @package Wszetko\Sitemap\Tests
+ *
  * @internal
- * @coversNothing
  */
 class MemoryTest extends TestCase
 {

@@ -14,9 +14,11 @@ matrix:
               - IGNORE_PLATFORMS=false
         - php: 7.4snapshot
           env:
+              - COLLECT_COVERAGE=false
               - IGNORE_PLATFORMS=true
         - php: nightly
           env:
+              - COLLECT_COVERAGE=false
               - IGNORE_PLATFORMS=true
     allow_failures:
         - php: 7.4snapshot

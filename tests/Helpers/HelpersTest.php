@@ -11,14 +11,17 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Wszetko\Sitemap\Tests;
+namespace Wszetko\Sitemap\Tests\Helpers;
 
 use PHPUnit\Framework\TestCase;
 use Wszetko\Sitemap\Helpers\Url;
 
 /**
+ * Class HelpersTest.
+ *
+ * @package Wszetko\Sitemap\Tests
+ *
  * @internal
- * @coversNothing
  */
 class HelpersTest extends TestCase
 {

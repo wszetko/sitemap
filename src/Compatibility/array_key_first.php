@@ -11,6 +11,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
+// For compatibility with PHP < 7.3
 if (!function_exists('array_key_first')) {
     /**
      * Gets the first key of an array.

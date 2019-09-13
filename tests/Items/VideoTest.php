@@ -11,7 +11,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Wszetko\Sitemap\Tests;
+namespace Wszetko\Sitemap\Tests\Items;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -23,418 +23,684 @@ use Wszetko\Sitemap\Items\Video;
  * @package Wszetko\Sitemap\Tests
  *
  * @internal
- * @coversNothing
  */
 class VideoTest extends TestCase
 {
+    /**
+     * @throws \ReflectionException
+     */
     public function testConstructor()
     {
         $video = new Video('thumb.png', 'Video', 'Description');
         $this->assertInstanceOf(Video::class, $video);
+    }
 
+    /**
+     * @throws \ReflectionException
+     */
+    public function testConstructorExceptionCase1()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('title need to be set.');
+        new Video('thumb.png', '', 'Description');
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testConstructorExceptionCase2()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('description need to be set.');
+        new Video('thumb.png', 'Video', '');
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testConstructorExceptionCase3()
+    {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('thumbnailLoc need to be set.');
         new Video('', 'Video', 'Description');
     }
 
-    public function testContentLoc()
+    /**
+     * @dataProvider contentLocProvider
+     *
+     * @param mixed $contentLoc
+     * @param mixed $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testContentLoc($contentLoc, $expected)
     {
         $video = new Video('thumb.png', 'Video', 'Description');
         $video->setDomain('https://example.com');
-        $video->setContentLoc('example/test');
-        $this->assertEquals('https://example.com/example/test', $video->getContentLoc());
 
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setDomain('https://example.com');
-        $video->setContentLoc('/example/test');
-        $this->assertEquals('https://example.com/example/test', $video->getContentLoc());
+        if (!empty($contentLoc)) {
+            $video->setContentLoc($contentLoc);
+        }
 
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setDomain('https://example.com');
-        $this->assertNull($video->getContentLoc());
+        $this->assertEquals($expected, $video->getContentLoc());
     }
 
-    public function testPlayerLoc()
+    /**
+     * @return array
+     */
+    public function contentLocProvider()
+    {
+        return [
+            ['example/test', 'https://example.com/example/test'],
+            ['/example/test', 'https://example.com/example/test'],
+            ['', null],
+        ];
+    }
+
+    /**
+     * @dataProvider playerLocProvider
+     *
+     * @param $player
+     * @param $allow_embed
+     * @param $autoplay
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testPlayerLoc($player, $allow_embed, $autoplay, $expected)
     {
         $video = new Video('thumb.png', 'Video', 'Description');
         $video->setDomain('https://example.com');
-        $video->setPlayerLoc('/player.swf');
-        $this->assertEquals('https://example.com/player.swf', $video->getPlayerLoc());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setDomain('https://example.com');
-        $video->setPlayerLoc('player.swf');
-        $this->assertEquals('https://example.com/player.swf', $video->getPlayerLoc());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setDomain('https://example.com');
-        $video->setPlayerLoc('/player.swf', 'Yes');
-        $this->assertEquals(['https://example.com/player.swf' => ['allow_embed' => 'Yes']], $video->getPlayerLoc());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setDomain('https://example.com');
-        $video->setPlayerLoc('/player.swf', 'Yes', 'string');
-        $this->assertEquals(['https://example.com/player.swf' => ['allow_embed' => 'Yes', 'autoplay' => 'string']], $video->getPlayerLoc());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setDomain('https://example.com');
-        $video->setPlayerLoc('/player.swf', null, 'string');
-        $this->assertEquals(['https://example.com/player.swf' => ['autoplay' => 'string']], $video->getPlayerLoc());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setDomain('https://example.com');
-        $this->assertNull($video->getPlayerLoc());
+        $video->setPlayerLoc($player, $allow_embed, $autoplay);
+        $this->assertEquals($expected, $video->getPlayerLoc());
     }
 
-    public function testThumbnailLoc()
+    /**
+     * @return array
+     */
+    public function playerLocProvider()
     {
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setDomain('https://example.com');
-        $this->assertEquals('https://example.com/thumb.png', $video->getThumbnailLoc());
-
-        $video = new Video('/thumb.png', 'Video', 'Description');
-        $video->setDomain('https://example.com');
-        $this->assertEquals('https://example.com/thumb.png', $video->getThumbnailLoc());
+        return [
+            ['/player.swf', null, null, 'https://example.com/player.swf'],
+            ['player.swf', null, null, 'https://example.com/player.swf'],
+            ['/player.swf', 'yes', null, ['https://example.com/player.swf' => ['allow_embed' => 'Yes']]],
+            ['/player.swf', 'yes', 'string', ['https://example.com/player.swf' => ['allow_embed' => 'Yes', 'autoplay' => 'string']]],
+            ['/player.swf', null, 'string', ['https://example.com/player.swf' => ['autoplay' => 'string']]],
+            [null, null, null, null],
+        ];
     }
 
-    public function testGetTitle()
-    {
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $this->assertEquals('Video', $video->getTitle());
-
-        $video = new Video('thumb.png', 'VideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoMOREthan100chars', 'Description');
-        $this->assertEquals('VideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideo', $video->getTitle());
-
-        $video = new Video('thumb.png', '', 'Description');
-        $this->assertNull($video->getTitle());
-    }
-
-    public function testGetDescription()
-    {
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $this->assertEquals('Description', $video->getDescription());
-
-        $video = new Video('thumb.png', 'Video', 'Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one.');
-        $this->assertEquals('Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one', $video->getDescription());
-    }
-
-    public function testDuration()
-    {
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $this->assertNull($video->getDuration());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setDuration(60);
-        $this->assertEquals('60', $video->getDuration());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setDuration(-10);
-        $this->assertNull($video->getDuration());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setDuration(30000);
-        $this->assertNull($video->getDuration());
-    }
-
-    public function testExpirationDate()
-    {
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $this->assertNull($video->getExpirationDate());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setExpirationDate('2020-01-01');
-        $this->assertEquals('2020-01-01', $video->getExpirationDate());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setExpirationDate(new \DateTime('2020-01-01'));
-        $this->assertEquals('2020-01-01', $video->getExpirationDate());
-    }
-
-    public function testRating()
-    {
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $this->assertNull($video->getRating());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating(null);
-        $this->assertNull($video->getRating());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating(0);
-        $this->assertEquals('0.0', $video->getRating());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating(5);
-        $this->assertEquals('5.0', $video->getRating());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating(2.5);
-        $this->assertEquals('2.5', $video->getRating());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating(2.333);
-        $this->assertEquals('2.3', $video->getRating());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating(2.666);
-        $this->assertEquals('2.7', $video->getRating());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating(10);
-        $this->assertNull($video->getRating());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating(-1);
-        $this->assertNull($video->getRating());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating('0');
-        $this->assertEquals('0.0', $video->getRating());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating('5');
-        $this->assertEquals('5.0', $video->getRating());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating('2.5');
-        $this->assertEquals('2.5', $video->getRating());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating('2.333');
-        $this->assertEquals('2.3', $video->getRating());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating('2.666');
-        $this->assertEquals('2.7', $video->getRating());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating('10');
-        $this->assertNull($video->getRating());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating('-1');
-        $this->assertNull($video->getRating());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating('Error');
-        $this->assertNull($video->getRating());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating('');
-        $this->assertNull($video->getRating());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRating(new \stdClass());
-        $this->assertNull($video->getRating());
-    }
-
-    public function testViewCount()
-    {
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $this->assertNull($video->getViewCount());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setViewCount(10);
-        $this->assertEquals('10', $video->getViewCount());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setViewCount('10');
-        $this->assertEquals('10', $video->getViewCount());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setViewCount(10.1);
-        $this->assertEquals('10', $video->getViewCount());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setViewCount('10.1');
-        $this->assertEquals('10', $video->getViewCount());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setViewCount('');
-        $this->assertNull($video->getViewCount());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setViewCount('Bad');
-        $this->assertNull($video->getViewCount());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setViewCount(new \stdClass());
-        $this->assertNull($video->getViewCount());
-    }
-
-    public function testPublicationDate()
-    {
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $this->assertNull($video->getPublicationDate());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setPublicationDate('2010-01-01');
-        $this->assertEquals('2010-01-01', $video->getPublicationDate());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setPublicationDate(new \DateTime('2010-01-01'));
-        $this->assertEquals('2010-01-01', $video->getPublicationDate());
-    }
-
-    public function testFamilyFriendly()
-    {
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $this->assertNull($video->getFamilyFriendly());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setFamilyFriendly(true);
-        $this->assertEquals('Yes', $video->getFamilyFriendly());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setFamilyFriendly(false);
-        $this->assertEquals('No', $video->getFamilyFriendly());
-    }
-
-    public function testRestriction()
-    {
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $this->assertNull($video->getRestriction());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRestriction('GB DE', 'allow');
-        $this->assertEquals(['GB DE' => ['relationship' => 'allow']], $video->getRestriction());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRestriction('US', 'deny');
-        $this->assertEquals(['US' => ['relationship' => 'deny']], $video->getRestriction());
-    }
-
-    public function testPlatform()
-    {
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $this->assertNull($video->getPlatform());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setPlatform('web', 'allow');
-        $this->assertEquals(['web' => ['relationship' => 'allow']], $video->getPlatform());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setPlatform('mobile', 'deny');
-        $this->assertEquals(['mobile' => ['relationship' => 'deny']], $video->getPlatform());
-    }
-
-    public function testPrice()
-    {
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $this->assertNull($video->getPrice());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setPrice(9.99, 'USD');
-        $this->assertEquals(['9.99' => ['currency' => 'USD']], $video->getPrice());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setPrice(10, 'USD', 'rent', 'sd');
-        $this->assertEquals(['10.00' => ['currency' => 'USD', 'type' => 'rent', 'resolution' => 'SD']], $video->getPrice());
-    }
-
-    public function testRequireSubscription()
-    {
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $this->assertNull($video->getRequiresSubscription());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRequiresSubscription(true);
-        $this->assertEquals('Yes', $video->getRequiresSubscription());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setRequiresSubscription(false);
-        $this->assertEquals('No', $video->getRequiresSubscription());
-    }
-
-    public function testUploader()
-    {
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $this->assertNull($video->getUploader());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setUploader('UserName');
-        $this->assertEquals('UserName', $video->getUploader());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setDomain('https://example.com');
-        $video->setUploader('UserName', '/username');
-        $this->assertEquals(['UserName' => ['info' => 'https://example.com/username']], $video->getUploader());
-    }
-
-    public function testLive()
-    {
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $this->assertNull($video->getLive());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setLive(true);
-        $this->assertEquals('Yes', $video->getLive());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setLive(false);
-        $this->assertEquals('No', $video->getLive());
-    }
-
-    public function testTags()
-    {
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $this->assertNull($video->getTag());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setTag(['tag']);
-        $this->assertEquals(['tag'], $video->getTag());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setTag('tag');
-        $this->assertEquals(['tag'], $video->getTag());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->addTag('tag');
-        $this->assertEquals(['tag'], $video->getTag());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setTag(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33']);
-        $this->assertEquals(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32'], $video->getTag());
-    }
-
-    public function testCategory()
-    {
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $this->assertNull($video->getCategory());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setCategory('Travel');
-        $this->assertEquals('Travel', $video->getCategory());
-    }
-
-    public function testGalleryLoc()
-    {
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $this->assertNull($video->getGalleryLoc());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setDomain('https://example.com');
-        $video->setGalleryLoc('https://example.com/gallery');
-        $this->assertEquals('https://example.com/gallery', $video->getGalleryLoc());
-
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $video->setDomain('https://example.com');
-        $video->setGalleryLoc('/gallery');
-        $this->assertEquals('https://example.com/gallery', $video->getGalleryLoc());
-    }
-
-    public function testInvalidDomainOnContentLoc()
-    {
-        $video = new Video('thumb.png', 'Video', 'Description');
-        $this->assertNull($video->getContentLoc());
-    }
-
+    /**
+     * @throws \ReflectionException
+     */
     public function testInvalidDomainOnPlayerLoc()
     {
         $video = new Video('thumb.png', 'Video', 'Description');
         $this->assertNull($video->getPlayerLoc());
     }
 
+    /**
+     * @dataProvider getThumbnailLocProvider
+     *
+     * @param mixed $thumbnailLoc
+     * @param mixed $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testGetThumbnailLoc($thumbnailLoc, $expected)
+    {
+        $video = new Video($thumbnailLoc, 'Video', 'Description');
+        $video->setDomain('https://example.com');
+        $this->assertEquals($expected, $video->getThumbnailLoc());
+    }
+
+    /**
+     * @return array
+     */
+    public function getThumbnailLocProvider()
+    {
+        return [
+            ['thumb.png', 'https://example.com/thumb.png'],
+            ['/thumb.png', 'https://example.com/thumb.png'],
+        ];
+    }
+
+    /**
+     * @dataProvider getTitleProvider
+     *
+     * @param $title
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testGetTitle($title, $expected)
+    {
+        $video = new Video('thumb.png', $title, 'Description');
+        $this->assertEquals($expected, $video->getTitle());
+    }
+
+    /**
+     * @return array
+     */
+    public function getTitleProvider()
+    {
+        return [
+            ['Video', 'Video'],
+            ['VideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoMOREthan100chars', 'VideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideoVideo'],
+        ];
+    }
+
+    /**
+     * @dataProvider getDescriptionPrivider
+     *
+     * @param $description
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testGetDescription($description, $expected)
+    {
+        $video = new Video('thumb.png', 'Video', $description);
+        $this->assertEquals($expected, $video->getDescription());
+    }
+
+    /**
+     * @return array
+     */
+    public function getDescriptionPrivider()
+    {
+        return [
+            ['Description', 'Description'],
+            ['Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one.', 'Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one. Long description test for to trim to correct one'],
+        ];
+    }
+
+    /**
+     * @dataProvider durationProvider
+     *
+     * @param $duration
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testDuration($duration, $expected)
+    {
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $video->setDuration($duration);
+        $this->assertEquals($expected, $video->getDuration());
+    }
+
+    /**
+     * @return array
+     */
+    public function durationProvider()
+    {
+        return [
+            [60, '60'],
+            ['60', '60'],
+            [-10, null],
+            ['-10', null],
+            [30000, null],
+            ['30000', null],
+            [10.1, '10'],
+            ['10.1', '10'],
+            [null, null],
+        ];
+    }
+
+    /**
+     * @dataProvider expirationDateProvider
+     *
+     * @param $expirationDate
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testExpirationDate($expirationDate, $expected)
+    {
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $video->setExpirationDate($expirationDate);
+        $this->assertEquals($expected, $video->getExpirationDate());
+    }
+
+    /**
+     * @throws \Exception
+     *
+     * @return array
+     */
+    public function expirationDateProvider()
+    {
+        return [
+            [null, null],
+            ['2020-01-01', '2020-01-01'],
+            [new \DateTime('2020-01-01'), '2020-01-01'],
+        ];
+    }
+
+    /**
+     * @dataProvider ratingProvider
+     *
+     * @param $rating
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testRating($rating, $expected)
+    {
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $video->setRating($rating);
+        $this->assertEquals($expected, $video->getRating());
+    }
+
+    /**
+     * @return array
+     */
+    public function ratingProvider()
+    {
+        return [
+            [null, null],
+            [0, '0.0'],
+            [5, '5.0'],
+            [2.5, '2.5'],
+            [2.333, '2.3'],
+            [2.666, '2.7'],
+            [10, null],
+            [-1, null],
+            ['0', '0.0'],
+            ['5', '5.0'],
+            ['2.5', '2.5'],
+            ['2.333', '2.3'],
+            ['2.666', '2.7'],
+            ['10', null],
+            ['-1', null],
+            ['Error', null],
+            ['', null],
+            [new \stdClass(), null],
+        ];
+    }
+
+    /**
+     * @dataProvider viewCountProvider
+     *
+     * @param $viewCount
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testViewCount($viewCount, $expected)
+    {
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $video->setViewCount($viewCount);
+        $this->assertEquals($expected, $video->getViewCount());
+    }
+
+    /**
+     * @return array
+     */
+    public function viewCountProvider()
+    {
+        return [
+            [null, null],
+            [10, '10'],
+            ['10', '10'],
+            [10.1, '10'],
+            ['10.1', '10'],
+            ['', null],
+            ['Bad', null],
+            [new \stdClass(), null],
+        ];
+    }
+
+    /**
+     * @dataProvider publicationDateProvider
+     *
+     * @param $publicationDate
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testPublicationDate($publicationDate, $expected)
+    {
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $video->setPublicationDate($publicationDate);
+        $this->assertEquals($expected, $video->getPublicationDate());
+    }
+
+    /**
+     * @throws \Exception
+     *
+     * @return array
+     */
+    public function publicationDateProvider()
+    {
+        return [
+            [null, null],
+            ['2010-01-01', '2010-01-01'],
+            [new \DateTime('2010-01-01'), '2010-01-01'],
+        ];
+    }
+
+    /**
+     * @dataProvider yesNoProvider
+     *
+     * @param $familyFriendly
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testFamilyFriendly($familyFriendly, $expected)
+    {
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $video->setFamilyFriendly($familyFriendly);
+        $this->assertEquals($expected, $video->getFamilyFriendly());
+    }
+
+    /**
+     * @return array
+     */
+    public function yesNoProvider()
+    {
+        return [
+            [null, null],
+            [true, 'Yes'],
+            [false, 'No'],
+            ['Yes', 'Yes'],
+            ['yes', 'Yes'],
+            ['y', 'Yes'],
+            ['Y', 'Yes'],
+            ['No', 'No'],
+            ['no', 'No'],
+            ['n', 'No'],
+            ['N', 'No'],
+            ['1', 'Yes'],
+            ['0', 'No'],
+            [1, 'Yes'],
+            [0, 'No'],
+        ];
+    }
+
+    /**
+     * @dataProvider restrictionProvider
+     *
+     * @param $country
+     * @param $relationship
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testRestriction($country, $relationship, $expected)
+    {
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $video->setRestriction($country, $relationship);
+        $this->assertEquals($expected, $video->getRestriction());
+    }
+
+    /**
+     * @return array
+     */
+    public function restrictionProvider()
+    {
+        return [
+            ['GB DE', 'allow', ['GB DE' => ['relationship' => 'allow']]],
+            ['US', 'deny', ['US' => ['relationship' => 'deny']]],
+            ['US', 'Deny', ['US' => ['relationship' => 'deny']]],
+            ['US', 'DENY', ['US' => ['relationship' => 'deny']]],
+            ['us', 'deny', ['US' => ['relationship' => 'deny']]],
+            [null, null, null],
+        ];
+    }
+
+    /**
+     * @dataProvider platformProvider
+     *
+     * @param $platform
+     * @param $relationship
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testPlatform($platform, $relationship, $expected)
+    {
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $video->setPlatform($platform, $relationship);
+        $this->assertEquals($expected, $video->getPlatform());
+    }
+
+    /**
+     * @return array
+     */
+    public function platformProvider()
+    {
+        return [
+            ['web', 'allow', ['web' => ['relationship' => 'allow']]],
+            ['WEB', 'allow', ['web' => ['relationship' => 'allow']]],
+            ['web', 'ALLOW', ['web' => ['relationship' => 'allow']]],
+            ['mobile', 'deny', ['mobile' => ['relationship' => 'deny']]],
+            [null, null, null],
+        ];
+    }
+
+    /**
+     * @dataProvider priceProvider
+     *
+     * @param $price
+     * @param $currency
+     * @param $type
+     * @param $resolution
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testPrice($price, $currency, $type, $resolution, $expected)
+    {
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $video->setPrice($price, $currency, $type, $resolution);
+        $this->assertEquals($expected, $video->getPrice());
+    }
+
+    /**
+     * @return array
+     */
+    public function priceProvider()
+    {
+        return [
+            [null, null, null, null, null],
+            [10, 'USD', '', '', ['10.00' => ['currency' => 'USD']]],
+            [10, '', '', '', null],
+            ['10', 'USD', '', '', ['10.00' => ['currency' => 'USD']]],
+            ['10.00', 'USD', '', '', ['10.00' => ['currency' => 'USD']]],
+            [10.00, 'USD', '', '', ['10.00' => ['currency' => 'USD']]],
+            [10, 'usd', '', '', ['10.00' => ['currency' => 'USD']]],
+            [10, 'USD', 'rent', 'SD', ['10.00' => ['currency' => 'USD', 'type' => 'rent', 'resolution' => 'SD']]],
+            [10, 'USD', 'rent', '', ['10.00' => ['currency' => 'USD', 'type' => 'rent']]],
+            [10, 'USD', 'Rent', '', ['10.00' => ['currency' => 'USD', 'type' => 'rent']]],
+            [10, 'USD', 'RENT', '', ['10.00' => ['currency' => 'USD', 'type' => 'rent']]],
+            [10, 'USD', '', 'SD', ['10.00' => ['currency' => 'USD', 'resolution' => 'SD']]],
+            [10, 'USD', '', 'sd', ['10.00' => ['currency' => 'USD', 'resolution' => 'SD']]],
+        ];
+    }
+
+    /**
+     * @dataProvider yesNoProvider
+     *
+     * @param $requireSubscription
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testRequireSubscription($requireSubscription, $expected)
+    {
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $video->setRequiresSubscription($requireSubscription);
+        $this->assertEquals($expected, $video->getRequiresSubscription());
+    }
+
+    /**
+     * @dataProvider uploaderProvider
+     *
+     * @param $uploader
+     * @param $info
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testUploader($uploader, $info, $expected)
+    {
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $video->setDomain('https://example.com');
+        $video->setUploader($uploader, $info);
+        $this->assertEquals($expected, $video->getUploader());
+    }
+
+    /**
+     * @return array
+     */
+    public function uploaderProvider()
+    {
+        return [
+            [null, null, null],
+            ['UserName', null, 'UserName'],
+            ['UserName', '/username', ['UserName' => ['info' => 'https://example.com/username']]],
+            ['UserName', 'username', ['UserName' => ['info' => 'https://example.com/username']]],
+            ['UserName', 'https://example.com/username', ['UserName' => ['info' => 'https://example.com/username']]],
+        ];
+    }
+
+    /**
+     * @dataProvider yesNoProvider
+     *
+     * @param $live
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testLive($live, $expected)
+    {
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $video->setLive($live);
+        $this->assertEquals($expected, $video->getLive());
+    }
+
+    /**
+     * @dataProvider tagProvider
+     *
+     * @param $tag
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testTagsCase1($tag, $expected)
+    {
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $video->setTag($tag);
+        $this->assertEquals($expected, $video->getTag());
+    }
+
+    /**
+     * @dataProvider tagProvider
+     *
+     * @param $tag
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testTagsCase2($tag, $expected)
+    {
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $video->addTag($tag);
+        $this->assertEquals($expected, $video->getTag());
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testTagsCase3()
+    {
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $video->addTag('tag1');
+        $video->addTag('tag2');
+        $this->assertEquals(['tag1', 'tag2'], $video->getTag());
+    }
+
+    /**
+     * @return array
+     */
+    public function tagProvider()
+    {
+        return [
+            ['tag', ['tag']],
+            ['tag, tag', ['tag, tag']],
+            [['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33'], ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32']],
+        ];
+    }
+
+    /**
+     * @dataProvider categoryProvider
+     *
+     * @param $category
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testCategory($category, $expected)
+    {
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $video->setCategory($category);
+        $this->assertEquals($expected, $video->getCategory());
+    }
+
+    /**
+     * @return array
+     */
+    public function categoryProvider()
+    {
+        return [
+            [null, null],
+            ['Travel', 'Travel'],
+            ['Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec at dui volutpat, pretium est vitae, facilisis ex. Ut euismod justo bibendum, imperdiet odio sit amet, faucibus mauris. Fusce non gravida lorem. Nam sit amet tellus lorem. Cras non est orci aliquam.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec at dui volutpat, pretium est vitae, facilisis ex. Ut euismod justo bibendum, imperdiet odio sit amet, faucibus mauris. Fusce non gravida lorem. Nam sit amet tellus lorem. Cras non est orci aliq'],
+        ];
+    }
+
+    /**
+     * @dataProvider galleryLocProvider
+     *
+     * @param $galleryLoc
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testGalleryLoc($galleryLoc, $expected)
+    {
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $video->setDomain('https://example.com');
+        $video->setGalleryLoc($galleryLoc);
+        $this->assertEquals($expected, $video->getGalleryLoc());
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testInvalidDomainOnContentLoc()
+    {
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $this->assertNull($video->getContentLoc());
+    }
+
+    /**
+     * @return array
+     */
+    public function galleryLocProvider()
+    {
+        return [
+            [null, null],
+            ['https://example.com/gallery', 'https://example.com/gallery'],
+            ['/gallery', 'https://example.com/gallery'],
+        ];
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
     public function testToArray()
     {
         $video = new Video('thumb.png', 'Video', 'Description');

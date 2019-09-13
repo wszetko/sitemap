@@ -11,7 +11,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Wszetko\Sitemap\Tests;
+namespace Wszetko\Sitemap\Tests\Items;
 
 use DateTime;
 use InvalidArgumentException;
@@ -24,28 +24,44 @@ use Wszetko\Sitemap\Items;
  * @package Wszetko\Sitemap\Tests
  *
  * @internal
- * @coversNothing
  */
 class NewsTest extends TestCase
 {
-    public function testConstructor()
+    /**
+     * @dataProvider constructorProvider
+     *
+     * @param $name
+     * @param $lang
+     * @param $date
+     * @param $title
+     *
+     * @throws \ReflectionException
+     */
+    public function testConstructor($name, $lang, $date, $title)
     {
-        $news = new Items\News('News name', 'pl', new DateTime('2014-02-14'), 'Title');
-        $this->assertInstanceOf(Items\News::class, $news);
-
-        $news = new Items\News('News name', 'zh-cn', new DateTime('2014-02-14'), 'Title');
-        $this->assertInstanceOf(Items\News::class, $news);
-
-        $news = new Items\News('News name', 'zh-tw', new DateTime('2014-02-14'), 'Title');
-        $this->assertInstanceOf(Items\News::class, $news);
-
-        $news = new Items\News('News name', 'csb', new DateTime('2014-02-14'), 'Title');
-        $this->assertInstanceOf(Items\News::class, $news);
-
-        $news = new Items\News('News name', 'en', '2014-02-14', 'Title');
+        $news = new Items\News($name, $lang, $date, $title);
         $this->assertInstanceOf(Items\News::class, $news);
     }
 
+    /**
+     * @throws \Exception
+     *
+     * @return array
+     */
+    public function constructorProvider()
+    {
+        return [
+            ['News name', 'pl', new DateTime('2014-02-14'), 'Title'],
+            ['News name', 'zh-cn', new DateTime('2014-02-14'), 'Title'],
+            ['News name', 'zh-tw', new DateTime('2014-02-14'), 'Title'],
+            ['News name', 'csb', new DateTime('2014-02-14'), 'Title'],
+            ['News name', 'en', '2014-02-14', 'Title'],
+        ];
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
     public function testConstructorExceptionName()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -53,13 +69,29 @@ class NewsTest extends TestCase
         $news = new Items\News('', 'en', '2014-02-14', 'Title');
     }
 
-    public function testConstructorExceptionLang()
+    /**
+     * @throws \ReflectionException
+     */
+    public function testConstructorExceptionLangCase1()
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('publicationLanguage need to be set.');
         new Items\News('News name', 'invalid', '2014-02-14', 'Title');
     }
 
+    /**
+     * @throws \ReflectionException
+     */
+    public function testConstructorExceptionLangCase2()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('publicationLanguage need to be set.');
+        new Items\News('News name', '', '2014-02-14', 'Title');
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
     public function testConstructorExceptionInvalidDate()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -67,6 +99,9 @@ class NewsTest extends TestCase
         new Items\News('News name', 'en', '0000-00-00', 'Title');
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function testConstructorExceptionNoDate()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -74,60 +109,152 @@ class NewsTest extends TestCase
         new Items\News('News name', 'en', 'Thi is no date', 'Title');
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function testGetPublicationName()
     {
         $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
-
         $this->assertEquals('News name', $news->getPublicationName());
     }
 
-    public function testGetPublicationLanguage()
+    /**
+     * @dataProvider getPublicationLanguageProvider
+     *
+     * @param $lang
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testGetPublicationLanguage($lang, $expected)
     {
-        $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
-
-        $this->assertEquals('pl', $news->getPublicationLanguage());
+        $news = new Items\News('News name', $lang, new DateTime('2014-08-01'), 'Title');
+        $this->assertEquals($expected, $news->getPublicationLanguage());
     }
 
-    public function testGetPublicationDate()
+    public function getPublicationLanguageProvider()
+    {
+        return [
+            ['pl', 'pl'],
+            ['PL', 'pl'],
+        ];
+    }
+
+    /**
+     * @dataProvider getPublicationDateProvider
+     *
+     * @param        $date
+     * @param string $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testGetPublicationDate($date, string $expected)
+    {
+        $news = new Items\News('News name', 'pl', $date, 'Title');
+        $this->assertEquals($expected, $news->getPublicationDate());
+    }
+
+    /**
+     * @throws \Exception
+     *
+     * @return array
+     */
+    public function getPublicationDateProvider()
     {
         date_default_timezone_set('Europe/London');
 
-        $news = new Items\News('News name', 'pl', new DateTime('2013-11-01'), 'Title');
-
-        $this->assertEquals('2013-11-01', $news->getPublicationDate());
-
-        $news = new Items\News('News name', 'pl', '2015-09-05', 'Title');
-
-        $this->assertEquals('2015-09-05', $news->getPublicationDate());
-
-        $news = new Items\News('News name', 'pl', new DateTime('2013-11-01 16:40:00'), 'Title');
-
-        $this->assertEquals('2013-11-01T16:40:00+00:00', $news->getPublicationDate());
+        return [
+            [new DateTime('2013-11-01'), '2013-11-01'],
+            ['2015-09-05', '2015-09-05'],
+            [new DateTime('2013-11-01 16:40:00'), '2013-11-01T16:40:00+00:00'],
+        ];
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function testGetTitle()
     {
         $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
-
         $this->assertEquals('Title', $news->getTitle());
     }
 
-    public function testAccess()
+    /**
+     * @throws \ReflectionException
+     */
+    public function testAccessSubscription()
     {
         $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
         $news->setAccess('Subscription');
         $this->assertEquals('Subscription', $news->getAccess());
+    }
 
+    /**
+     * @throws \ReflectionException
+     */
+    public function testAccessRegistration()
+    {
         $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
         $news->setAccess('Registration');
         $this->assertEquals('Registration', $news->getAccess());
+    }
 
+    /**
+     * @throws \ReflectionException
+     */
+    public function testAccessInvalid()
+    {
         $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
         $news->setAccess('Invalid');
         $this->assertNull($news->getAccess());
     }
 
-    public function testGenres()
+    /**
+     * @throws \ReflectionException
+     */
+    public function testGenresCase1()
+    {
+        $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
+
+        $news->addGenres('Blog');
+        $this->assertEquals(['Blog'], $news->getGenres());
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testGenresCase2()
+    {
+        $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
+
+        $news->addGenres('Blog');
+        $this->assertEquals(['Blog'], $news->getGenres());
+
+        $news->addGenres('Invalid entry');
+        $this->assertEquals(['Blog'], $news->getGenres());
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testGenresCase3()
+    {
+        $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
+
+        $news->addGenres('Blog');
+        $this->assertEquals(['Blog'], $news->getGenres());
+
+        $news->addGenres('Invalid entry');
+        $this->assertEquals(['Blog'], $news->getGenres());
+
+        $news->addGenres('PressRelease');
+        $this->assertEquals(['Blog', 'PressRelease'], $news->getGenres());
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testGenresCase4()
     {
         $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
 
@@ -144,7 +271,21 @@ class NewsTest extends TestCase
         $this->assertEquals(['Blog', 'PressRelease', 'Opinion', 'UserGenerated'], $news->getGenres());
     }
 
-    public function testKeywords()
+    /**
+     * @throws \ReflectionException
+     */
+    public function testKeywordsCase1()
+    {
+        $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
+
+        $news->addKeywords('Test1');
+        $this->assertEquals(['Test1'], $news->getKeywords());
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testKeywordsCase2()
     {
         $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
 
@@ -155,7 +296,35 @@ class NewsTest extends TestCase
         $this->assertEquals(['Test1', 'Test2', 'Test3', 'Test4'], $news->getKeywords());
     }
 
-    public function testStockTickers()
+    /**
+     * @throws \ReflectionException
+     */
+    public function testStockTickersCase1()
+    {
+        $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
+
+        $news->addStockTickers('NASDAQ:AMAT');
+        $this->assertEquals(['NASDAQ:AMAT'], $news->getStockTickers());
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testStockTickersCase2()
+    {
+        $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
+
+        $news->addStockTickers('NASDAQ:AMAT');
+        $this->assertEquals(['NASDAQ:AMAT'], $news->getStockTickers());
+
+        $news->addStockTickers('BOM:500325');
+        $this->assertEquals(['NASDAQ:AMAT', 'BOM:500325'], $news->getStockTickers());
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testStockTickersCase3()
     {
         $news = new Items\News('News name', 'pl', new DateTime('2014-08-01'), 'Title');
 
@@ -169,6 +338,9 @@ class NewsTest extends TestCase
         $this->assertEquals(['NASDAQ:AMAT', 'BOM:500325', 'NASDAQ:AMD', 'NASDAQ:GOOG', 'NASDAQ:MSFT'], $news->getStockTickers());
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function testToArray()
     {
         date_default_timezone_set('Europe/London');

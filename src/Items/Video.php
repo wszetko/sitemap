@@ -269,11 +269,13 @@ class Video extends Extension
         ;
         $this->setThumbnailLoc($thumbnailLoc);
         $this->title
+            ->setRequired(true)
             ->setMinLength(1)
             ->setMaxLength(100)
         ;
         $this->setTitle($title);
         $this->description
+            ->setRequired(true)
             ->setMinLength(1)
             ->setMaxLength(2048)
         ;
@@ -291,17 +293,21 @@ class Video extends Extension
             ->setMaxValue(28800)
         ;
         $this->restriction
+            ->setConversion('upper')
             ->setValueRegex("/^(?'countries'[A-Z]{2}( +[A-Z]{2})*)?$/", 'countries')
         ;
         $this->restriction
             ->getAttribute('relationship')
+            ->setConversion('lower')
             ->setAllowedValues('allow, deny')
         ;
         $this->platform
+            ->setConversion('lower')
             ->setValueRegex("/^(?'platform'(web|mobile|tv)( (web|mobile|tv))*)?/", 'platform')
         ;
         $this->platform
             ->getAttribute('relationship')
+            ->setConversion('lower')
             ->setAllowedValues('allow, deny')
         ;
         $this->price
@@ -310,14 +316,18 @@ class Video extends Extension
         ;
         $this->price
             ->getAttribute('currency')
+            ->setConversion('upper')
+            ->setRequired(true)
             ->setValueRegex("/^(?'currency'[A-Z]{3})$/", 'currency')
         ;
         $this->price
             ->getAttribute('type')
+            ->setConversion('lower')
             ->setAllowedValues('rent, purchase')
         ;
         $this->price
             ->getAttribute('resolution')
+            ->setConversion('upper')
             ->setAllowedValues('SD, HD')
         ;
         $this->tag

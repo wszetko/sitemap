@@ -35,6 +35,7 @@ return PhpCsFixer\Config::create()
         'ordered_imports' => ['imports_order' => ['class', 'function', 'const'], 'sort_algorithm' => 'alpha'],
         'phpdoc_no_empty_return' => false,
         'phpdoc_no_package' => false,
+        'php_unit_test_class_requires_covers' => false,
         'psr4' => true,
         'single_line_comment_style' => ['comment_types' => ['hash']],
     ])

@@ -11,15 +11,18 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Wszetko\Sitemap\Tests;
+namespace Wszetko\Sitemap\Tests\Drivers\XML;
 
 use PHPUnit\Framework\TestCase;
 use Wszetko\Sitemap\Drivers\XML\XMLWriter;
 use Wszetko\Sitemap\Items\Mobile;
 
 /**
+ * Class XMLWriterTest.
+ *
+ * @package Wszetko\Sitemap\Tests
+ *
  * @internal
- * @coversNothing
  */
 class XMLWriterTest extends TestCase
 {

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Wszetko\Sitemap\Tests;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
 use Wszetko\Sitemap\Drivers\DataCollectors\Memory;
 use Wszetko\Sitemap\Drivers\XML\XMLWriter;
@@ -20,8 +21,11 @@ use Wszetko\Sitemap\Items\Url;
 use Wszetko\Sitemap\Sitemap;
 
 /**
+ * Class SitemapTest.
+ *
+ * @package Wszetko\Sitemap\Tests
+ *
  * @internal
- * @coversNothing
  */
 class SitemapTest extends TestCase
 {
@@ -49,51 +53,118 @@ class SitemapTest extends TestCase
         $sitemap = new Sitemap('https://example.com');
         $sitemap->setDataCollector('Memory');
         $this->assertInstanceOf(Memory::class, $sitemap->getDataCollector());
-
-        $sitemap = new Sitemap('https://example.com');
-        $sitemap->setDataCollector('BadOne');
-        $this->assertNull($sitemap->getDataCollector());
     }
 
+    public function testDataCollectorException()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('BadOne data collector does not exists.');
+        $sitemap = new Sitemap('https://example.com');
+        $sitemap->setDataCollector('BadOne');
+    }
+
+    /**
+     * @throws \Exception
+     */
     public function testPublicDirectory()
     {
         $sitemap = new Sitemap('https://example.com');
         $sitemap->setPublicDirectory(__DIR__);
         $this->assertEquals(__DIR__, $sitemap->getPublicDirectory());
+    }
 
+    /**
+     * @throws \Exception
+     */
+    public function testPublicDirectoryException()
+    {
         $sitemap = new Sitemap('https://example.com');
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Sitemap directory does not exists.');
         $sitemap->setPublicDirectory(__DIR__ . 'NotExists');
     }
 
-    public function testXML()
+    public function testXMLCase1()
     {
         $sitemap = new Sitemap('https://example.com');
         $sitemap->setXml(XMLWriter::class, ['domain' => $sitemap->getDomain()]);
         $this->assertInstanceOf(XMLWriter::class, $sitemap->getXml());
+    }
 
+    public function testXMLCase2()
+    {
         $sitemap = new Sitemap('https://example.com');
         $sitemap->setXml(XMLWriter::class, []);
         $this->assertInstanceOf(XMLWriter::class, $sitemap->getXml());
     }
 
-    public function testTempDirectory()
+    public function testTempDirectoryCase1()
     {
         $sitemap = new Sitemap('https://example.com');
         $this->assertStringContainsString(DIRECTORY_SEPARATOR . 'sitemap', $sitemap->getTempDirectory());
+    }
 
+    public function testTempDirectoryCase2()
+    {
+        $sitemap = new Sitemap('https://example.com');
         $sitemap->setSitepamsDirectory('sitemaps');
         $this->assertStringContainsString($sitemap->getTempDirectory() . DIRECTORY_SEPARATOR, $sitemap->getSitepamsTempDirectory());
     }
 
-    public function testAddItem()
+    /**
+     * @dataProvider addItemProvider
+     *
+     * @param $items
+     * @param $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testAddItem($items, $expected)
     {
         $sitemap = new Sitemap('https://example.com');
         $sitemap->setDataCollector('Memory');
+
+        foreach ($items as $item) {
+            $url = new Url($item);
+            $sitemap->addItem($url);
+        }
+
+        $this->assertEquals($expected, $sitemap->getDataCollector()->fetchAll($sitemap->getDefaultFilename()));
+    }
+
+    /**
+     * @return array
+     */
+    public function addItemProvider()
+    {
+        return [
+            [['/'], [['url' => ['loc' => 'https://example.com/']]]],
+            [['/', '/test'], [['url' => ['loc' => 'https://example.com/']], ['url' => ['loc' => 'https://example.com/test']]]],
+        ];
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testAddItems()
+    {
+        $sitemap = new Sitemap('https://example.com');
+        $sitemap->setDataCollector('Memory');
+        $items = [new Url('/'), new Url('/test')];
+        $sitemap->addItems($items);
+        $this->assertEquals([['url' => ['loc' => 'https://example.com/']], ['url' => ['loc' => 'https://example.com/test']]], $sitemap->getDataCollector()->fetchAll($sitemap->getDefaultFilename()));
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testAddItemException()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('DataCollector is not set.');
+        $sitemap = new Sitemap('https://example.com');
         $item = new Url('/');
         $sitemap->addItem($item);
-        $this->assertEquals(['url' => ['loc' => 'https://example.com/']], $sitemap->getDataCollector()->fetch($sitemap->getDefaultFilename()));
     }
 
     public function testSeparator()
@@ -103,12 +174,17 @@ class SitemapTest extends TestCase
         $this->assertEquals('_', $sitemap->getSeparator());
     }
 
-    public function testUseCompression()
+    public function testUseCompressionTrue()
+    {
+        $sitemap = new Sitemap('https://example.com');
+        $sitemap->setUseCompression(true);
+        $this->assertTrue($sitemap->isUseCompression());
+    }
+
+    public function testUseCompressionFalse()
     {
         $sitemap = new Sitemap('https://example.com');
         $this->assertFalse($sitemap->isUseCompression());
-        $sitemap->setUseCompression(true);
-        $this->assertTrue($sitemap->isUseCompression());
     }
 
     public function testIndexFilename()

@@ -11,7 +11,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Wszetko\Sitemap\Tests;
+namespace Wszetko\Sitemap\Tests\Items;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -23,35 +23,51 @@ use Wszetko\Sitemap\Items\HrefLang;
  * @package Wszetko\Sitemap\Tests
  *
  * @internal
- * @coversNothing
  */
 class HrefLangTest extends TestCase
 {
-    public function testConstructor()
+    /**
+     * @dataProvider constructorProvider
+     *
+     * @param string $hrefLang
+     * @param string $href
+     *
+     * @throws \ReflectionException
+     */
+    public function testConstructor(string $hrefLang, string $href)
     {
-        $hrefLang = new HrefLang('pl-PL', '/');
-        $this->assertInstanceOf(HrefLang::class, $hrefLang);
+        $test = new HrefLang($hrefLang, $href);
+        $this->assertInstanceOf(HrefLang::class, $test);
+    }
 
-        $hrefLang = new HrefLang('fr-be', '/');
-        $this->assertInstanceOf(HrefLang::class, $hrefLang);
+    /**
+     * @return array
+     */
+    public function constructorProvider()
+    {
+        return [
+            ['pl-PL', '/'],
+            ['fr-be', '/'],
+            ['en', '/'],
+            ['x-default', '/'],
+            ['zh-Hant', '/'],
+            ['zh-Hans', '/'],
+        ];
+    }
 
-        $hrefLang = new HrefLang('en', '/');
-        $this->assertInstanceOf(HrefLang::class, $hrefLang);
-
-        $hrefLang = new HrefLang('x-default', '/');
-        $this->assertInstanceOf(HrefLang::class, $hrefLang);
-
-        $hrefLang = new HrefLang('zh-Hant', '/');
-        $this->assertInstanceOf(HrefLang::class, $hrefLang);
-
-        $hrefLang = new HrefLang('zh-Hans', '/');
-        $this->assertInstanceOf(HrefLang::class, $hrefLang);
-
+    /**
+     * @throws \ReflectionException
+     */
+    public function testConstructorException()
+    {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('hrefLang need to be set.');
         new HrefLang('PL', '/');
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function testHrefLang()
     {
         $hrefLang = new HrefLang('pl-PL', '/');
@@ -75,6 +91,9 @@ class HrefLangTest extends TestCase
         $this->assertEquals($expectedResult, $hrefLang->getHrefLang());
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function testToArray()
     {
         $hrefLang = new HrefLang('pl-PL', '/');

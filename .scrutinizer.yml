@@ -20,14 +20,7 @@ tools:
     external_code_coverage:
         timeout: 600
         runs: 2
-    php_code_coverage: false
     php_loc:
-        enabled: true
-        excluded_dirs:
-            - 'build'
-            - 'tests'
-            - 'vendor'
-    php_cpd:
         enabled: true
         excluded_dirs:
             - 'build'

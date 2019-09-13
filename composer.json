@@ -38,9 +38,14 @@
             "src/Compatibility/array_key_first.php"
         ]
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Wszetko\\Sitemap\\Tests\\": "tests/"
+        }
+    },
     "scripts": {
         "phpcs": "php-cs-fixer fix -v --diff --dry-run",
-        "phpunit": "phpunit",
+        "phpunit": "phpunit --coverage-text",
         "test": [
             "@phpcs",
             "@phpunit"

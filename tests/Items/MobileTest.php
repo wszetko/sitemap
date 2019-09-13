@@ -11,7 +11,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Wszetko\Sitemap\Tests;
+namespace Wszetko\Sitemap\Tests\Items;
 
 use PHPUnit\Framework\TestCase;
 use Wszetko\Sitemap\Items\Mobile;
@@ -22,10 +22,12 @@ use Wszetko\Sitemap\Items\Mobile;
  * @package Wszetko\Sitemap\Tests
  *
  * @internal
- * @coversNothing
  */
 class MobileTest extends TestCase
 {
+    /**
+     * @throws \ReflectionException
+     */
     public function testToArray()
     {
         $mobile = new Mobile();

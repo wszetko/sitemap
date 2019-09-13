@@ -49,6 +49,11 @@ class StringType extends AbstractDataType
     protected $regexGroup;
 
     /**
+     * @var string
+     */
+    protected $conversion;
+
+    /**
      * @return null|int
      */
     public function getMinLength(): ?int
@@ -142,6 +147,22 @@ class StringType extends AbstractDataType
         return null;
     }
 
+    public function setConversion(string $convertion): self
+    {
+        if (in_array($convertion, ['upper', 'UPPER', 'Upper'])) {
+            $this->conversion = 'upper';
+        } elseif (in_array($convertion, ['lower', 'LOWER', 'Lower'])) {
+            $this->conversion = 'lower';
+        }
+
+        return $this;
+    }
+
+    public function getConversion(): ?string
+    {
+        return $this->conversion;
+    }
+
     /**
      * @param null|float|int|object|string $value
      * @param array                        $parameters
@@ -177,6 +198,14 @@ class StringType extends AbstractDataType
 
         if (null !== $this->getMaxLength() && null !== $value && mb_strlen($value) > $this->getMaxLength()) {
             $value = mb_substr($value, 0, $this->getMaxLength());
+        }
+
+        if ($conversion = $this->getConversion()) {
+            if ('upper' == $conversion) {
+                $value = mb_strtoupper($value);
+            } elseif ('lower' == $conversion) {
+                $value = mb_strtolower($value);
+            }
         }
 
         if (!empty($this->getAllowedValues())) {

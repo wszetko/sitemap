@@ -173,8 +173,12 @@ class Sitemap
     /**
      * @param Items\Url   $item
      * @param null|string $group
+     *
+     * @throws \Exception
+     *
+     * @return \Wszetko\Sitemap\Sitemap
      */
-    public function addItem(Items\Url $item, ?string $group = null): void
+    public function addItem(Items\Url $item, ?string $group = null): self
     {
         if (null === $group) {
             $group = $this->getDefaultFilename();
@@ -182,7 +186,31 @@ class Sitemap
 
         $group = mb_strtolower(preg_replace('/\W+/', '', $group));
         $item->setDomain($this->getDomain());
+
+        if (!$this->getDataCollector()) {
+            throw new \Exception('DataCollector is not set.');
+        }
+
         $this->getDataCollector()->add($item, $group);
+
+        return $this;
+    }
+
+    /**
+     * @param array       $items
+     * @param null|string $group
+     *
+     * @throws \Exception
+     *
+     * @return $this
+     */
+    public function addItems(array $items, ?string $group = null): self
+    {
+        foreach ($items as $item) {
+            $this->addItem($item, $group);
+        }
+
+        return $this;
     }
 
     /**
@@ -199,10 +227,14 @@ class Sitemap
      * Set default filename for sitemap file.
      *
      * @param string $defaultFilename
+     *
+     * @return \Wszetko\Sitemap\Sitemap
      */
-    public function setDefaultFilename(string $defaultFilename): void
+    public function setDefaultFilename(string $defaultFilename): self
     {
         $this->defaultFilename = $defaultFilename;
+
+        return $this;
     }
 
     /**
@@ -216,23 +248,32 @@ class Sitemap
     }
 
     /**
-     * @param string $driver
-     * @param mixed
+     * @param string     $driver
      * @param null|mixed $config
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return \Wszetko\Sitemap\Sitemap
      */
-    public function setDataCollector(string $driver, $config = null): void
+    public function setDataCollector(string $driver, $config = null): self
     {
         $driver = '\Wszetko\Sitemap\Drivers\DataCollectors\\' . $driver;
 
         if (class_exists($driver)) {
             $this->dataCollector = new $driver($config);
+        } else {
+            throw new \InvalidArgumentException($driver . ' data collector does not exists.');
         }
+
+        return $this;
     }
 
     /**
      * @throws Exception
+     *
+     * @return self
      */
-    public function generate()
+    public function generate(): void
     {
         if ('' === $this->getPublicDirectory()) {
             throw new Exception('Public directory is not set.');
@@ -270,14 +311,18 @@ class Sitemap
      * @param string $publicDirectory
      *
      * @throws Exception
+     *
+     * @return \Wszetko\Sitemap\Sitemap
      */
-    public function setPublicDirectory(string $publicDirectory): void
+    public function setPublicDirectory(string $publicDirectory): self
     {
         if (!($publicDirectory = realpath($publicDirectory))) {
             throw new Exception('Sitemap directory does not exists.');
         }
 
         $this->publicDirectory = $publicDirectory;
+
+        return $this;
     }
 
     /**
@@ -291,8 +336,10 @@ class Sitemap
     /**
      * @param string $driver
      * @param array  $config
+     *
+     * @return \Wszetko\Sitemap\Sitemap
      */
-    public function setXml(string $driver, array $config = []): void
+    public function setXml(string $driver, array $config = []): self
     {
         if (class_exists($driver)) {
             if (!isset($config['domain'])) {
@@ -305,6 +352,8 @@ class Sitemap
                 $this->xml = $xml;
             }
         }
+
+        return $this;
     }
 
     /**
@@ -343,6 +392,8 @@ class Sitemap
 
     /**
      * @throws Exception
+     *
+     * @return array
      */
     public function generateSitemaps(): array
     {
@@ -419,10 +470,14 @@ class Sitemap
 
     /**
      * @param string $separator
+     *
+     * @return \Wszetko\Sitemap\Sitemap
      */
-    public function setSeparator(string $separator): void
+    public function setSeparator(string $separator): self
     {
         $this->separator = $separator;
+
+        return $this;
     }
 
     /**
@@ -439,13 +494,16 @@ class Sitemap
      * Set whether to use compression or not.
      *
      * @param bool $useCompression
+     *
+     * @return \Wszetko\Sitemap\Sitemap
      */
-    public function setUseCompression(bool $useCompression): void
+    public function setUseCompression(bool $useCompression): self
     {
-        if ($useCompression && !extension_loaded('zlib')) {
-            return;
+        if ($useCompression && extension_loaded('zlib')) {
+            $this->useCompression = $useCompression;
         }
-        $this->useCompression = $useCompression;
+
+        return $this;
     }
 
     /**
@@ -509,10 +567,14 @@ class Sitemap
      * Set filename of sitemap index file.
      *
      * @param string $indexFilename
+     *
+     * @return \Wszetko\Sitemap\Sitemap
      */
-    public function setIndexFilename(string $indexFilename): void
+    public function setIndexFilename(string $indexFilename): self
     {
         $this->indexFilename = $indexFilename;
+
+        return $this;
     }
 
     /**
@@ -530,16 +592,22 @@ class Sitemap
 
     /**
      * @param string $sitepamsDirectory
+     *
+     * @return \Wszetko\Sitemap\Sitemap
      */
-    public function setSitepamsDirectory(string $sitepamsDirectory): void
+    public function setSitepamsDirectory(string $sitepamsDirectory): self
     {
         $this->sitepamsDirectory = $sitepamsDirectory;
+
+        return $this;
     }
 
     /**
      * @param string $dir
+     *
+     * @return void
      */
-    private function removeDir($dir)
+    private function removeDir($dir): void
     {
         if (is_dir($dir)) {
             $objects = scandir($dir);
@@ -563,8 +631,10 @@ class Sitemap
      * @param array  $files
      *
      * @throws Exception
+     *
+     * @return void
      */
-    private function compressFiles(string $dir, array &$files)
+    private function compressFiles(string $dir, array &$files): void
     {
         $newFiles = [];
 
@@ -592,10 +662,14 @@ class Sitemap
             unlink($source);
             $newFiles[$gzFile] = $lastmod;
         }
+
         $files = $newFiles;
     }
 
-    private function publishSitemap()
+    /**
+     * @return void
+     */
+    private function publishSitemap(): void
     {
         // Clear previous sitemaps
         $this->removeDir($this->getSitepamsDirectory());
@@ -640,7 +714,7 @@ class Sitemap
     /**
      * @return string
      */
-    private function getExt()
+    private function getExt(): string
     {
         if ($this->isUseCompression()) {
             return self::GZ_EXT;

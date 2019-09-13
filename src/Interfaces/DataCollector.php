@@ -55,9 +55,11 @@ interface DataCollector
     public function fetchGroup(string $group): array;
 
     /**
-     * @return array
+     * @param null|string $group
+     *
+     * @return null|array
      */
-    public function fetchAll(): array;
+    public function fetchAll(?string $group): ?array;
 
     /**
      * @param string $group

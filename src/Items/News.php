@@ -142,6 +142,7 @@ class News extends Extension
         ;
         $this->setPublicationName($publicationName);
         $this->publicationLanguage
+            ->setConversion('lower')
             ->setValueRegex("/^(?'lang'zh-cn|zh-tw|([a-z]{2,3}))?$/", 'lang')
             ->setRequired(true)
         ;

@@ -78,10 +78,15 @@ abstract class AbstractDataType implements DataType
     public function getValue()
     {
         $value = $this->value;
-        $attributes = $this->getAttributes();
 
-        if (!empty($attributes)) {
-            return [$value => $attributes];
+        try {
+            $attributes = $this->getAttributes();
+
+            if (!empty($attributes)) {
+                return [$value => $attributes];
+            }
+        } catch (\InvalidArgumentException $e) {
+            return null;
         }
 
         return $value;
@@ -135,6 +140,8 @@ abstract class AbstractDataType implements DataType
     }
 
     /**
+     * @throws \InvalidArgumentException
+     *
      * @return array
      */
     public function getAttributes(): array
@@ -143,9 +150,11 @@ abstract class AbstractDataType implements DataType
 
         foreach ($this->attributes as $name => $value) {
             $this->propagateDomain($value);
-//            var_dump($this->getDomain(), $value->getDomain());
+
             if (!empty($value->getValue())) {
                 $attributes[$name] = $value->getValue();
+            } elseif ($value->isRequired()) {
+                throw new \InvalidArgumentException('Lack of required value');
             }
         }
 

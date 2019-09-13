@@ -11,7 +11,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Wszetko\Sitemap\Tests;
+namespace Wszetko\Sitemap\Tests\Items;
 
 use PHPUnit\Framework\TestCase;
 use Wszetko\Sitemap\Items;
@@ -22,10 +22,12 @@ use Wszetko\Sitemap\Items;
  * @package Wszetko\Sitemap\Tests
  *
  * @internal
- * @coversNothing
  */
 class ImageTest extends TestCase
 {
+    /**
+     * @throws \ReflectionException
+     */
     public function testConstructor()
     {
         $image = new Items\Image('image.png');
@@ -33,38 +35,67 @@ class ImageTest extends TestCase
         $this->assertInstanceOf(Items\Image::class, $image);
     }
 
-    public function testGetLoc()
+    /**
+     * @dataProvider getLocProvider
+     *
+     * @throws \ReflectionException
+     */
+    public function testGetLoc(string $image, string $expected)
     {
-        $image = new Items\Image('image.png');
-        $image->setDomain('https://example.com');
-        $this->assertEquals('https://example.com/image.png', $image->getLoc(), 'Faild testGetLoc without leading slash.');
-
-        $image = new Items\Image('/image.png');
-        $image->setDomain('https://example.com');
-        $this->assertEquals('https://example.com/image.png', $image->getLoc(), 'Faild testGetLoc with leading slash.');
+        $test = new Items\Image($image);
+        $test->setDomain('https://example.com');
+        $this->assertEquals($expected, $test->getLoc());
     }
 
-    public function testCaption()
+    /**
+     * @return array
+     */
+    public function getLocProvider()
+    {
+        return [
+            ['image.png', 'https://example.com/image.png'],
+            ['/image.png', 'https://example.com/image.png'],
+            ['path/image.png', 'https://example.com/path/image.png'],
+        ];
+    }
+
+    /**
+     * @dataProvider captionProvider
+     *
+     * @param        $caption
+     * @param string $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testCaption($caption, string $expected)
     {
         $image = new Items\Image('image.png');
-        $image->setCaption('Test Caption');
-        $this->assertEquals('Test Caption', $image->getCaption());
+        $image->setCaption($caption);
+        $this->assertEquals($expected, $image->getCaption());
+    }
 
-        $image = new Items\Image('image.png');
-        $image->setCaption(100);
-        $this->assertEquals('100', $image->getCaption());
-
-        $image = new Items\Image('image.png');
-        $caption = new class() {
+    /**
+     * @return array
+     */
+    public function captionProvider()
+    {
+        $in = new class() {
             public function __toString()
             {
                 return 'Test';
             }
         };
-        $image->setCaption($caption);
-        $this->assertEquals('Test', $image->getCaption());
+
+        return [
+            ['Test Caption', 'Test Caption'],
+            [100, '100'],
+            [$in, 'Test'],
+        ];
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function testGeolocation()
     {
         $image = new Items\Image('image.png');
@@ -73,6 +104,9 @@ class ImageTest extends TestCase
         $this->assertEquals('Gdynia, Poland', $image->getGeoLocation());
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function testTitle()
     {
         $image = new Items\Image('image.png');
@@ -81,23 +115,41 @@ class ImageTest extends TestCase
         $this->assertEquals('Title example', $image->getTitle());
     }
 
-    public function testLicense()
+    /**
+     * @dataProvider licenseProvider
+     *
+     * @param mixed $image
+     * @param mixed $domain
+     * @param mixed $licence
+     * @param mixed $expected
+     *
+     * @throws \ReflectionException
+     */
+    public function testLicense($image, $domain, $licence, $expected)
     {
-        $image = new Items\Image('image.png');
-        $image->setDomain('https://example.com');
-        $image->setLicense('/licence.txt');
-        $this->assertEquals('https://example.com/licence.txt', $image->getLicense());
-
-        $image = new Items\Image('image.png');
-        $image->setLicense('https://creativecommons.org/licenses/by-sa/2.0/');
-        $this->assertEquals('https://creativecommons.org/licenses/by-sa/2.0/', $image->getLicense());
-
-        $image = new Items\Image('image.png');
-        $image->setDomain('https://example.com');
-        $image->setLicense('https://creativecommons.org/licenses/by-sa/2.0/');
-        $this->assertEquals('https://creativecommons.org/licenses/by-sa/2.0/', $image->getLicense());
+        $test = new Items\Image($image);
+        if (!empty($domain)) {
+            $test->setDomain($domain);
+        }
+        $test->setLicense($licence);
+        $this->assertEquals($expected, $test->getLicense());
     }
 
+    /**
+     * @return array
+     */
+    public function licenseProvider()
+    {
+        return [
+            ['image.png', 'https://example.com', '/licence.txt', 'https://example.com/licence.txt'],
+            ['image.png', 'https://example.com', 'https://creativecommons.org/licenses/by-sa/2.0/', 'https://creativecommons.org/licenses/by-sa/2.0/'],
+            ['image.png', '', 'https://creativecommons.org/licenses/by-sa/2.0/', 'https://creativecommons.org/licenses/by-sa/2.0/'],
+        ];
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
     public function testToArray()
     {
         $image = new Items\Image('image.png');
