@@ -21,12 +21,12 @@ namespace Wszetko\Sitemap\Items\DataTypes;
 class IntegerType extends FloatType
 {
     /**
-     * @return null|mixed|string
+     * @return null|string
      */
     public function getValue()
     {
         $value = parent::getValue();
 
-        return null === $value ? null : (string) ((int) (round($value)));
+        return null === $value ? null : (string) round((float) $value);
     }
 }

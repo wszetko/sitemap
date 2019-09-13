@@ -23,9 +23,10 @@ use Wszetko\Sitemap\Interfaces\DataType;
 class FloatType extends AbstractDataType
 {
     /**
-     * @var int
+     * @var null|int
      */
     protected $precision;
+
     /**
      * @var float|int
      */
@@ -110,13 +111,9 @@ class FloatType extends AbstractDataType
             return $this;
         }
 
-        if (is_string($value)) {
-            if (is_numeric($value)) {
-                $value = (float) $value;
-            } else {
-                return $this;
-            }
-        } elseif (!is_numeric($value)) {
+        if (is_numeric($value)) {
+            $value = (float) $value;
+        } else {
             return $this;
         }
 

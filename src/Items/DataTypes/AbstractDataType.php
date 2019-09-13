@@ -73,7 +73,7 @@ abstract class AbstractDataType implements DataType
     }
 
     /**
-     * @return mixed
+     * @return null|mixed
      */
     public function getValue()
     {

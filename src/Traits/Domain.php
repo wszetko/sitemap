@@ -26,7 +26,7 @@ trait Domain
     /**
      * Domain.
      *
-     * @var string
+     * @var null|string
      */
     private $domain;
 

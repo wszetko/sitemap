@@ -33,9 +33,9 @@ interface XML
     public function setWorkDir(string $dir): void;
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getWorkDir(): string;
+    public function getWorkDir(): ?string;
 
     /**
      * @return int

@@ -59,9 +59,9 @@ abstract class AbstractXML implements XML
     }
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getWorkDir(): string
+    public function getWorkDir(): ?string
     {
         return $this->workDir;
     }

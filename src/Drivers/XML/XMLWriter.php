@@ -154,25 +154,25 @@ class XMLWriter extends AbstractXML
      */
     private function endFile(): void
     {
-        $sitemapFile = fopen($this->getSitemapFileFullPath(), 'r+');
+        if ($sitemapFile = fopen($this->getSitemapFileFullPath(), 'r+')) {
+            fseek($sitemapFile, -1, SEEK_END);
+            $truncate = 0;
+            $length = $this->getSitemapSize();
+            $end = false;
 
-        fseek($sitemapFile, -1, SEEK_END);
-        $truncate = 0;
-        $length = $this->getSitemapSize();
-        $end = false;
+            do {
+                $s = fread($sitemapFile, 1);
+                if (ctype_space($s)) {
+                    ++$truncate;
+                    fseek($sitemapFile, -2, SEEK_CUR);
+                } else {
+                    $end = true;
+                }
+            } while (!$end);
 
-        do {
-            $s = fread($sitemapFile, 1);
-            if (ctype_space($s)) {
-                ++$truncate;
-                fseek($sitemapFile, -2, SEEK_CUR);
-            } else {
-                $end = true;
-            }
-        } while (!$end);
-
-        ftruncate($sitemapFile, $length - $truncate);
-        fclose($sitemapFile);
+            ftruncate($sitemapFile, $length - $truncate);
+            fclose($sitemapFile);
+        }
     }
 
     /**

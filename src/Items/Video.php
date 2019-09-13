@@ -269,6 +269,18 @@ class Video extends Extension
         $this->setDescription($description);
     }
 
+    /**
+     * @return array
+     */
+    public function toArray(): array
+    {
+        if (empty($this->getContentLoc()) && empty($this->getPlayerLoc())) {
+            throw new InvalidArgumentException('Nor content_loc or player_loc parameter is set.');
+        }
+
+        return parent::toArray();
+    }
+
     private function setUpValues(): void
     {
         $this->thumbnailLoc
@@ -340,17 +352,5 @@ class Video extends Extension
         $this->category
             ->setMaxLength(256)
         ;
-    }
-
-    /**
-     * @return array
-     */
-    public function toArray(): array
-    {
-        if (empty($this->getContentLoc()) && empty($this->getPlayerLoc())) {
-            throw new InvalidArgumentException('Nor content_loc or player_loc parameter is set.');
-        }
-
-        return parent::toArray();
     }
 }

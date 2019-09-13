@@ -164,7 +164,7 @@ class StringType extends AbstractDataType
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getConversion(): ?string
     {

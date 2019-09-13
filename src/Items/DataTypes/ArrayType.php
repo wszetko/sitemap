@@ -23,9 +23,10 @@ use Wszetko\Sitemap\Interfaces\DataType;
 class ArrayType extends AbstractDataType
 {
     /**
-     * @var int
+     * @var null|int
      */
     protected $maxElements;
+
     /**
      * @var \Wszetko\Sitemap\Items\DataTypes\AbstractDataType
      */
@@ -74,7 +75,7 @@ class ArrayType extends AbstractDataType
     }
 
     /**
-     * @param       $value
+     * @param mixed $value
      * @param mixed ...$parameters
      *
      * @return \Wszetko\Sitemap\Interfaces\DataType
@@ -126,6 +127,7 @@ class ArrayType extends AbstractDataType
         $result = [];
 
         if (is_array($values)) {
+            /** @var DataType $element */
             foreach ($values as $element) {
                 $this->propagateDomain($element);
                 $value = $element->getValue();
