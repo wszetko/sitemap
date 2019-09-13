@@ -263,23 +263,27 @@ class Video extends Extension
     public function __construct($thumbnailLoc, $title, $description)
     {
         parent::__construct();
+        $this->setUpValues();
+        $this->setThumbnailLoc($thumbnailLoc);
+        $this->setTitle($title);
+        $this->setDescription($description);
+    }
 
+    private function setUpValues(): void
+    {
         $this->thumbnailLoc
             ->setRequired(true)
         ;
-        $this->setThumbnailLoc($thumbnailLoc);
         $this->title
             ->setRequired(true)
             ->setMinLength(1)
             ->setMaxLength(100)
         ;
-        $this->setTitle($title);
         $this->description
             ->setRequired(true)
             ->setMinLength(1)
             ->setMaxLength(2048)
         ;
-        $this->setDescription($description);
         $this->rating
             ->setMinValue(0)
             ->setMaxValue(5)

@@ -147,6 +147,11 @@ class StringType extends AbstractDataType
         return null;
     }
 
+    /**
+     * @param string $convertion
+     *
+     * @return $this
+     */
     public function setConversion(string $convertion): self
     {
         if (in_array($convertion, ['upper', 'UPPER', 'Upper'])) {
@@ -158,6 +163,9 @@ class StringType extends AbstractDataType
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getConversion(): ?string
     {
         return $this->conversion;
@@ -191,7 +199,17 @@ class StringType extends AbstractDataType
     private function checkValue(&$value)
     {
         $value = trim($value);
+        $this->checkValueLength($value);
+        $this->convertValue($value);
+        $this->checkIfValueIsInAllowedValues($value);
+        $this->checkValueRegex($value);
+    }
 
+    /**
+     * @param $value
+     */
+    private function checkValueLength(&$value)
+    {
         if (null !== $this->getMinLength() && mb_strlen($value) < $this->getMinLength()) {
             $value = null;
         }
@@ -199,7 +217,13 @@ class StringType extends AbstractDataType
         if (null !== $this->getMaxLength() && null !== $value && mb_strlen($value) > $this->getMaxLength()) {
             $value = mb_substr($value, 0, $this->getMaxLength());
         }
+    }
 
+    /**
+     * @param $value
+     */
+    private function convertValue(&$value)
+    {
         if ($conversion = $this->getConversion()) {
             if ('upper' == $conversion) {
                 $value = mb_strtoupper($value);
@@ -207,7 +231,13 @@ class StringType extends AbstractDataType
                 $value = mb_strtolower($value);
             }
         }
+    }
 
+    /**
+     * @param $value
+     */
+    private function checkIfValueIsInAllowedValues(&$value)
+    {
         if (!empty($this->getAllowedValues())) {
             $match = preg_grep("/{$value}/i", $this->getAllowedValues());
 
@@ -217,7 +247,13 @@ class StringType extends AbstractDataType
                 $value = array_values($match)[0];
             }
         }
+    }
 
+    /**
+     * @param $value
+     */
+    private function checkValueRegex(&$value)
+    {
         $regex = $this->getValueRegex();
 
         if (!empty($regex)) {
