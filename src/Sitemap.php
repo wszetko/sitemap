@@ -180,14 +180,18 @@ class Sitemap
      */
     public function addItem(Items\Url $item, ?string $group = null): self
     {
-        if (null === $group) {
+        if (is_string($group)) {
+            $group = preg_replace('/\W+/', '', $group);
+        }
+
+        if (empty($group)) {
             $group = $this->getDefaultFilename();
         }
 
-        $group = mb_strtolower(preg_replace('/\W+/', '', $group));
+        $group = mb_strtolower($group);
         $item->setDomain($this->getDomain());
 
-        if (!$this->getDataCollector()) {
+        if (null === $this->getDataCollector()) {
             throw new \Exception('DataCollector is not set.');
         }
 
@@ -248,14 +252,14 @@ class Sitemap
     }
 
     /**
-     * @param string     $driver
-     * @param null|mixed $config
+     * @param string $driver
+     * @param array  $config
      *
      * @throws \InvalidArgumentException
      *
      * @return \Wszetko\Sitemap\Sitemap
      */
-    public function setDataCollector(string $driver, $config = null): self
+    public function setDataCollector(string $driver, $config = []): self
     {
         $driver = '\Wszetko\Sitemap\Drivers\DataCollectors\\' . $driver;
 
@@ -270,8 +274,6 @@ class Sitemap
 
     /**
      * @throws Exception
-     *
-     * @return self
      */
     public function generate(): void
     {
@@ -287,8 +289,12 @@ class Sitemap
             throw new Exception('DataCollector is not set.');
         }
 
-        if (empty($this->getXml())) {
+        if (null === $this->getXml()) {
             $this->setXml(XMLWriter::class, ['domain' => $this->getDomain()]);
+        }
+
+        if (null === $this->getXml()) {
+            throw new Exception('XML Driver is not set.');
         }
 
         $this->removeDir($this->getTempDirectory());
@@ -357,23 +363,32 @@ class Sitemap
     }
 
     /**
+     * @throws \Exception
+     *
      * @return string
      */
     public function getTempDirectory(): string
     {
         if (empty($this->sitemapTempDirectory)) {
             $hash = md5(microtime());
+
             if (!is_dir(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemap' . $hash)) {
                 mkdir(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemap' . $hash);
             }
 
-            $this->sitemapTempDirectory = realpath(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemap' . $hash);
+            if ($tempDir = realpath(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemap' . $hash)) {
+                $this->sitemapTempDirectory = $tempDir;
+            } else {
+                throw new Exception('Can\'t get temporary directory.');
+            }
         }
 
         return $this->sitemapTempDirectory;
     }
 
     /**
+     * @throws \Exception
+     *
      * @return string
      */
     public function getSitepamsTempDirectory(): string
@@ -387,6 +402,10 @@ class Sitemap
             $directory = realpath($this->getTempDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory);
         }
 
+        if (!$directory) {
+            throw new Exception('Can\'t get temporary directory.');
+        }
+
         return $directory;
     }
 
@@ -397,6 +416,14 @@ class Sitemap
      */
     public function generateSitemaps(): array
     {
+        if (null === $this->getDataCollector()) {
+            throw new Exception('DataCollector is not set.');
+        }
+
+        if (null === $this->getXml()) {
+            throw new Exception('XML Driver is not set.');
+        }
+
         $totalItems = $this->getDataCollector()->getCount();
 
         if (0 == $totalItems) {
@@ -519,9 +546,14 @@ class Sitemap
             return [];
         }
 
+        if (null === $this->getXml()) {
+            throw new Exception('XML Driver is not set.');
+        }
+
         $counter = 0;
-        $files = [$this->getIndexFilename() . self::EXT => null];
-        $this->getXml()->openSitemapIndex(array_key_last($files));
+        $file = $this->getIndexFilename() . self::EXT;
+        $files = [$file => null];
+        $this->getXml()->openSitemapIndex($file);
         $lastItem = array_key_last($sitemaps);
 
         foreach ($sitemaps as $sitemap => $lastmod) {
@@ -538,8 +570,9 @@ class Sitemap
                 $filesCount = count($files);
 
                 if ($sitemap != $lastItem) {
-                    $files[$this->getIndexFilename() . $this->getSeparator() . $filesCount . self::EXT] = null;
-                    $this->getXml()->openSitemapIndex(array_key_last($files));
+                    $file = $this->getIndexFilename() . $this->getSeparator() . $filesCount . self::EXT;
+                    $files[$file] = null;
+                    $this->getXml()->openSitemapIndex($file);
                 }
             }
         }
@@ -578,6 +611,8 @@ class Sitemap
     }
 
     /**
+     * @throws \Exception
+     *
      * @return string
      */
     public function getSitepamsDirectory(): string
@@ -585,6 +620,10 @@ class Sitemap
         if (!($directory = realpath($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory))) {
             mkdir($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory, 0777, true);
             $directory = realpath($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory);
+        }
+
+        if (!$directory) {
+            throw new Exception('Can\'t get sitemap directory.');
         }
 
         return $directory;
@@ -609,9 +648,7 @@ class Sitemap
      */
     private function removeDir($dir): void
     {
-        if (is_dir($dir)) {
-            $objects = scandir($dir);
-
+        if (is_dir($dir) && $objects = scandir($dir)) {
             foreach ($objects as $object) {
                 if ('.' != $object && '..' != $object) {
                     if ('dir' == filetype($dir . '/' . $object)) {
@@ -636,6 +673,10 @@ class Sitemap
      */
     private function compressFiles(string $dir, array &$files): void
     {
+        if (!extension_loaded('zlib')) {
+            throw new Exception('Extension zlib is not loaded.');
+        }
+
         $newFiles = [];
 
         foreach ($files as $file => $lastmod) {
@@ -654,7 +695,9 @@ class Sitemap
             }
 
             while (!feof($in)) {
-                gzwrite($out, fread($in, 524288));
+                if ($content = fread($in, 524288)) {
+                    gzwrite($out, $content);
+                }
             }
 
             fclose($in);
@@ -667,20 +710,23 @@ class Sitemap
     }
 
     /**
+     * @throws \Exception
+     *
      * @return void
      */
     private function publishSitemap(): void
     {
         // Clear previous sitemaps
         $this->removeDir($this->getSitepamsDirectory());
-        $publicDir = scandir($this->getPublicDirectory());
 
-        foreach ($publicDir as $file) {
-            if (preg_match_all(
-                '/^(' . $this->getIndexFilename() . ')((-)[\d]+)?(' . $this->getExt() . ')$/',
-                $file
-            )) {
-                unlink($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $file);
+        if ($publicDir = scandir($this->getPublicDirectory())) {
+            foreach ($publicDir as $file) {
+                if (preg_match_all(
+                    '/^(' . $this->getIndexFilename() . ')((-)[\d]+)?(' . $this->getExt() . ')$/',
+                    $file
+                )) {
+                    unlink($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $file);
+                }
             }
         }
 

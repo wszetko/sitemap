@@ -103,7 +103,7 @@ class FloatType extends AbstractDataType
      *
      * @return \Wszetko\Sitemap\Interfaces\DataType
      */
-    public function setValue($value, ...$parameters): DataType
+    public function setValue($value, $parameters = []): DataType
     {
         if (null === $value) {
             $this->value = null;
@@ -130,7 +130,7 @@ class FloatType extends AbstractDataType
             $value = number_format($value, $this->getPrecision(), '.', '');
         }
 
-        parent::setValue($value, $parameters[0]);
+        parent::setValue($value, $parameters);
 
         return $this;
     }

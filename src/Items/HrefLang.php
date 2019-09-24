@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Wszetko\Sitemap\Items;
 
+use Wszetko\Sitemap\Items\DataTypes\StringType;
+
 /**
  * Class HrefLang.
  *
@@ -58,16 +60,22 @@ class HrefLang extends Extension
     {
         parent::__construct();
 
-        $hrefLangValue = $this->hrefLang
-            ->getBaseDataType()
-        ;
-        /* @var $hrefLangValue \Wszetko\Sitemap\Items\DataTypes\StringType */
-        $hrefLangValue
-            ->setRequired(true)
-            ->setValueRegex("/^(?'hreflang'([a-z]{2}|(x))((-)([A-Za-z]{2}|[A-Z]([a-z]|[a-z]{3})|(default)))?)$/", 'hreflang')
-            ->getAttribute('href')
-            ->setRequired(true)
-        ;
+        if ($this->hrefLang->getBaseDataType() instanceof StringType) {
+            $this->hrefLang
+                ->getBaseDataType()
+                ->setValueRegex(
+                    "/^(?'hreflang'([a-z]{2}|(x))((-)([A-Za-z]{2}|[A-Z]([a-z]|[a-z]{3})|(default)))?)$/",
+                    'hreflang'
+                )
+                ->setRequired(true)
+                ->getAttribute('href')
+                ->setRequired(true)
+            ;
+        } else {
+            // @codeCoverageIgnoreStart
+            throw new \InvalidArgumentException('Class is missconfigured.');
+            // @codeCoverageIgnoreEnd
+        }
 
         $this->addHrefLang($hrefLang, $href);
     }

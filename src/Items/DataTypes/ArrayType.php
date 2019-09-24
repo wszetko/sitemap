@@ -35,8 +35,8 @@ class ArrayType extends AbstractDataType
     /**
      * ArrayType constructor.
      *
-     * @param $name
-     * @param $dataType
+     * @param mixed $name
+     * @param mixed $dataType
      */
     public function __construct($name, $dataType)
     {
@@ -76,11 +76,11 @@ class ArrayType extends AbstractDataType
 
     /**
      * @param mixed $value
-     * @param mixed ...$parameters
+     * @param array $parameters
      *
      * @return \Wszetko\Sitemap\Interfaces\DataType
      */
-    public function setValue($value, ...$parameters): DataType
+    public function setValue($value, $parameters = []): DataType
     {
         if (is_array($value)) {
             foreach ($value as $val) {
@@ -94,23 +94,27 @@ class ArrayType extends AbstractDataType
     }
 
     /**
-     * @param       $value
-     * @param mixed ...$parameters
+     * @param mixed $value
+     * @param array $parameters
+     *
+     * @return \Wszetko\Sitemap\Interfaces\DataType
      */
-    public function addValue($value, ...$parameters): void
+    public function addValue($value, $parameters = []): DataType
     {
         if (is_array($value)) {
             foreach ($value as $val) {
-                $this->addValue($val, $parameters[0]);
+                $this->addValue($val, $parameters);
             }
         } else {
             $var = clone $this->getBaseDataType();
-            $var->setValue($value, $parameters[0]);
+            $var->setValue($value, $parameters);
 
             if (null !== $var->getValue()) {
                 $this->value[] = $var;
             }
         }
+
+        return $this;
     }
 
     /**

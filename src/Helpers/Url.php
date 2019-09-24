@@ -38,6 +38,12 @@ class Url
             $url
         );
 
+        if (null === $encodedUrl) {
+            // @codeCoverageIgnoreStart
+            return false;
+            // @codeCoverageIgnoreEnd
+        }
+
         $url = parse_url($encodedUrl);
 
         if (empty($url) || !isset($url['host'])) {

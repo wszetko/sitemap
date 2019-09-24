@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Wszetko\Sitemap\Items;
 
 use DateTimeInterface;
+use Wszetko\Sitemap\Items\DataTypes\StringType;
 
 /**
  * Class News.
@@ -158,18 +159,33 @@ class News extends Extension
         $generesValue = $this->genres
             ->getBaseDataType()
         ;
-        /* @var $generesValue \Wszetko\Sitemap\Items\DataTypes\StringType */
-        $generesValue
-            ->setAllowedValues('PressRelease, Satire, Blog, OpEd, Opinion, UserGenerated')
-        ;
+
+        if ($generesValue instanceof StringType) {
+            /* @var $generesValue \Wszetko\Sitemap\Items\DataTypes\StringType */
+            $generesValue
+                ->setAllowedValues('PressRelease, Satire, Blog, OpEd, Opinion, UserGenerated')
+            ;
+        } else {
+            // @codeCoverageIgnoreStart
+            throw new \InvalidArgumentException('Class is missconfigured.');
+            // @codeCoverageIgnoreEnd
+        }
+
         $stickTickersValue = $this->stockTickers
             ->setMaxElements(5)
             ->getBaseDataType()
         ;
-        /* @var $stickTickersValue \Wszetko\Sitemap\Items\DataTypes\StringType */
-        $stickTickersValue
-            ->setValueRegex("/^(?'stockTickers'\\w+:\\w+)?$/", 'stockTickers')
-        ;
+
+        if ($stickTickersValue instanceof StringType) {
+            /* @var $stickTickersValue \Wszetko\Sitemap\Items\DataTypes\StringType */
+            $stickTickersValue
+                ->setValueRegex("/^(?'stockTickers'\\w+:\\w+)?$/", 'stockTickers')
+            ;
+        } else {
+            // @codeCoverageIgnoreStart
+            throw new \InvalidArgumentException('Class is missconfigured.');
+            // @codeCoverageIgnoreEnd
+        }
     }
 
     /**

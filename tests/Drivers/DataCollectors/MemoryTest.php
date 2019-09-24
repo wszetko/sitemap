@@ -29,13 +29,13 @@ class MemoryTest extends TestCase
 {
     public function testConstructor()
     {
-        $driver = new Memory(null);
+        $driver = new Memory();
         $this->assertInstanceOf(Memory::class, $driver);
     }
 
     public function testElement()
     {
-        $driver = new Memory(null);
+        $driver = new Memory();
         $url = new Url('/');
         $driver->add($url, 'test');
 
@@ -52,7 +52,7 @@ class MemoryTest extends TestCase
 
     public function testExtensions()
     {
-        $driver = new Memory(null);
+        $driver = new Memory();
         $url = new Url('/');
         $url->setDomain('https://example.com');
         $url->addExtension(new Mobile());

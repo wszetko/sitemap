@@ -177,7 +177,7 @@ class StringType extends AbstractDataType
      *
      * @return self
      */
-    public function setValue($value, ...$parameters): DataType
+    public function setValue($value, $parameters = []): DataType
     {
         if (null !== $value) {
             $value = (string) $value;
@@ -188,15 +188,15 @@ class StringType extends AbstractDataType
             throw new InvalidArgumentException($this->getName() . ' need to be set.');
         }
 
-        parent::setValue($value, $parameters[0] ?? []);
+        parent::setValue($value, $parameters);
 
         return $this;
     }
 
     /**
-     * @param $value
+     * @param string $value
      */
-    private function checkValue(&$value)
+    private function checkValue(string &$value)
     {
         $value = trim($value);
         $this->checkValueLength($value);
@@ -206,61 +206,69 @@ class StringType extends AbstractDataType
     }
 
     /**
-     * @param $value
+     * @param null|string $value
      */
-    private function checkValueLength(&$value)
+    private function checkValueLength(?string &$value)
     {
-        if (null !== $this->getMinLength() && mb_strlen($value) < $this->getMinLength()) {
-            $value = null;
-        }
+        if (null !== $value) {
+            if (null !== $this->getMinLength() && mb_strlen($value) < $this->getMinLength()) {
+                $value = null;
+            }
 
-        if (null !== $this->getMaxLength() && null !== $value && mb_strlen($value) > $this->getMaxLength()) {
-            $value = mb_substr($value, 0, $this->getMaxLength());
-        }
-    }
-
-    /**
-     * @param $value
-     */
-    private function convertValue(&$value)
-    {
-        if ($conversion = $this->getConversion()) {
-            if ('upper' == $conversion) {
-                $value = mb_strtoupper($value);
-            } elseif ('lower' == $conversion) {
-                $value = mb_strtolower($value);
+            if (null !== $this->getMaxLength() && null !== $value && mb_strlen($value) > $this->getMaxLength()) {
+                $value = mb_substr($value, 0, $this->getMaxLength());
             }
         }
     }
 
     /**
-     * @param $value
+     * @param null|string $value
      */
-    private function checkIfValueIsInAllowedValues(&$value)
+    private function convertValue(?string &$value)
     {
-        if (!empty($this->getAllowedValues())) {
-            $match = preg_grep("/{$value}/i", $this->getAllowedValues());
-
-            if (empty($match)) {
-                $value = null;
-            } else {
-                $value = array_values($match)[0];
+        if (null !== $value) {
+            if ($conversion = $this->getConversion()) {
+                if ('upper' == $conversion) {
+                    $value = mb_strtoupper($value);
+                } elseif ('lower' == $conversion) {
+                    $value = mb_strtolower($value);
+                }
             }
         }
     }
 
     /**
-     * @param $value
+     * @param null|string $value
      */
-    private function checkValueRegex(&$value)
+    private function checkIfValueIsInAllowedValues(?string &$value)
     {
-        $regex = $this->getValueRegex();
+        if (null !== $value) {
+            if (!empty($this->getAllowedValues())) {
+                $match = preg_grep("/{$value}/i", $this->getAllowedValues());
 
-        if (!empty($regex)) {
-            preg_match_all(array_values($regex)[0], $value, $matches);
+                if (empty($match)) {
+                    $value = null;
+                } else {
+                    $value = array_values($match)[0];
+                }
+            }
+        }
+    }
 
-            if (empty($matches[array_key_first($regex)])) {
-                $value = null;
+    /**
+     * @param null|string $value
+     */
+    private function checkValueRegex(?string &$value)
+    {
+        if (null !== $value) {
+            $regex = $this->getValueRegex();
+
+            if (!empty($regex)) {
+                preg_match_all(array_values($regex)[0], $value, $matches);
+
+                if (empty($matches[array_key_first($regex)])) {
+                    $value = null;
+                }
             }
         }
     }

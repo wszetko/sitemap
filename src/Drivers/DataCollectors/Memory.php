@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Wszetko\Sitemap\Drivers\DataCollectors;
 
-use Wszetko\Sitemap\Interfaces\DataCollector;
 use Wszetko\Sitemap\Items\Url;
 
 /**
@@ -21,7 +20,7 @@ use Wszetko\Sitemap\Items\Url;
  *
  * @package Wszetko\Sitemap\Drivers\DataCollectors
  */
-class Memory implements DataCollector
+class Memory extends AbstractDataCollector
 {
     /**
      * @var array
@@ -37,15 +36,6 @@ class Memory implements DataCollector
      * @var array
      */
     private $extensions = [];
-
-    /**
-     * DataCollector constructor.
-     *
-     * @param null|array $config
-     */
-    public function __construct(?array $config)
-    {
-    }
 
     /**
      * @param Url    $item

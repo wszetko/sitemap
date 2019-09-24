@@ -44,9 +44,10 @@ abstract class AbstractItem implements Item
         foreach ($properties as $property) {
             $data = $this->grabData($property);
 
-            if (!empty($data['type']) &&
+            if (is_array($data) && !empty($data['type']) &&
                 class_exists($data['type']) &&
-                in_array('Wszetko\Sitemap\Interfaces\DataType', class_implements($data['type']))) {
+                in_array('Wszetko\Sitemap\Interfaces\DataType', class_implements($data['type']))
+            ) {
                 if (!empty($data['dataType']) && class_exists($data['dataType'])) {
                     $this->{$property->getName()} = new ArrayType($property->getName(), $data['dataType']);
                     $this->{$property->getName()}->getBaseDataType()->addAttributes($data['attributes']);
@@ -59,8 +60,8 @@ abstract class AbstractItem implements Item
     }
 
     /**
-     * @param $name
-     * @param $arguments
+     * @param mixed $name
+     * @param mixed $arguments
      *
      * @return mixed
      */
@@ -71,12 +72,17 @@ abstract class AbstractItem implements Item
 
         if (property_exists($this, $property) &&
             in_array($operation, ['add', 'set', 'get']) &&
-            ($this->{$property} instanceof DataType)) {
+            ($this->{$property} instanceof DataType)
+        ) {
             switch ($operation) {
                 case 'add':
-                    $this->{$property}->addValue($arguments[0], array_slice($arguments, 1));
+                    if (method_exists($this->{$property}, 'addValue')) {
+                        $this->{$property}->addValue($arguments[0], array_slice($arguments, 1));
 
-                    return $this;
+                        return $this;
+                    }
+
+                    break;
                 case 'set':
                     $this->{$property}->setValue($arguments[0], array_slice($arguments, 1));
 
@@ -148,10 +154,16 @@ abstract class AbstractItem implements Item
     /**
      * @param \ReflectionProperty $property
      *
-     * @return array
+     * @return null|array
      */
-    private function grabData(ReflectionProperty $property): array
+    private function grabData(ReflectionProperty $property): ?array
     {
+        if (false === $property->getDocComment()) {
+            // @codeCoverageIgnoreStart
+            return null;
+            // @codeCoverageIgnoreEnd
+        }
+
         preg_match_all('/@var\s+(?\'type\'[^\s]+)|@dataType\s+(?\'dataType\'[^\s]+)|@attribute\s+(?\'attribute\'[^\s]+)|@attributeDataType\s+(?\'attributeDataType\'[^\s]+)/m', $property->getDocComment(), $matches);
 
         $results = [

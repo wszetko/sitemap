@@ -41,11 +41,13 @@ trait Domain
     /**
      * @param null|string $domain
      *
-     * @return self
+     * @return static
      */
-    public function setDomain(?string $domain): self
+    public function setDomain(?string $domain)
     {
-        if ($domain = Url::normalizeUrl((string) $domain)) {
+        $domain = Url::normalizeUrl((string) $domain);
+
+        if (is_string($domain)) {
             $this->domain = rtrim($domain, '/');
         } else {
             throw new InvalidArgumentException('Domain name is not valid.');

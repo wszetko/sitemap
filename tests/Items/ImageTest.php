@@ -116,6 +116,16 @@ class ImageTest extends TestCase
     }
 
     /**
+     * @throws \ReflectionException
+     */
+    public function testTitleInvalid()
+    {
+        $image = new Items\Image('image.png');
+        $image->addTitle('Title example');
+        $this->assertNull($image->getTitle());
+    }
+
+    /**
      * @dataProvider licenseProvider
      *
      * @param mixed $image

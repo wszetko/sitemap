@@ -21,12 +21,12 @@ namespace Wszetko\Sitemap\Interfaces;
 interface DataType
 {
     /**
-     * @param       $value
-     * @param mixed ...$parameters
+     * @param mixed $value
+     * @param array $parameters
      *
      * @return \Wszetko\Sitemap\Interfaces\DataType
      */
-    public function setValue($value, ...$parameters): DataType;
+    public function setValue($value, $parameters = []): DataType;
 
     /**
      * @return mixed

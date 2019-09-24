@@ -23,13 +23,6 @@ use Wszetko\Sitemap\Items\Url;
 interface DataCollector
 {
     /**
-     * DataCollector constructor.
-     *
-     * @param null|array $config
-     */
-    public function __construct(?array $config);
-
-    /**
      * @param Url    $item
      * @param string $group
      */

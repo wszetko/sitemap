@@ -30,7 +30,7 @@ class URLType extends StringType
     protected $external = false;
 
     /**
-     * @return null|mixed|string
+     * @return null|array|string
      */
     public function getValue()
     {
@@ -38,13 +38,16 @@ class URLType extends StringType
             return null;
         }
 
+        $value = null;
+
         if ($this->isExternal() && false !== Url::normalizeUrl($this->value)) {
             $value = $this->value;
         } else {
-            $value = str_replace($this->getDomain(), '', $this->value);
+            $domain = $this->getDomain() ?? '';
+            $value = str_replace($domain, '', $this->value);
 
             if (!empty($value)) {
-                $value = $this->getDomain() . '/' . ltrim($value, '/');
+                $value = $domain . '/' . ltrim($value, '/');
             }
         }
 

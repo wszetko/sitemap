@@ -35,11 +35,12 @@ trait DateTime
             $dateTime = date_create($dateTime);
         }
 
-        if ($dateTime && (int) $dateTime->format('Y') < 0) {
+        if (($dateTime instanceof DateTimeInterface && (int) $dateTime->format('Y') <= 0) ||
+            false === $dateTime) {
             $dateTime = null;
         }
 
-        if (!empty($dateTime)) {
+        if ($dateTime instanceof DateTimeInterface) {
             if (0 == $dateTime->format('H') &&
                 0 == $dateTime->format('i') &&
                 0 == $dateTime->format('s')) {

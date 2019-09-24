@@ -58,6 +58,7 @@ class HelpersTest extends TestCase
     public function testCheckDomainInvalids()
     {
         $testCaseInvalid = [
+            '',
             ' ',
             '-',
             '.',

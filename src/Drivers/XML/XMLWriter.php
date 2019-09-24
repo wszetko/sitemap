@@ -20,8 +20,6 @@ use Wszetko\Sitemap\Sitemap;
  * Class XMLWriter.
  *
  * @package Wszetko\Sitemap\Drivers\XML
- *
- * @method getXMLWriter(): \XMLWriter
  */
 class XMLWriter extends AbstractXML
 {
@@ -49,11 +47,13 @@ class XMLWriter extends AbstractXML
     public function openSitemap(string $sitemap, array $extensions = []): void
     {
         $this->setCurrentSitemap($sitemap);
-        $this->getXMLWriter()->openMemory();
-        $this->getXMLWriter()->startDocument('1.0', 'UTF-8');
-        $this->getXMLWriter()->setIndent(true);
-        $this->getXMLWriter()->startElement('urlset');
-        $this->getXMLWriter()->writeAttribute('xmlns', Sitemap::SCHEMA);
+        /* @var \XMLWriter $XMLWriter */
+        $XMLWriter = $this->getXMLWriter();
+        $XMLWriter->openMemory();
+        $XMLWriter->startDocument('1.0', 'UTF-8');
+        $XMLWriter->setIndent(true);
+        $XMLWriter->startElement('urlset');
+        $XMLWriter->writeAttribute('xmlns', Sitemap::SCHEMA);
 
         foreach ($extensions as $extension => $urlset) {
             $this->getXMLWriter()->writeAttribute('xmlns:' . $extension, $urlset);
@@ -67,8 +67,10 @@ class XMLWriter extends AbstractXML
      */
     public function closeSitemap(): void
     {
-        $this->getXMLWriter()->endElement();
-        $this->getXMLWriter()->endDocument();
+        /* @var \XMLWriter $XMLWriter */
+        $XMLWriter = $this->getXMLWriter();
+        $XMLWriter->endElement();
+        $XMLWriter->endDocument();
         $this->flushData();
         $this->endFile();
     }
@@ -80,7 +82,7 @@ class XMLWriter extends AbstractXML
     {
         clearstatcache(true, $this->getSitemapFileFullPath());
 
-        return file_exists($this->getSitemapFileFullPath()) ? filesize($this->getSitemapFileFullPath()) : 0;
+        return file_exists($this->getSitemapFileFullPath()) ? (int) filesize($this->getSitemapFileFullPath()) : 0;
     }
 
     /**
@@ -101,11 +103,13 @@ class XMLWriter extends AbstractXML
     public function openSitemapIndex(string $sitemap): void
     {
         $this->setCurrentSitemap($sitemap);
-        $this->getXMLWriter()->openMemory();
-        $this->getXMLWriter()->startDocument('1.0', 'UTF-8');
-        $this->getXMLWriter()->setIndent(true);
-        $this->getXMLWriter()->startElement('sitemapindex');
-        $this->getXMLWriter()->writeAttribute('xmlns', Sitemap::SCHEMA);
+        /* @var \XMLWriter $XMLWriter */
+        $XMLWriter = $this->getXMLWriter();
+        $XMLWriter->openMemory();
+        $XMLWriter->startDocument('1.0', 'UTF-8');
+        $XMLWriter->setIndent(true);
+        $XMLWriter->startElement('sitemapindex');
+        $XMLWriter->writeAttribute('xmlns', Sitemap::SCHEMA);
         $this->flushData();
     }
 
@@ -114,8 +118,10 @@ class XMLWriter extends AbstractXML
      */
     public function closeSitemapIndex(): void
     {
-        $this->getXMLWriter()->endElement();
-        $this->getXMLWriter()->endDocument();
+        /* @var \XMLWriter $XMLWriter */
+        $XMLWriter = $this->getXMLWriter();
+        $XMLWriter->endElement();
+        $XMLWriter->endDocument();
         $this->flushData();
         $this->endFile();
     }
@@ -126,12 +132,14 @@ class XMLWriter extends AbstractXML
      */
     public function addSitemap(string $sitemap, string $lastmod = null): void
     {
-        $this->getXMLWriter()->startElement('sitemap');
-        $this->getXMLWriter()->writeElement('loc', $sitemap);
+        /* @var \XMLWriter $XMLWriter */
+        $XMLWriter = $this->getXMLWriter();
+        $XMLWriter->startElement('sitemap');
+        $XMLWriter->writeElement('loc', $sitemap);
         if (isset($lastmod)) {
-            $this->getXMLWriter()->writeElement('lastmod', $lastmod);
+            $XMLWriter->writeElement('lastmod', $lastmod);
         }
-        $this->getXMLWriter()->endElement();
+        $XMLWriter->endElement();
         $this->flushData();
     }
 
@@ -162,7 +170,7 @@ class XMLWriter extends AbstractXML
 
             do {
                 $s = fread($sitemapFile, 1);
-                if (ctype_space($s)) {
+                if (is_string($s) && ctype_space($s)) {
                     ++$truncate;
                     fseek($sitemapFile, -2, SEEK_CUR);
                 } else {
@@ -177,13 +185,15 @@ class XMLWriter extends AbstractXML
 
     /**
      * @param string      $element
-     * @param             $value
+     * @param mixed       $value
      * @param null|string $namespace
      */
     private function addElement(string $element, $value, ?string $namespace = null): void
     {
         if (!is_array($value)) {
-            $this->getXMLWriter()->writeElement(($namespace ? $namespace . ':' : '') . $element, (string) $value);
+            /* @var \XMLWriter $XMLWriter */
+            $XMLWriter = $this->getXMLWriter();
+            $XMLWriter->writeElement(($namespace ? $namespace . ':' : '') . $element, (string) $value);
         } else {
             if (isset($value['_namespace'])) {
                 $this->addElement($value['_element'], $value[$value['_element']], $value['_namespace']);
@@ -195,7 +205,7 @@ class XMLWriter extends AbstractXML
 
     /**
      * @param string      $element
-     * @param             $value
+     * @param mixed       $value
      * @param null|string $namespace
      */
     private function addElementArray(string $element, $value, ?string $namespace = null): void
@@ -204,7 +214,9 @@ class XMLWriter extends AbstractXML
             if (!empty($value)) {
                 $this->addElementArrayNonAssoc($element, $value, $namespace);
             } else {
-                $this->getXMLWriter()->writeElement(($namespace ? $namespace . ':' : '') . $element);
+                /* @var \XMLWriter $XMLWriter */
+                $XMLWriter = $this->getXMLWriter();
+                $XMLWriter->writeElement(($namespace ? $namespace . ':' : '') . $element);
             }
         } else {
             $this->addElementArrayAssoc($element, $value, $namespace);
@@ -213,10 +225,13 @@ class XMLWriter extends AbstractXML
 
     private function addElementArrayAssoc(string $element, $value, ?string $namespace = null): void
     {
-        $this->getXMLWriter()->startElement(($namespace ? $namespace . ':' : '') . $element);
+        /* @var \XMLWriter $XMLWriter */
+        $XMLWriter = $this->getXMLWriter();
+        $XMLWriter->startElement(($namespace ? $namespace . ':' : '') . $element);
+
         if (isset($value['_attributes'])) {
             foreach ($value['_attributes'] as $attribute => $val) {
-                $this->getXMLWriter()->writeAttribute($attribute, $val);
+                $XMLWriter->writeAttribute($attribute, $val);
             }
 
             if (isset($value['_value'])) {
@@ -225,7 +240,7 @@ class XMLWriter extends AbstractXML
                         $this->addElement($el, $val);
                     }
                 } else {
-                    $this->getXMLWriter()->text((string) $value['_value']);
+                    $XMLWriter->text((string) $value['_value']);
                 }
             }
         } else {
@@ -233,16 +248,17 @@ class XMLWriter extends AbstractXML
                 if (is_array($val)) {
                     $this->addElement($el, $val, $namespace);
                 } else {
-                    $this->getXMLWriter()->writeElement(($namespace ? $namespace . ':' : '') . $el, (string) $val);
+                    $XMLWriter->writeElement(($namespace ? $namespace . ':' : '') . $el, (string) $val);
                 }
             }
         }
-        $this->getXMLWriter()->endElement();
+
+        $XMLWriter->endElement();
     }
 
     /**
      * @param string      $element
-     * @param             $value
+     * @param mixed       $value
      * @param null|string $namespace
      */
     private function addElementArrayNonAssoc(string $element, $value, ?string $namespace = null): void

@@ -28,7 +28,7 @@ abstract class AbstractDataType implements DataType
     use Domain;
 
     /**
-     * @var
+     * @var mixed
      */
     protected $value;
 
@@ -45,7 +45,7 @@ abstract class AbstractDataType implements DataType
     /**
      * AbstractDataType constructor.
      *
-     * @param $name
+     * @param mixed $name
      */
     public function __construct($name)
     {
@@ -93,20 +93,18 @@ abstract class AbstractDataType implements DataType
     }
 
     /**
-     * @param       $value
-     * @param mixed ...$parameters
+     * @param mixed $value
+     * @param array $parameters
      *
      * @return \Wszetko\Sitemap\Interfaces\DataType
      */
-    public function setValue($value, ...$parameters): DataType
+    public function setValue($value, $parameters = []): DataType
     {
         $this->value = $value;
 
-        foreach ($parameters[0] as $key => $attribute) {
+        foreach ($parameters as $key => $attribute) {
             if (!empty($attribute)) {
-                $attr = array_keys($this->attributes)[$key] ?? null;
-
-                if ($attr) {
+                if ($attr = array_keys($this->attributes)[$key]) {
                     $this->attributes[$attr]->setValue($attribute);
                 }
             }
@@ -116,7 +114,7 @@ abstract class AbstractDataType implements DataType
     }
 
     /**
-     * @param $attributes
+     * @param mixed $attributes
      *
      * @return \Wszetko\Sitemap\Items\DataTypes\AbstractDataType
      */
@@ -130,7 +128,7 @@ abstract class AbstractDataType implements DataType
     }
 
     /**
-     * @param $name
+     * @param mixed $name
      *
      * @return null|mixed
      */
@@ -162,11 +160,11 @@ abstract class AbstractDataType implements DataType
     }
 
     /**
-     * @param object $target
+     * @param mixed $target
      */
-    public function propagateDomain(object &$target): void
+    public function propagateDomain(&$target): void
     {
-        if (null !== $this->getDomain()) {
+        if (method_exists($target, 'setDomain') && null !== $this->getDomain()) {
             $target->setDomain($this->getDomain());
         }
     }

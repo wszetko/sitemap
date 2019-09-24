@@ -20,13 +20,13 @@ use Wszetko\Sitemap\Sitemap;
  *
  * @package Wszetko\Sitemap\Items
  *
- * @method setLoc($loc): self
+ * @method setLoc($loc): static
  * @method getLoc()
- * @method setPriority($priority): self
+ * @method setPriority($priority): static
  * @method getPriority()
- * @method setChangefreq($changeFreq): self
+ * @method setChangefreq($changeFreq): static
  * @method getChangefreq()
- * @method setLastmod($lastMod): self
+ * @method setLastmod($lastMod): static
  * @method getLastmod()
  */
 class Url extends AbstractItem
