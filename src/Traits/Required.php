@@ -38,7 +38,7 @@ trait Required
      *
      * @return static
      */
-    public function setRequired(bool $required)
+    public function setRequired(bool $required): self
     {
         $this->required = $required;
 

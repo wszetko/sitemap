@@ -43,7 +43,7 @@ trait Domain
      *
      * @return static
      */
-    public function setDomain(?string $domain)
+    public function setDomain(?string $domain): self
     {
         $domain = Url::normalizeUrl((string) $domain);
 

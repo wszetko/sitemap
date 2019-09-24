@@ -96,7 +96,7 @@ abstract class AbstractDataType implements DataType
      * @param mixed $value
      * @param array $parameters
      *
-     * @return \Wszetko\Sitemap\Interfaces\DataType
+     * @return static
      */
     public function setValue($value, $parameters = []): DataType
     {
@@ -116,7 +116,7 @@ abstract class AbstractDataType implements DataType
     /**
      * @param mixed $attributes
      *
-     * @return \Wszetko\Sitemap\Items\DataTypes\AbstractDataType
+     * @return static
      */
     public function addAttributes($attributes): self
     {
