@@ -12,7 +12,7 @@ declare(strict_types=1);
  */
 
 // For compatibility with PHP < 7.3
-if (version_compare(PHP_VERSION, '7.3.0') < 0) {
+if (PHP_VERSION_ID < 70300) {
     /**
      * Gets the first key of an array.
      *

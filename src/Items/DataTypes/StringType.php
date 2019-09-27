@@ -49,7 +49,7 @@ class StringType extends AbstractDataType
     protected $regexGroup;
 
     /**
-     * @var string
+     * @var null|string
      */
     protected $conversion;
 
