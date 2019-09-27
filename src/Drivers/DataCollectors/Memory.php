@@ -74,7 +74,7 @@ class Memory extends AbstractDataCollector
             return null;
         }
 
-        $element = $this->getGroupElement($group);
+        $element = (int) $this->getGroupElement($group);
 
         if (($element + 1) > $this->getGroupCount($group)) {
             return null;
@@ -121,7 +121,7 @@ class Memory extends AbstractDataCollector
      */
     public function isLast(string $group): bool
     {
-        return (bool) !isset($this->items[$group][$this->getGroupElement($group) + 1]);
+        return (bool) !isset($this->items[$group][(int) $this->getGroupElement($group) + 1]);
     }
 
     /**

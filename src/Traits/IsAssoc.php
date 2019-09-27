@@ -22,7 +22,7 @@ trait IsAssoc
      */
     protected function isAssoc(array $array): bool
     {
-        foreach ($array as $key => $val) {
+        foreach (array_keys($array) as $key) {
             if (!is_integer($key)) {
                 return true;
             }

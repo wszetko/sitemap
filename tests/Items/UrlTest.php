@@ -43,14 +43,15 @@ class UrlTest extends TestCase
     public function testPropertyNotExists()
     {
         $url = new Items\Url('test');
-        $this->assertNull($url->setNotExists('test'));
+        $wrong = 'setNotExists';
+        $this->assertNull($url->$wrong('test'));
     }
 
     /**
      * @dataProvider domainProvider
      *
-     * @param $domain
-     * @param $expected
+     * @param mixed $domain
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */
@@ -86,8 +87,8 @@ class UrlTest extends TestCase
     /**
      * @dataProvider getLocProvider
      *
-     * @param $loc
-     * @param $excepted
+     * @param mixed $loc
+     * @param mixed $excepted
      *
      * @throws \ReflectionException
      */
@@ -116,8 +117,8 @@ class UrlTest extends TestCase
     /**
      * @dataProvider lastModProvider
      *
-     * @param $lastMod
-     * @param $expected
+     * @param mixed $lastMod
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */
@@ -149,8 +150,8 @@ class UrlTest extends TestCase
     /**
      * @dataProvider changeFreqProvider
      *
-     * @param $changeFreq
-     * @param $expected
+     * @param mixed $changeFreq
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */
@@ -181,8 +182,8 @@ class UrlTest extends TestCase
     /**
      * @dataProvider priorityProvider
      *
-     * @param $priority
-     * @param $expected
+     * @param mixed $priority
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */

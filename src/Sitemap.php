@@ -14,10 +14,12 @@ declare(strict_types=1);
 namespace Wszetko\Sitemap;
 
 use Exception;
+use InvalidArgumentException;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RegexIterator;
-use Wszetko\Sitemap\Drivers\XML\XMLWriter;
+use Wszetko\Sitemap\Drivers\DataCollectors\AbstractDataCollector;
+use Wszetko\Sitemap\Drivers\Output\OutputXMLWriter;
 use Wszetko\Sitemap\Interfaces\DataCollector;
 use Wszetko\Sitemap\Interfaces\XML;
 use Wszetko\Sitemap\Traits\Domain;
@@ -162,6 +164,8 @@ class Sitemap
      * Construktor.
      *
      * @param string $domain
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct(string $domain = null)
     {
@@ -190,11 +194,6 @@ class Sitemap
 
         $group = mb_strtolower($group);
         $item->setDomain($this->getDomain());
-
-        if (null === $this->getDataCollector()) {
-            throw new \Exception('DataCollector is not set.');
-        }
-
         $this->getDataCollector()->add($item, $group);
 
         return $this;
@@ -244,10 +243,15 @@ class Sitemap
     /**
      * Get DataCollecotr Object.
      *
-     * @return null|DataCollector
+     * @return DataCollector
+     *
+     * @throws \Exception
      */
-    public function getDataCollector(): ?DataCollector
+    public function getDataCollector(): DataCollector
     {
+        if (null === $this->dataCollector) {
+            throw new Exception('DataCollector is not set.');
+        }
         return $this->dataCollector;
     }
 
@@ -261,12 +265,16 @@ class Sitemap
      */
     public function setDataCollector(string $driver, $config = []): self
     {
-        $driver = '\Wszetko\Sitemap\Drivers\DataCollectors\\' . $driver;
-
         if (class_exists($driver)) {
-            $this->dataCollector = new $driver($config);
+            $dataCollector = new $driver($config);
+
+            if ($dataCollector instanceof AbstractDataCollector) {
+                $this->dataCollector = $dataCollector;
+            } else {
+                throw new InvalidArgumentException($driver . ' data collector does not exists.');
+            }
         } else {
-            throw new \InvalidArgumentException($driver . ' data collector does not exists.');
+            throw new InvalidArgumentException($driver . ' data collector does not exists.');
         }
 
         return $this;
@@ -285,16 +293,8 @@ class Sitemap
             throw new Exception('Domain is not set.');
         }
 
-        if (null === $this->getDataCollector()) {
-            throw new Exception('DataCollector is not set.');
-        }
-
-        if (null === $this->getXml()) {
-            $this->setXml(XMLWriter::class, ['domain' => $this->getDomain()]);
-        }
-
-        if (null === $this->getXml()) {
-            throw new Exception('XML Driver is not set.');
+        if (null === $this->xml) {
+            $this->setXml(OutputXMLWriter::class, ['domain' => $this->getDomain()]);
         }
 
         $this->removeDir($this->getTempDirectory());
@@ -332,10 +332,16 @@ class Sitemap
     }
 
     /**
-     * @return null|XML
+     * @return XML
+     *
+     * @throws \Exception
      */
-    public function getXml(): ?XML
+    public function getXml(): XML
     {
+        if (null === $this->xml) {
+            throw new Exception('XML writer class is not set.');
+        }
+
         return $this->xml;
     }
 
@@ -416,17 +422,7 @@ class Sitemap
      */
     public function generateSitemaps(): array
     {
-        if (null === $this->getDataCollector()) {
-            throw new Exception('DataCollector is not set.');
-        }
-
-        if (null === $this->getXml()) {
-            throw new Exception('XML Driver is not set.');
-        }
-
-        $totalItems = $this->getDataCollector()->getCount();
-
-        if (0 == $totalItems) {
+        if (0 == $this->getDataCollector()->getCount()) {
             return [];
         }
 
@@ -452,7 +448,10 @@ class Sitemap
 
                     if (isset($element['lastmod'])) {
                         if ($files[$group . $this->getSeparator() . $groupNo . self::EXT]) {
-                            if (strtotime($element['lastmod']) > strtotime($files[$group . $this->getSeparator() . $groupNo . self::EXT])) {
+                            if (
+                                strtotime($element['lastmod']) >
+                                    strtotime($files[$group . $this->getSeparator() . $groupNo . self::EXT])
+                            ) {
                                 $files[$group . $this->getSeparator() . $groupNo . self::EXT] = $element['lastmod'];
                             }
                         } else {
@@ -460,8 +459,11 @@ class Sitemap
                         }
                     }
 
-                    if ($filesInGroup >= self::ITEM_PER_SITEMAP ||
-                        $this->getXml()->getSitemapSize() >= (self::SITEMAP_MAX_SIZE - 20)) { // 20 chars buffer for close tag
+                    // self::SITEMAP_MAX_SIZE - 20 for buffer for close tag
+                    if (
+                        $filesInGroup >= self::ITEM_PER_SITEMAP ||
+                        $this->getXml()->getSitemapSize() >= (self::SITEMAP_MAX_SIZE - 20)
+                    ) {
                         $this->getXml()->closeSitemap();
 
                         if (!$this->getDataCollector()->isLast($group)) {
@@ -546,10 +548,6 @@ class Sitemap
             return [];
         }
 
-        if (null === $this->getXml()) {
-            throw new Exception('XML Driver is not set.');
-        }
-
         $counter = 0;
         $file = $this->getIndexFilename() . self::EXT;
         $files = [$file => null];
@@ -557,7 +555,7 @@ class Sitemap
         $lastItem = array_key_last($sitemaps);
 
         foreach ($sitemaps as $sitemap => $lastmod) {
-            $this->getXml()->addSitemap($this->getDomain() . '/' . ltrim(str_replace(
+            $this->getXml()->addSitemap((string) $this->getDomain() . '/' . ltrim(str_replace(
                 $this->getPublicDirectory(),
                 '',
                 $this->getSitepamsDirectory()
@@ -721,10 +719,12 @@ class Sitemap
 
         if ($publicDir = scandir($this->getPublicDirectory())) {
             foreach ($publicDir as $file) {
-                if (preg_match_all(
-                    '/^(' . $this->getIndexFilename() . ')((-)[\d]+)?(' . $this->getExt() . ')$/',
-                    $file
-                )) {
+                if (
+                    preg_match_all(
+                        '/^(' . $this->getIndexFilename() . ')((-)[\d]+)?(' . $this->getExt() . ')$/',
+                        $file
+                    )
+                ) {
                     unlink($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $file);
                 }
             }

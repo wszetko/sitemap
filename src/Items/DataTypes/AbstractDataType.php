@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Wszetko\Sitemap\Items\DataTypes;
 
+use InvalidArgumentException;
 use Wszetko\Sitemap\Interfaces\DataType;
 use Wszetko\Sitemap\Traits\Domain;
 use Wszetko\Sitemap\Traits\Required;
@@ -85,7 +86,7 @@ abstract class AbstractDataType implements DataType
             if (!empty($attributes)) {
                 return [$value => $attributes];
             }
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             return null;
         }
 
@@ -104,7 +105,9 @@ abstract class AbstractDataType implements DataType
 
         foreach ($parameters as $key => $attribute) {
             if (!empty($attribute)) {
-                if ($attr = array_keys($this->attributes)[$key]) {
+                $attr = array_keys($this->attributes)[$key];
+
+                if (!empty($attr)) {
                     $this->attributes[$attr]->setValue($attribute);
                 }
             }
@@ -130,9 +133,9 @@ abstract class AbstractDataType implements DataType
     /**
      * @param mixed $name
      *
-     * @return null|mixed
+     * @return null|AbstractDataType
      */
-    public function getAttribute($name)
+    public function getAttribute($name): ?AbstractDataType
     {
         return isset($this->attributes[$name]) ? $this->attributes[$name] : null;
     }
@@ -152,7 +155,7 @@ abstract class AbstractDataType implements DataType
             if (!empty($value->getValue())) {
                 $attributes[$name] = $value->getValue();
             } elseif ($value->isRequired()) {
-                throw new \InvalidArgumentException('Lack of required value');
+                throw new InvalidArgumentException('Lack of required value');
             }
         }
 

@@ -26,13 +26,17 @@ class YesNoType extends AbstractDataType
      * @param mixed $value
      * @param array $parameters
      *
-     * @return \Wszetko\Sitemap\Interfaces\DataType
+     * @return static
      */
     public function setValue($value, $parameters = []): DataType
     {
-        if ((is_string($value) && preg_grep("/{$value}/i", ['Yes', 'y', '1'])) || true === $value || 1 === $value) {
+        if ((is_string($value) && preg_grep("/{$value}/i", ['Yes', 'y', '1'])) ||
+            true === $value || 1 === $value
+        ) {
             $this->value = 'Yes';
-        } elseif ((is_string($value) && preg_grep("/{$value}/i", ['No', 'n', '0'])) || false === $value || 0 === $value) {
+        } elseif ((is_string($value) && preg_grep("/{$value}/i", ['No', 'n', '0'])) ||
+            false === $value || 0 === $value
+        ) {
             $this->value = 'No';
         }
 

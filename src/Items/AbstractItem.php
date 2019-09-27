@@ -44,9 +44,11 @@ abstract class AbstractItem implements Item
         foreach ($properties as $property) {
             $data = $this->grabData($property);
 
-            if (is_array($data) && !empty($data['type']) &&
-                class_exists($data['type']) &&
-                in_array('Wszetko\Sitemap\Interfaces\DataType', class_implements($data['type']))
+            if (
+                is_array($data)
+                && !empty($data['type'])
+                && class_exists($data['type'])
+                && in_array('Wszetko\Sitemap\Interfaces\DataType', class_implements($data['type']))
             ) {
                 if (!empty($data['dataType']) && class_exists($data['dataType'])) {
                     $this->{$property->getName()} = new ArrayType($property->getName(), $data['dataType']);
@@ -70,7 +72,8 @@ abstract class AbstractItem implements Item
         $operation = mb_substr($name, 0, 3);
         $property = lcfirst(mb_substr($name, 3));
 
-        if (property_exists($this, $property) &&
+        if (
+            property_exists($this, $property) &&
             in_array($operation, ['add', 'set', 'get']) &&
             ($this->{$property} instanceof DataType)
         ) {
@@ -88,10 +91,11 @@ abstract class AbstractItem implements Item
 
                     return $this;
                 case 'get':
-                    if (method_exists($this, 'getDomain') &&
+                    if (
+                        method_exists($this, 'getDomain') &&
                         method_exists($this->{$property}, 'setDomain') &&
                         null !== $this->getDomain()
-                        ) {
+                    ) {
                         $this->{$property}->setDomain($this->getDomain());
                     }
 
@@ -116,7 +120,7 @@ abstract class AbstractItem implements Item
 
         $array[static::ELEMENT_NAME] = [];
 
-        foreach (get_object_vars($this) as $property => $value) {
+        foreach (array_keys(get_object_vars($this)) as $property) {
             if (is_object($this->{$property})) {
                 $method = 'get' . ucfirst($property);
                 preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $property, $matches);
@@ -132,10 +136,15 @@ abstract class AbstractItem implements Item
                 if (is_array($data)) {
                     if ($this->isAssoc($data)) {
                         $item = array_key_first($data);
-                        $array[static::ELEMENT_NAME][$property]['_value'] = $item;
 
-                        foreach ($data[$item] as $attr => $val) {
-                            $array[static::ELEMENT_NAME][$property]['_attributes'][$attr] = $val;
+                        if (null !== $item) {
+                            $array[static::ELEMENT_NAME][$property]['_value'] = $item;
+
+                            if (array_key_exists($item, $data)) {
+                                foreach ($data[$item] as $attr => $val) {
+                                    $array[static::ELEMENT_NAME][$property]['_attributes'][$attr] = $val;
+                                }
+                            }
                         }
                     } else {
                         foreach ($data as $element) {
@@ -164,7 +173,16 @@ abstract class AbstractItem implements Item
             // @codeCoverageIgnoreEnd
         }
 
-        preg_match_all('/@var\s+(?\'type\'[^\s]+)|@dataType\s+(?\'dataType\'[^\s]+)|@attribute\s+(?\'attribute\'[^\s]+)|@attributeDataType\s+(?\'attributeDataType\'[^\s]+)/m', $property->getDocComment(), $matches);
+        preg_match_all(
+            '/
+                        @var\s+(?\'type\'[^\s]+)|
+                        @dataType\s+(?\'dataType\'[^\s]+)|
+                        @attribute\s+(?\'attribute\'[^\s]+)|
+                        @attributeDataType\s+(?\'attributeDataType\'[^\s]+)
+                    /mx',
+            $property->getDocComment(),
+            $matches
+        );
 
         $results = [
             'type' => null,

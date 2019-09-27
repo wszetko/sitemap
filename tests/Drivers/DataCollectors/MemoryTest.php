@@ -39,8 +39,8 @@ class MemoryTest extends TestCase
         $url = new Url('/');
         $driver->add($url, 'test');
 
-        $this->assertCount(1, $driver->fetchAll());
-        $this->assertCount(1, $driver->fetchGroup('test'));
+        $this->assertCount(1, $driver->fetchAll() ?? []);
+        $this->assertCount(1, $driver->fetchGroup('test') ?? []);
         $this->assertEquals(1, $driver->getGroupsCount());
         $this->assertEquals(1, $driver->getGroupCount('test'));
         $this->assertEquals(1, $driver->getCount());

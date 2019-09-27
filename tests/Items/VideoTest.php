@@ -100,10 +100,10 @@ class VideoTest extends TestCase
     /**
      * @dataProvider playerLocProvider
      *
-     * @param $player
-     * @param $allow_embed
-     * @param $autoplay
-     * @param $expected
+     * @param mixed $player
+     * @param mixed $allow_embed
+     * @param mixed $autoplay
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */
@@ -168,8 +168,8 @@ class VideoTest extends TestCase
     /**
      * @dataProvider getTitleProvider
      *
-     * @param $title
-     * @param $expected
+     * @param mixed $title
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */
@@ -193,8 +193,8 @@ class VideoTest extends TestCase
     /**
      * @dataProvider getDescriptionPrivider
      *
-     * @param $description
-     * @param $expected
+     * @param mixed $description
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */
@@ -218,8 +218,8 @@ class VideoTest extends TestCase
     /**
      * @dataProvider durationProvider
      *
-     * @param $duration
-     * @param $expected
+     * @param mixed $duration
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */
@@ -251,8 +251,8 @@ class VideoTest extends TestCase
     /**
      * @dataProvider expirationDateProvider
      *
-     * @param $expirationDate
-     * @param $expected
+     * @param mixed $expirationDate
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */
@@ -280,8 +280,8 @@ class VideoTest extends TestCase
     /**
      * @dataProvider ratingProvider
      *
-     * @param $rating
-     * @param $expected
+     * @param mixed $rating
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */
@@ -322,8 +322,8 @@ class VideoTest extends TestCase
     /**
      * @dataProvider viewCountProvider
      *
-     * @param $viewCount
-     * @param $expected
+     * @param mixed $viewCount
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */
@@ -354,8 +354,8 @@ class VideoTest extends TestCase
     /**
      * @dataProvider publicationDateProvider
      *
-     * @param $publicationDate
-     * @param $expected
+     * @param mixed $publicationDate
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */
@@ -383,8 +383,8 @@ class VideoTest extends TestCase
     /**
      * @dataProvider yesNoProvider
      *
-     * @param $familyFriendly
-     * @param $expected
+     * @param mixed $familyFriendly
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */
@@ -422,9 +422,9 @@ class VideoTest extends TestCase
     /**
      * @dataProvider restrictionProvider
      *
-     * @param $country
-     * @param $relationship
-     * @param $expected
+     * @param mixed $country
+     * @param mixed $relationship
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */
@@ -453,9 +453,9 @@ class VideoTest extends TestCase
     /**
      * @dataProvider platformProvider
      *
-     * @param $platform
-     * @param $relationship
-     * @param $expected
+     * @param mixed $platform
+     * @param mixed $relationship
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */
@@ -483,11 +483,11 @@ class VideoTest extends TestCase
     /**
      * @dataProvider priceProvider
      *
-     * @param $price
-     * @param $currency
-     * @param $type
-     * @param $resolution
-     * @param $expected
+     * @param mixed $price
+     * @param mixed $currency
+     * @param mixed $type
+     * @param mixed $resolution
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */
@@ -523,8 +523,8 @@ class VideoTest extends TestCase
     /**
      * @dataProvider yesNoProvider
      *
-     * @param $requireSubscription
-     * @param $expected
+     * @param mixed $requireSubscription
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */
@@ -538,9 +538,9 @@ class VideoTest extends TestCase
     /**
      * @dataProvider uploaderProvider
      *
-     * @param $uploader
-     * @param $info
-     * @param $expected
+     * @param mixed $uploader
+     * @param mixed $info
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */
@@ -569,8 +569,8 @@ class VideoTest extends TestCase
     /**
      * @dataProvider yesNoProvider
      *
-     * @param $live
-     * @param $expected
+     * @param mixed $live
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */
@@ -584,8 +584,8 @@ class VideoTest extends TestCase
     /**
      * @dataProvider tagProvider
      *
-     * @param $tag
-     * @param $expected
+     * @param mixed $tag
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */
@@ -599,8 +599,8 @@ class VideoTest extends TestCase
     /**
      * @dataProvider tagProvider
      *
-     * @param $tag
-     * @param $expected
+     * @param mixed $tag
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */
@@ -637,8 +637,8 @@ class VideoTest extends TestCase
     /**
      * @dataProvider categoryProvider
      *
-     * @param $category
-     * @param $expected
+     * @param mixed $category
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */
@@ -664,8 +664,8 @@ class VideoTest extends TestCase
     /**
      * @dataProvider galleryLocProvider
      *
-     * @param $galleryLoc
-     * @param $expected
+     * @param mixed $galleryLoc
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */

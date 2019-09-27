@@ -12,7 +12,7 @@ declare(strict_types=1);
  */
 
 // For compatibility with PHP < 7.3
-if (!function_exists('array_key_first')) {
+if (version_compare(PHP_VERSION, '7.3.0') < 0) {
     /**
      * Gets the first key of an array.
      *
@@ -22,7 +22,7 @@ if (!function_exists('array_key_first')) {
      */
     function array_key_first(array $arr): ?string
     {
-        foreach ($arr as $key => $unused) {
+        foreach (array_keys($arr) as $key) {
             return $key;
         }
 

@@ -172,10 +172,12 @@ class StringType extends AbstractDataType
     }
 
     /**
-     * @param null|float|int|object|string $value
-     * @param array                        $parameters
+     * @param mixed $value
+     * @param array $parameters
      *
-     * @return self
+     * @return static
+     *
+     * @throws \InvalidArgumentException
      */
     public function setValue($value, $parameters = []): DataType
     {
@@ -195,6 +197,7 @@ class StringType extends AbstractDataType
 
     /**
      * @param string $value
+     * @param-out null|string $value
      */
     private function checkValue(string &$value)
     {
@@ -227,7 +230,9 @@ class StringType extends AbstractDataType
     private function convertValue(?string &$value)
     {
         if (null !== $value) {
-            if ($conversion = $this->getConversion()) {
+            $conversion = $this->getConversion();
+
+            if (is_string($conversion)) {
                 if ('upper' == $conversion) {
                     $value = mb_strtoupper($value);
                 } elseif ('lower' == $conversion) {
@@ -243,8 +248,10 @@ class StringType extends AbstractDataType
     private function checkIfValueIsInAllowedValues(?string &$value)
     {
         if (null !== $value) {
-            if (!empty($this->getAllowedValues())) {
-                $match = preg_grep("/{$value}/i", $this->getAllowedValues());
+            $allowedValues = $this->getAllowedValues();
+
+            if (null !== $allowedValues) {
+                $match = preg_grep("/{$value}/i", $allowedValues);
 
                 if (empty($match)) {
                     $value = null;

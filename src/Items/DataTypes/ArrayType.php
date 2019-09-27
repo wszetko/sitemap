@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Wszetko\Sitemap\Items\DataTypes;
 
+use InvalidArgumentException;
 use Wszetko\Sitemap\Interfaces\DataType;
 
 /**
@@ -37,12 +38,20 @@ class ArrayType extends AbstractDataType
      *
      * @param mixed $name
      * @param mixed $dataType
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct($name, $dataType)
     {
         parent::__construct($name);
 
-        $this->baseDataType = new $dataType($this->getName());
+        $baseDataType = new $dataType($this->getName());
+
+        if (($baseDataType instanceof AbstractDataType) === false) {
+            throw new InvalidArgumentException('Provided DataType is invalid.');
+        }
+
+        $this->baseDataType = $baseDataType;
         $this->value = [];
     }
 
@@ -78,7 +87,7 @@ class ArrayType extends AbstractDataType
      * @param mixed $value
      * @param array $parameters
      *
-     * @return \Wszetko\Sitemap\Interfaces\DataType
+     * @return static
      */
     public function setValue($value, $parameters = []): DataType
     {
@@ -137,7 +146,11 @@ class ArrayType extends AbstractDataType
                 $value = $element->getValue();
 
                 if (is_array($value) && !empty(array_values($value)[0])) {
-                    $result[array_key_first($value)] = array_values($value)[0];
+                    $key = array_key_first($value);
+
+                    if (null !== $key) {
+                        $result[$key] = array_values($value)[0];
+                    }
                 } elseif (!empty($value)) {
                     $result[] = $value;
                 }

@@ -23,9 +23,9 @@ use Wszetko\Sitemap\Interfaces\DataType;
 class FloatType extends AbstractDataType
 {
     /**
-     * @var null|int
+     * @var int
      */
-    protected $precision;
+    protected $precision = 0;
 
     /**
      * @var float|int
@@ -78,9 +78,9 @@ class FloatType extends AbstractDataType
     }
 
     /**
-     * @return null|int
+     * @return int
      */
-    public function getPrecision(): ?int
+    public function getPrecision(): int
     {
         return $this->precision;
     }
@@ -98,10 +98,10 @@ class FloatType extends AbstractDataType
     }
 
     /**
-     * @param null|float|int|string $value
-     * @param array                 $parameters
+     * @param mixed $value
+     * @param array $parameters
      *
-     * @return \Wszetko\Sitemap\Interfaces\DataType
+     * @return static
      */
     public function setValue($value, $parameters = []): DataType
     {

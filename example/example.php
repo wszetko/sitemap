@@ -14,6 +14,8 @@ declare(strict_types=1);
 // Simple example how to use this library
 
 // Load Composer autoloader
+use Wszetko\Sitemap\Drivers\DataCollectors\Memory;
+
 require_once '../vendor/autoload.php';
 
 try {
@@ -29,7 +31,7 @@ try {
     // Set up Sitemap configuration
     $sitemap->setPublicDirectory(__DIR__ . DIRECTORY_SEPARATOR . 'sitemap');
     $sitemap->setSitepamsDirectory('sitemaps');
-    $sitemap->setDataCollector('Memory');
+    $sitemap->setDataCollector(Memory::class);
     $sitemap->setUseCompression(false);
 
     // Create example item

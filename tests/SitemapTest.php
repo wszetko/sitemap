@@ -16,7 +16,7 @@ namespace Wszetko\Sitemap\Tests;
 use Exception;
 use PHPUnit\Framework\TestCase;
 use Wszetko\Sitemap\Drivers\DataCollectors\Memory;
-use Wszetko\Sitemap\Drivers\XML\XMLWriter;
+use Wszetko\Sitemap\Drivers\Output\OutputXMLWriter;
 use Wszetko\Sitemap\Items\Url;
 use Wszetko\Sitemap\Sitemap;
 
@@ -51,7 +51,7 @@ class SitemapTest extends TestCase
     public function testDataCollector()
     {
         $sitemap = new Sitemap('https://example.com');
-        $sitemap->setDataCollector('Memory');
+        $sitemap->setDataCollector(Memory::class);
         $this->assertInstanceOf(Memory::class, $sitemap->getDataCollector());
     }
 
@@ -87,15 +87,15 @@ class SitemapTest extends TestCase
     public function testXMLCase1()
     {
         $sitemap = new Sitemap('https://example.com');
-        $sitemap->setXml(XMLWriter::class, ['domain' => $sitemap->getDomain()]);
-        $this->assertInstanceOf(XMLWriter::class, $sitemap->getXml());
+        $sitemap->setXml(OutputXMLWriter::class, ['domain' => $sitemap->getDomain()]);
+        $this->assertInstanceOf(OutputXMLWriter::class, $sitemap->getXml());
     }
 
     public function testXMLCase2()
     {
         $sitemap = new Sitemap('https://example.com');
-        $sitemap->setXml(XMLWriter::class, []);
-        $this->assertInstanceOf(XMLWriter::class, $sitemap->getXml());
+        $sitemap->setXml(OutputXMLWriter::class, []);
+        $this->assertInstanceOf(OutputXMLWriter::class, $sitemap->getXml());
     }
 
     public function testTempDirectoryCase1()
@@ -108,28 +108,33 @@ class SitemapTest extends TestCase
     {
         $sitemap = new Sitemap('https://example.com');
         $sitemap->setSitepamsDirectory('sitemaps');
-        $this->assertStringContainsString($sitemap->getTempDirectory() . DIRECTORY_SEPARATOR, $sitemap->getSitepamsTempDirectory());
+        $this->assertStringContainsString(
+            $sitemap->getTempDirectory() . DIRECTORY_SEPARATOR, $sitemap->getSitepamsTempDirectory()
+        );
     }
 
     /**
      * @dataProvider addItemProvider
      *
-     * @param $items
-     * @param $expected
+     * @param mixed $items
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */
     public function testAddItem($items, $expected)
     {
         $sitemap = new Sitemap('https://example.com');
-        $sitemap->setDataCollector('Memory');
+        $sitemap->setDataCollector(Memory::class);
 
         foreach ($items as $item) {
             $url = new Url($item);
             $sitemap->addItem($url);
         }
 
-        $this->assertEquals($expected, $sitemap->getDataCollector()->fetchAll($sitemap->getDefaultFilename()));
+        if ($sitemap->getDataCollector() !== null) {
+            $result = $sitemap->getDataCollector()->fetchAll($sitemap->getDefaultFilename());
+            $this->assertEquals($expected, $result);
+        }
     }
 
     /**
@@ -139,7 +144,10 @@ class SitemapTest extends TestCase
     {
         return [
             [['/'], [['url' => ['loc' => 'https://example.com/']]]],
-            [['/', '/test'], [['url' => ['loc' => 'https://example.com/']], ['url' => ['loc' => 'https://example.com/test']]]],
+            [
+                ['/', '/test'],
+                [['url' => ['loc' => 'https://example.com/']], ['url' => ['loc' => 'https://example.com/test']]]
+            ],
         ];
     }
 
@@ -149,10 +157,17 @@ class SitemapTest extends TestCase
     public function testAddItems()
     {
         $sitemap = new Sitemap('https://example.com');
-        $sitemap->setDataCollector('Memory');
+        $sitemap->setDataCollector(Memory::class);
         $items = [new Url('/'), new Url('/test')];
         $sitemap->addItems($items);
-        $this->assertEquals([['url' => ['loc' => 'https://example.com/']], ['url' => ['loc' => 'https://example.com/test']]], $sitemap->getDataCollector()->fetchAll($sitemap->getDefaultFilename()));
+
+        if ($sitemap->getDataCollector() !== null) {
+            $result = $sitemap->getDataCollector()->fetchAll($sitemap->getDefaultFilename());
+            $this->assertEquals([
+                ['url' => ['loc' => 'https://example.com/']],
+                ['url' => ['loc' => 'https://example.com/test']]
+            ], $result);
+        }
     }
 
     /**

@@ -29,11 +29,15 @@ class DateTimeType extends AbstractDataType
      * @param mixed $value
      * @param array $parameters
      *
-     * @return \Wszetko\Sitemap\Interfaces\DataType
+     * @return static
+     *
+     * @throws \InvalidArgumentException
      */
     public function setValue($value, $parameters = []): DataType
     {
-        if ($value = $this->processDateTime($value, $this->isRequired())) {
+        $value = $this->processDateTime($value, $this->isRequired());
+
+        if (is_string($value)) {
             $this->value = $value;
         }
 

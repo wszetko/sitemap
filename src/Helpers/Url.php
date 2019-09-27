@@ -79,7 +79,7 @@ class Url
             $url['path'] = implode('/', $parts);
         }
 
-        if (!empty($url['query'])) {
+        if (isset($url['query']) && is_string($url['query']) && '' !== $url['query']) {
             parse_str($url['query'], $query);
             array_walk($query, function (&$val, &$var) {
                 $var = rawurlencode($var);
@@ -88,14 +88,26 @@ class Url
             $url['query'] = http_build_query($query);
         }
 
+        $user = '';
+
+        if (isset($url['user']) && is_string($url['user']) && '' !== $url['user']) {
+            $user = $url['user'];
+
+            if (isset($url['pass']) && is_string($url['pass']) && '' !== $url['pass']) {
+                $user .= ':' . $url['pass'];
+            }
+
+            $user .= '@';
+        }
+
         return
             $url['scheme'] . '://'
-            . (isset($url['user']) ? $url['user'] . ((isset($url['pass'])) ? ':' . $url['pass'] : '') . '@' : '')
+            . $user
             . mb_strtolower($url['host'])
-            . ((isset($url['port'])) ? ':' . $url['port'] : '')
+            . ((isset($url['port']) && is_string($url['port']) && '' !== $url['port']) ? ':' . $url['port'] : '')
             . ((isset($url['path'])) ? $url['path'] : '')
-            . ((isset($url['query'])) ? '?' . $url['query'] : '')
-            . ((isset($url['fragment'])) ? '#' . $url['fragment'] : '');
+            . (isset($url['query']) && (is_string($url['query']) && '' !== $url['query']) ? '?' . $url['query'] : '')
+            . (isset($url['fragment']) && (is_string($url['fragment']) && '' !== $url['fragment']) ? '#' . $url['fragment'] : '');
     }
 
     /**

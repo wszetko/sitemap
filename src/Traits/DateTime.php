@@ -28,6 +28,8 @@ trait DateTime
      * @param bool                     $required
      *
      * @return null|string
+     *
+     * @throws \InvalidArgumentException
      */
     private function processDateTime($dateTime, $required = false): ?string
     {
@@ -35,21 +37,30 @@ trait DateTime
             $dateTime = date_create($dateTime);
         }
 
-        if (($dateTime instanceof DateTimeInterface && (int) $dateTime->format('Y') <= 0) ||
-            false === $dateTime) {
+        if (
+            ($dateTime instanceof DateTimeInterface
+            && (int) $dateTime->format('Y') <= 0)
+            || false === $dateTime
+        ) {
             $dateTime = null;
         }
 
         if ($dateTime instanceof DateTimeInterface) {
-            if (0 == $dateTime->format('H') &&
+            if (
+                0 == $dateTime->format('H') &&
                 0 == $dateTime->format('i') &&
-                0 == $dateTime->format('s')) {
+                0 == $dateTime->format('s')
+            ) {
                 $dateTime = $dateTime->format('Y-m-d');
             } else {
                 $dateTime = $dateTime->format(DateTimeInterface::W3C);
             }
         } elseif ($required) {
             throw new InvalidArgumentException('Invalid date parameter.');
+        }
+
+        if (!is_string($dateTime)) {
+            $dateTime = null;
         }
 
         return $dateTime;

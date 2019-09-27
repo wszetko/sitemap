@@ -30,10 +30,10 @@ class NewsTest extends TestCase
     /**
      * @dataProvider constructorProvider
      *
-     * @param $name
-     * @param $lang
-     * @param $date
-     * @param $title
+     * @param mixed $name
+     * @param mixed $lang
+     * @param mixed $date
+     * @param mixed $title
      *
      * @throws \ReflectionException
      */
@@ -121,8 +121,8 @@ class NewsTest extends TestCase
     /**
      * @dataProvider getPublicationLanguageProvider
      *
-     * @param $lang
-     * @param $expected
+     * @param mixed $lang
+     * @param mixed $expected
      *
      * @throws \ReflectionException
      */
@@ -143,7 +143,7 @@ class NewsTest extends TestCase
     /**
      * @dataProvider getPublicationDateProvider
      *
-     * @param        $date
+     * @param mixed  $date
      * @param string $expected
      *
      * @throws \ReflectionException
@@ -335,7 +335,10 @@ class NewsTest extends TestCase
         $this->assertEquals(['NASDAQ:AMAT', 'BOM:500325'], $news->getStockTickers());
 
         $news->addStockTickers(['NASDAQ:AMD', 'NASDAQ:GOOG', 'NASDAQ:MSFT', 'NASDAQ:AITX']);
-        $this->assertEquals(['NASDAQ:AMAT', 'BOM:500325', 'NASDAQ:AMD', 'NASDAQ:GOOG', 'NASDAQ:MSFT'], $news->getStockTickers());
+        $this->assertEquals(
+            ['NASDAQ:AMAT', 'BOM:500325', 'NASDAQ:AMD', 'NASDAQ:GOOG', 'NASDAQ:MSFT'],
+            $news->getStockTickers()
+        );
     }
 
     /**

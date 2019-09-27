@@ -42,6 +42,8 @@ trait Domain
      * @param null|string $domain
      *
      * @return static
+     *
+     * @throws \InvalidArgumentException
      */
     public function setDomain(?string $domain): self
     {

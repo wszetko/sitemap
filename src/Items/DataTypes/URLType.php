@@ -31,14 +31,14 @@ class URLType extends StringType
 
     /**
      * @return null|array|string
+     *
+     * @throws \InvalidArgumentException
      */
     public function getValue()
     {
         if (null === $this->value || !is_string($this->value)) {
             return null;
         }
-
-        $value = null;
 
         if ($this->isExternal() && false !== Url::normalizeUrl($this->value)) {
             $value = $this->value;

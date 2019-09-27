@@ -271,6 +271,8 @@ class Video extends Extension
 
     /**
      * @return array
+     *
+     * @throws \InvalidArgumentException
      */
     public function toArray(): array
     {
@@ -312,40 +314,66 @@ class Video extends Extension
             ->setConversion('upper')
             ->setValueRegex("/^(?'countries'[A-Z]{2}( +[A-Z]{2})*)?$/", 'countries')
         ;
-        $this->restriction
-            ->getAttribute('relationship')
-            ->setConversion('lower')
-            ->setAllowedValues('allow, deny')
-        ;
+        /** @var \Wszetko\Sitemap\Items\DataTypes\StringType $restrictionRelationship */
+        $restrictionRelationship = $this->restriction
+            ->getAttribute('relationship');
+
+        if (null !== $restrictionRelationship) {
+            $restrictionRelationship
+                ->setConversion('lower')
+                ->setAllowedValues('allow, deny');
+        }
+
         $this->platform
             ->setConversion('lower')
             ->setValueRegex("/^(?'platform'(web|mobile|tv)( (web|mobile|tv))*)?/", 'platform')
         ;
-        $this->platform
-            ->getAttribute('relationship')
-            ->setConversion('lower')
-            ->setAllowedValues('allow, deny')
-        ;
+        /** @var \Wszetko\Sitemap\Items\DataTypes\StringType $platformRelationship */
+        $platformRelationship = $this->platform
+            ->getAttribute('relationship');
+
+        if (null !== $platformRelationship) {
+            $platformRelationship
+                ->setConversion('lower')
+                ->setAllowedValues('allow, deny')
+            ;
+        }
+
         $this->price
             ->setMinValue(0)
             ->setPrecision(2)
         ;
-        $this->price
-            ->getAttribute('currency')
-            ->setConversion('upper')
-            ->setRequired(true)
-            ->setValueRegex("/^(?'currency'[A-Z]{3})$/", 'currency')
-        ;
-        $this->price
-            ->getAttribute('type')
-            ->setConversion('lower')
-            ->setAllowedValues('rent, purchase')
-        ;
-        $this->price
-            ->getAttribute('resolution')
-            ->setConversion('upper')
-            ->setAllowedValues('SD, HD')
-        ;
+        /** @var \Wszetko\Sitemap\Items\DataTypes\StringType $priceCurrency */
+        $priceCurrency = $this->price
+            ->getAttribute('currency');
+
+        if (null !== $priceCurrency) {
+            $priceCurrency
+                ->setConversion('upper')
+                ->setRequired(true)
+                ->setValueRegex("/^(?'currency'[A-Z]{3})$/", 'currency');
+        }
+
+        /** @var \Wszetko\Sitemap\Items\DataTypes\StringType $priceType */
+        $priceType = $this->price
+            ->getAttribute('type');
+
+        if (null !== $priceType) {
+            $priceType
+                ->setConversion('lower')
+                ->setAllowedValues('rent, purchase');
+        }
+
+        /** @var \Wszetko\Sitemap\Items\DataTypes\StringType $priceResolution */
+        $priceResolution = $this->price
+            ->getAttribute('resolution');
+
+        if (null !== $priceResolution) {
+            $priceResolution
+                ->setConversion('upper')
+                ->setAllowedValues('SD, HD');
+        }
+
         $this->tag
             ->setMaxElements(32)
         ;

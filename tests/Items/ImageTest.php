@@ -62,7 +62,7 @@ class ImageTest extends TestCase
     /**
      * @dataProvider captionProvider
      *
-     * @param        $caption
+     * @param mixed  $caption
      * @param string $expected
      *
      * @throws \ReflectionException
@@ -121,7 +121,8 @@ class ImageTest extends TestCase
     public function testTitleInvalid()
     {
         $image = new Items\Image('image.png');
-        $image->addTitle('Title example');
+        $wrong = 'addTitle';
+        $image->$wrong('Title example');
         $this->assertNull($image->getTitle());
     }
 

@@ -11,7 +11,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Wszetko\Sitemap\Drivers\XML;
+namespace Wszetko\Sitemap\Drivers\Output;
 
 use Wszetko\Sitemap\Interfaces\XML;
 use Wszetko\Sitemap\Traits\Domain;
@@ -22,7 +22,7 @@ use Wszetko\Sitemap\Traits\IsAssoc;
  *
  * @package Wszetko\Sitemap\Drivers\XML
  */
-abstract class AbstractXML implements XML
+abstract class AbstractOutput implements XML
 {
     use IsAssoc;
     use Domain;
@@ -87,6 +87,6 @@ abstract class AbstractXML implements XML
      */
     protected function getSitemapFileFullPath(): string
     {
-        return $this->getWorkDir() . DIRECTORY_SEPARATOR . $this->currentSitemap;
+        return ((string) $this->getWorkDir()) . DIRECTORY_SEPARATOR . $this->currentSitemap;
     }
 }

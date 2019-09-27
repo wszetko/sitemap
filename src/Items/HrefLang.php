@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Wszetko\Sitemap\Items;
 
+use InvalidArgumentException;
 use Wszetko\Sitemap\Items\DataTypes\StringType;
 
 /**
@@ -55,25 +56,30 @@ class HrefLang extends Extension
      * @param string $href
      *
      * @throws \ReflectionException
+     * @throws \InvalidArgumentException
      */
     public function __construct(string $hrefLang, string $href)
     {
         parent::__construct();
 
-        if ($this->hrefLang->getBaseDataType() instanceof StringType) {
-            $this->hrefLang
-                ->getBaseDataType()
+        $baseType = $this->hrefLang->getBaseDataType();
+
+        if ($baseType instanceof StringType) {
+            $baseType
                 ->setValueRegex(
                     "/^(?'hreflang'([a-z]{2}|(x))((-)([A-Za-z]{2}|[A-Z]([a-z]|[a-z]{3})|(default)))?)$/",
                     'hreflang'
                 )
                 ->setRequired(true)
-                ->getAttribute('href')
-                ->setRequired(true)
             ;
+            $hrefAttribute =  $baseType->getAttribute('href');
+
+            if (null !== $hrefAttribute) {
+                $hrefAttribute->setRequired(true);
+            }
         } else {
             // @codeCoverageIgnoreStart
-            throw new \InvalidArgumentException('Class is missconfigured.');
+            throw new InvalidArgumentException('Class is missconfigured.');
             // @codeCoverageIgnoreEnd
         }
 

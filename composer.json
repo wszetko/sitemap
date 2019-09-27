@@ -29,7 +29,20 @@
     "require-dev": {
         "phpunit/phpunit": "^8.3",
         "friendsofphp/php-cs-fixer": "^2.15",
-        "phpstan/phpstan": "^0.11.16"
+        "phpstan/phpstan": "^0.11.16",
+        "squizlabs/php_codesniffer": "^3.5",
+        "phpstan/phpstan-phpunit": "^0.11.2",
+        "phpstan/phpstan-strict-rules": "^0.11.1",
+        "vimeo/psalm": "dev-master",
+        "jakub-onderka/php-parallel-lint": "^1.0",
+        "sensiolabs/security-checker": "^6.0",
+        "sebastian/phpcpd": "^4.1",
+        "phpmd/phpmd": "^2.7",
+        "phpmetrics/phpmetrics": "^2.4",
+        "jakub-onderka/php-console-highlighter": "^0.4.0",
+        "povils/phpmnd": "^2.1",
+        "wapmorgan/php-code-analyzer": "^1.0",
+        "phploc/phploc": "^5.0"
     },
     "autoload": {
         "psr-4": {
@@ -45,14 +58,63 @@
         }
     },
     "scripts": {
-        "phpcs": "php-cs-fixer fix -v --diff --dry-run",
+        "phpcs": "phpcs -p -s --colors --version --standard=PSR12 src",
+        "phpcsf": "php-cs-fixer fix -v --diff --dry-run --version --ansi",
         "phpunit": "phpunit --coverage-text",
-        "phpstan": "phpstan analyse -l max src",
+        "phpstan-src": "phpstan analyse --ansi -c phpstan.src.neon",
+        "phpstan-tests": "phpstan analyse --ansi -c phpstan.tests.neon",
+        "phpstan": [
+            "@phpstan-src",
+            "@phpstan-tests"
+        ],
+        "composer-check": "@composer validate --strict --ansi",
+        "phpcpd": "phpcpd --progress --fuzzy --no-interaction --ansi src tests",
+        "phpmd": "phpmd src text phpmd.xml --strict --ignore-violations-on-exit",
+        "phpmetrics": "phpmetrics --report-html=build/phpmetrics src",
+        "parallel-lint": "parallel-lint --colors src",
+        "psalm": "psalm --config=psalm.xml --show-info=ture",
+        "phpmnd": "phpmnd --progress --hint --ansi src tests",
+        "phpca": "phpca --since-version=7.0 src",
+        "phploc": "phploc src",
+        "security-checker": "security-checker --ansi security:check",
         "test": [
             "@phpcs",
+            "@phpcsf",
             "@phpstan",
+            "@phpcpd",
+            "@psalm",
+            "@phpmd",
+            "@phpmetrics",
+            "@parallel-lint",
+            "@phpmnd",
+            "@phpca",
+            "@security-checker",
+            "@composer-check",
+            "@phploc",
             "@phpunit"
+        ],
+        "phpcsfix": "phpcbf -p -s --colors --version --standard=PSR12 src",
+        "phpcsffix": "php-cs-fixer fix -v --diff --version --ansi",
+        "fixcode": [
+            "@phpcsfix",
+            "@phpcsffix"
         ]
+    },
+    "scripts-descriptions": {
+        "phpcs": "Runs coding style test suite by PHP_CodeSniffer",
+        "phpcsf": "Runs coding style test suite by PHP-CS-Fixer",
+        "phpunit": "Runs unit and functional testing",
+        "phpstan": "Runs complete codebase static analysis",
+        "phpstan-src": "Runs source code static analysis",
+        "phpstan-tests": "Runs test suite static analysis",
+        "phpcpd": "Runs phpcpd analysis",
+        "phpmd": "Runs PHP Mess Detector analysis",
+        "phploc": "Measuring the size and analyzing the structure of a PHP project",
+        "composer-check": "Validates a composer.json and composer.lock",
+        "test": "Runs full test suite",
+        "phpcsfix": "Runs automatic code fixing by PHP_CodeSniffer",
+        "phpcsffix": "Runs automatic code fixing by PHP-CS-Fixer",
+        "fixcode": "Runs automatic code fixing by PHP-CS-Fixer and PHP_CodeSniffer"
     },
     "minimum-stability": "dev",
     "prefer-stable": true

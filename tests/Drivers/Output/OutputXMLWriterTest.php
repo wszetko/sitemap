@@ -11,10 +11,11 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Wszetko\Sitemap\Tests\Drivers\XML;
+namespace Wszetko\Sitemap\Tests\Drivers\Output;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Wszetko\Sitemap\Drivers\XML\XMLWriter;
+use Wszetko\Sitemap\Drivers\Output\OutputXMLWriter;
 use Wszetko\Sitemap\Items\Mobile;
 
 /**
@@ -24,44 +25,44 @@ use Wszetko\Sitemap\Items\Mobile;
  *
  * @internal
  */
-class XMLWriterTest extends TestCase
+class OutputXMLWriterTest extends TestCase
 {
     public function testConstructor()
     {
-        $driver = new XMLWriter(['domain' => 'https://example.com']);
-        $this->assertInstanceOf(XMLWriter::class, $driver);
+        $driver = new OutputXMLWriter(['domain' => 'https://example.com']);
+        $this->assertInstanceOf(OutputXMLWriter::class, $driver);
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Domain is not set.');
-        new XMLWriter([]);
+        new OutputXMLWriter([]);
     }
 
     public function testDomain()
     {
-        $driver = new XMLWriter(['domain' => 'https://example.com']);
+        $driver = new OutputXMLWriter(['domain' => 'https://example.com']);
         $this->assertEquals('https://example.com', $driver->getDomain());
 
-        $driver = new XMLWriter(['domain' => 'https://example.com/']);
+        $driver = new OutputXMLWriter(['domain' => 'https://example.com/']);
         $this->assertEquals('https://example.com', $driver->getDomain());
     }
 
     public function testWorkDir()
     {
-        $driver = new XMLWriter(['domain' => 'https://example.com']);
+        $driver = new OutputXMLWriter(['domain' => 'https://example.com']);
         $driver->setWorkDir(__DIR__);
         $this->assertEquals(__DIR__, $driver->getWorkDir());
     }
 
     public function testCurrentSitemap()
     {
-        $driver = new XMLWriter(['domain' => 'https://example.com']);
+        $driver = new OutputXMLWriter(['domain' => 'https://example.com']);
         $driver->setCurrentSitemap('test.xml');
         $this->assertEquals('test.xml', $driver->getCurrentSitemap());
     }
 
     public function testSitemapIndex()
     {
-        $driver = new XMLWriter(['domain' => 'https://example.com']);
+        $driver = new OutputXMLWriter(['domain' => 'https://example.com']);
         $dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemapTest' . date('Y-m-d_H_i_s');
         mkdir($dir);
         $driver->setWorkDir($dir);
@@ -76,7 +77,7 @@ class XMLWriterTest extends TestCase
 </sitemapindex>', file_get_contents($dir . DIRECTORY_SEPARATOR . 'test.xml'));
         unlink($dir . DIRECTORY_SEPARATOR . 'test.xml');
 
-        $driver = new XMLWriter(['domain' => 'https://example.com']);
+        $driver = new OutputXMLWriter(['domain' => 'https://example.com']);
         $driver->setWorkDir($dir);
         $driver->openSitemapIndex('test.xml');
         $driver->addSitemap('sitemap.xml', '2019-02-20');
@@ -94,32 +95,38 @@ class XMLWriterTest extends TestCase
 
     public function testSitemap()
     {
-        $driver = new XMLWriter(['domain' => 'https://example.com']);
+        $driver = new OutputXMLWriter(['domain' => 'https://example.com']);
         $dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemapTest' . date('Y-m-d_H_i_s');
         mkdir($dir);
         $driver->setWorkDir($dir);
         $driver->openSitemap('sitemap.xml');
         $driver->closeSitemap();
-        $this->assertEquals('<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>', file_get_contents($dir . DIRECTORY_SEPARATOR . 'sitemap.xml'));
+        $this->assertEquals(
+            '<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>',
+            file_get_contents($dir . DIRECTORY_SEPARATOR . 'sitemap.xml')
+        );
         unlink($dir . DIRECTORY_SEPARATOR . 'sitemap.xml');
 
-        $driver = new XMLWriter(['domain' => 'https://example.com']);
+        $driver = new OutputXMLWriter(['domain' => 'https://example.com']);
         $dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemapTest' . date('Y-m-d_H_i_s');
         $driver->setWorkDir($dir);
         $extensions = ['mobile' => Mobile::NAMESPACE_URL];
         $driver->openSitemap('sitemap.xml', $extensions);
         $driver->closeSitemap();
 
-        $this->assertEquals('<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:mobile="' . Mobile::NAMESPACE_URL . '"/>', file_get_contents($dir . DIRECTORY_SEPARATOR . 'sitemap.xml'));
+        $this->assertEquals(
+            '<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:mobile="' . Mobile::NAMESPACE_URL . '"/>',
+            file_get_contents($dir . DIRECTORY_SEPARATOR . 'sitemap.xml')
+        );
         unlink($dir . DIRECTORY_SEPARATOR . 'sitemap.xml');
         rmdir($dir);
     }
 
     public function testUrl()
     {
-        $driver = new XMLWriter(['domain' => 'https://example.com']);
+        $driver = new OutputXMLWriter(['domain' => 'https://example.com']);
         $dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemapTest' . date('Y-m-d_H_i_s');
         mkdir($dir);
         $driver->setWorkDir($dir);

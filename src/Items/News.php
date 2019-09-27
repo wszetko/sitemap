@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Wszetko\Sitemap\Items;
 
 use DateTimeInterface;
+use InvalidArgumentException;
 use Wszetko\Sitemap\Items\DataTypes\StringType;
 
 /**
@@ -129,6 +130,7 @@ class News extends Extension
      * @param string                   $title
      *
      * @throws \ReflectionException
+     * @throws \InvalidArgumentException
      */
     public function __construct(
         string $publicationName,
@@ -161,13 +163,13 @@ class News extends Extension
         ;
 
         if ($generesValue instanceof StringType) {
-            /* @var $generesValue \Wszetko\Sitemap\Items\DataTypes\StringType */
+            /** @var $generesValue \Wszetko\Sitemap\Items\DataTypes\StringType */
             $generesValue
                 ->setAllowedValues('PressRelease, Satire, Blog, OpEd, Opinion, UserGenerated')
             ;
         } else {
             // @codeCoverageIgnoreStart
-            throw new \InvalidArgumentException('Class is missconfigured.');
+            throw new InvalidArgumentException('Class is missconfigured.');
             // @codeCoverageIgnoreEnd
         }
 
@@ -177,13 +179,13 @@ class News extends Extension
         ;
 
         if ($stickTickersValue instanceof StringType) {
-            /* @var $stickTickersValue \Wszetko\Sitemap\Items\DataTypes\StringType */
+            /** @var $stickTickersValue \Wszetko\Sitemap\Items\DataTypes\StringType */
             $stickTickersValue
                 ->setValueRegex("/^(?'stockTickers'\\w+:\\w+)?$/", 'stockTickers')
             ;
         } else {
             // @codeCoverageIgnoreStart
-            throw new \InvalidArgumentException('Class is missconfigured.');
+            throw new InvalidArgumentException('Class is missconfigured.');
             // @codeCoverageIgnoreEnd
         }
     }
