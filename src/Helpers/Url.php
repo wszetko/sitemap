@@ -46,18 +46,23 @@ class Url
 
         $url = parse_url($encodedUrl);
 
-        if (empty($url) || !isset($url['host'])) {
+        if (false === $url || false === isset($url['host'])) {
             return false;
         }
 
         $url = array_map('urldecode', $url);
         $url['host'] = idn_to_ascii($url['host'], IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46);
 
-        if (empty($url['scheme']) || !is_string($url['host']) || !self::checkDomain($url['host'])) {
+        if (
+            !isset($url['scheme']) ||
+            '' === $url['scheme'] ||
+            false === is_string($url['host']) ||
+            false === self::checkDomain($url['host'])
+        ) {
             return false;
         }
 
-        if (!empty($url['path'])) {
+        if (true === isset($url['path']) && '' !== $url['path']) {
             $url['path'] = explode('/', $url['path']);
             $parts = [];
 
@@ -79,7 +84,7 @@ class Url
             $url['path'] = implode('/', $parts);
         }
 
-        if (isset($url['query']) && is_string($url['query']) && '' !== $url['query']) {
+        if (true === isset($url['query']) && true === is_string($url['query']) && '' !== $url['query']) {
             parse_str($url['query'], $query);
             array_walk($query, function (&$val, &$var) {
                 $var = rawurlencode($var);
@@ -90,10 +95,10 @@ class Url
 
         $user = '';
 
-        if (isset($url['user']) && is_string($url['user']) && '' !== $url['user']) {
+        if (true === isset($url['user']) && true === is_string($url['user']) && '' !== $url['user']) {
             $user = $url['user'];
 
-            if (isset($url['pass']) && is_string($url['pass']) && '' !== $url['pass']) {
+            if (true === isset($url['pass']) && true === is_string($url['pass']) && '' !== $url['pass']) {
                 $user .= ':' . $url['pass'];
             }
 
@@ -104,10 +109,14 @@ class Url
             $url['scheme'] . '://'
             . $user
             . mb_strtolower($url['host'])
-            . ((isset($url['port']) && is_string($url['port']) && '' !== $url['port']) ? ':' . $url['port'] : '')
-            . ((isset($url['path'])) ? $url['path'] : '')
-            . (isset($url['query']) && (is_string($url['query']) && '' !== $url['query']) ? '?' . $url['query'] : '')
-            . (isset($url['fragment']) && (is_string($url['fragment']) && '' !== $url['fragment']) ? '#' . $url['fragment'] : '');
+            . (
+                (true === isset($url['port']) && true === is_string($url['port']) && '' !== $url['port']) ?
+                    ':' . $url['port'] : '')
+            . ((true === isset($url['path'])) ? $url['path'] : '')
+            . (true === isset($url['query']) && (true === is_string($url['query']) && '' !== $url['query']) ?
+                '?' . $url['query'] : '')
+            . (true === isset($url['fragment']) && (true === is_string($url['fragment']) && '' !== $url['fragment']) ?
+                '#' . $url['fragment'] : '');
     }
 
     /**
@@ -117,7 +126,7 @@ class Url
      */
     public static function checkDomain(string $domain): bool
     {
-        if ('.' == mb_substr($domain, -1) || '.' == mb_substr($domain, 0, 1)) {
+        if ('.' === mb_substr($domain, -1) || '.' === mb_substr($domain, 0, 1)) {
             return false;
         }
 

@@ -46,14 +46,14 @@ class URLType extends StringType
             $domain = $this->getDomain() ?? '';
             $value = str_replace($domain, '', $this->value);
 
-            if (!empty($value)) {
+            if ('' !== $value) {
                 $value = $domain . '/' . ltrim($value, '/');
             }
         }
 
         $attributes = $this->getAttributes();
 
-        if (!empty($value) && !empty($attributes)) {
+        if ('' !== $value && [] !== $attributes) {
             return [$value => $attributes];
         }
 

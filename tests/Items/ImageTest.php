@@ -120,10 +120,11 @@ class ImageTest extends TestCase
      */
     public function testTitleInvalid()
     {
+        $this->expectException(\Error::class);
+        $this->expectExceptionMessage('Call to undefined method Wszetko\Sitemap\Items\AbstractItem::addTitle()');
         $image = new Items\Image('image.png');
         $wrong = 'addTitle';
         $image->$wrong('Title example');
-        $this->assertNull($image->getTitle());
     }
 
     /**

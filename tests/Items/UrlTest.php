@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Wszetko\Sitemap\Tests\Items;
 
 use DateTime;
+use Error;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Wszetko\Sitemap\Items;
@@ -42,9 +43,11 @@ class UrlTest extends TestCase
      */
     public function testPropertyNotExists()
     {
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Call to undefined method Wszetko\Sitemap\Items\AbstractItem::setNotExists()');
         $url = new Items\Url('test');
         $wrong = 'setNotExists';
-        $this->assertNull($url->$wrong('test'));
+        $url->$wrong('test');
     }
 
     /**

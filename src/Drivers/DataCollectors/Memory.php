@@ -103,7 +103,7 @@ class Memory extends AbstractDataCollector
      */
     public function fetchAll(?string $group = null): ?array
     {
-        if ($group) {
+        if (is_string($group) && $group !== '') {
             if (isset($this->items[$group])) {
                 return $this->items[$group];
             }
@@ -121,7 +121,7 @@ class Memory extends AbstractDataCollector
      */
     public function isLast(string $group): bool
     {
-        return (bool) !isset($this->items[$group][(int) $this->getGroupElement($group) + 1]);
+        return !isset($this->items[$group][(int) $this->getGroupElement($group) + 1]);
     }
 
     /**

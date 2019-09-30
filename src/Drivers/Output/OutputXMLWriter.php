@@ -193,7 +193,7 @@ class OutputXMLWriter extends AbstractOutput
         if (!is_array($value)) {
             /** @var \XMLWriter $xmlWriter */
             $xmlWriter = $this->getXMLWriter();
-            $xmlWriter->writeElement(($namespace ? $namespace . ':' : '') . $element, (string) $value);
+            $xmlWriter->writeElement(($namespace !== null ? $namespace . ':' : '') . $element, (string) $value);
 
             return;
         }
@@ -207,29 +207,34 @@ class OutputXMLWriter extends AbstractOutput
 
     /**
      * @param string      $element
-     * @param mixed       $value
+     * @param array       $value
      * @param null|string $namespace
      */
-    private function addElementArray(string $element, $value, ?string $namespace = null): void
+    private function addElementArray(string $element, array $value, ?string $namespace = null): void
     {
         if (!$this->isAssoc($value)) {
-            if (!empty($value)) {
+            if ($value !== []) {
                 $this->addElementArrayNonAssoc($element, $value, $namespace);
             } else {
                 /** @var \XMLWriter $xmlWriter */
                 $xmlWriter = $this->getXMLWriter();
-                $xmlWriter->writeElement(($namespace ? $namespace . ':' : '') . $element);
+                $xmlWriter->writeElement(($namespace !== null ? $namespace . ':' : '') . $element);
             }
         } else {
             $this->addElementArrayAssoc($element, $value, $namespace);
         }
     }
 
+    /**
+     * @param string      $element
+     * @param mixed       $value
+     * @param string|null $namespace
+     */
     private function addElementArrayAssoc(string $element, $value, ?string $namespace = null): void
     {
         /** @var \XMLWriter $xmlWriter */
         $xmlWriter = $this->getXMLWriter();
-        $xmlWriter->startElement(($namespace ? $namespace . ':' : '') . $element);
+        $xmlWriter->startElement(($namespace !== null ? $namespace . ':' : '') . $element);
 
         if (isset($value['_attributes'])) {
             foreach ($value['_attributes'] as $attribute => $val) {
@@ -250,7 +255,7 @@ class OutputXMLWriter extends AbstractOutput
                 if (is_array($val)) {
                     $this->addElement($el, $val, $namespace);
                 } else {
-                    $xmlWriter->writeElement(($namespace ? $namespace . ':' : '') . $el, (string) $val);
+                    $xmlWriter->writeElement(($namespace !== null ? $namespace . ':' : '') . $el, (string) $val);
                 }
             }
         }

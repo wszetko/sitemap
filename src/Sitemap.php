@@ -188,7 +188,7 @@ class Sitemap
             $group = preg_replace('/\W+/', '', $group);
         }
 
-        if (empty($group)) {
+        if ('' === $group || null === $group) {
             $group = $this->getDefaultFilename();
         }
 
@@ -322,7 +322,9 @@ class Sitemap
      */
     public function setPublicDirectory(string $publicDirectory): self
     {
-        if (!($publicDirectory = realpath($publicDirectory))) {
+        $publicDirectory = realpath($publicDirectory);
+
+        if (false === $publicDirectory) {
             throw new Exception('Sitemap directory does not exists.');
         }
 
@@ -375,14 +377,16 @@ class Sitemap
      */
     public function getTempDirectory(): string
     {
-        if (empty($this->sitemapTempDirectory)) {
+        if (null === $this->sitemapTempDirectory || '' == $this->sitemapTempDirectory) {
             $hash = md5(microtime());
 
             if (!is_dir(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemap' . $hash)) {
                 mkdir(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemap' . $hash);
             }
 
-            if ($tempDir = realpath(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemap' . $hash)) {
+            $tempDir = realpath(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemap' . $hash);
+
+            if (false !== $tempDir) {
                 $this->sitemapTempDirectory = $tempDir;
             } else {
                 throw new Exception('Can\'t get temporary directory.');
@@ -399,7 +403,9 @@ class Sitemap
      */
     public function getSitepamsTempDirectory(): string
     {
-        if (!($directory = realpath($this->getTempDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory))) {
+        $directory = realpath($this->getTempDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory);
+
+        if (false === $directory) {
             mkdir(
                 $this->getTempDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory,
                 0777,
@@ -408,7 +414,7 @@ class Sitemap
             $directory = realpath($this->getTempDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory);
         }
 
-        if (!$directory) {
+        if (false === $directory) {
             throw new Exception('Can\'t get temporary directory.');
         }
 
@@ -482,7 +488,7 @@ class Sitemap
             }
         }
 
-        if ($this->isUseCompression() && !empty($files)) {
+        if ($this->isUseCompression() && [] !== $files) {
             $this->compressFiles($this->getSitepamsTempDirectory(), $files);
         }
 
@@ -577,7 +583,7 @@ class Sitemap
 
         $this->getXml()->closeSitemapIndex();
 
-        if ($this->isUseCompression() && !empty($files)) {
+        if ($this->isUseCompression() && [] !== $files) {
             $this->compressFiles($this->getTempDirectory(), $files);
         }
 
@@ -615,12 +621,14 @@ class Sitemap
      */
     public function getSitepamsDirectory(): string
     {
-        if (!($directory = realpath($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory))) {
+        $directory = realpath($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory);
+
+        if (false === $directory) {
             mkdir($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory, 0777, true);
             $directory = realpath($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory);
         }
 
-        if (!$directory) {
+        if (false === $directory) {
             throw new Exception('Can\'t get sitemap directory.');
         }
 
@@ -646,7 +654,13 @@ class Sitemap
      */
     private function removeDir($dir): void
     {
-        if (is_dir($dir) && $objects = scandir($dir)) {
+        if (is_dir($dir)) {
+            return;
+        }
+
+        $objects = scandir($dir);
+
+        if (false !== $objects) {
             foreach ($objects as $object) {
                 if ('.' != $object && '..' != $object) {
                     if ('dir' == filetype($dir . '/' . $object)) {
@@ -684,16 +698,18 @@ class Sitemap
             $out = gzopen($output, 'wb9');
             $in = fopen($source, 'rb');
 
-            if (!$out) {
+            if (false === $out) {
                 throw new Exception('Can\'t create GZip archive.');
             }
 
-            if (!$in) {
+            if (false === $in) {
                 throw new Exception('Can\'t open xml file.');
             }
 
             while (!feof($in)) {
-                if ($content = fread($in, 524288)) {
+                $content = fread($in, 524288);
+
+                if (false !== $content) {
                     gzwrite($out, $content);
                 }
             }
@@ -716,11 +732,12 @@ class Sitemap
     {
         // Clear previous sitemaps
         $this->removeDir($this->getSitepamsDirectory());
+        $publicDir = scandir($this->getPublicDirectory());
 
-        if ($publicDir = scandir($this->getPublicDirectory())) {
+        if (is_array($publicDir)) {
             foreach ($publicDir as $file) {
                 if (
-                    preg_match_all(
+                    1 === preg_match(
                         '/^(' . $this->getIndexFilename() . ')((-)[\d]+)?(' . $this->getExt() . ')$/',
                         $file
                     )

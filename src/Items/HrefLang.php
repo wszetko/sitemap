@@ -57,6 +57,7 @@ class HrefLang extends Extension
      *
      * @throws \ReflectionException
      * @throws \InvalidArgumentException
+     * @throws \Error
      */
     public function __construct(string $hrefLang, string $href)
     {
@@ -88,6 +89,8 @@ class HrefLang extends Extension
 
     /**
      * @return array
+     *
+     * @throws \Error
      */
     public function toArray(): array
     {

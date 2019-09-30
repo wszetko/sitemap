@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Wszetko\Sitemap\Items;
 
 use InvalidArgumentException as InvalidArgumentException;
+use Wszetko\Sitemap\Items\DataTypes\StringType;
 use Wszetko\Sitemap\Traits\DateTime;
 use Wszetko\Sitemap\Traits\IsAssoc;
 
@@ -259,6 +260,7 @@ class Video extends Extension
      *
      * @throws InvalidArgumentException
      * @throws \ReflectionException
+     * @throws \Error
      */
     public function __construct($thumbnailLoc, $title, $description)
     {
@@ -273,10 +275,16 @@ class Video extends Extension
      * @return array
      *
      * @throws \InvalidArgumentException
+     * @throws \Error
      */
     public function toArray(): array
     {
-        if (empty($this->getContentLoc()) && empty($this->getPlayerLoc())) {
+        if (
+            (null === $this->getContentLoc() ||
+                '' === $this->getContentLoc()) &&
+            (null === $this->getPlayerLoc() ||
+                '' === $this->getPlayerLoc())
+        ) {
             throw new InvalidArgumentException('Nor content_loc or player_loc parameter is set.');
         }
 
@@ -317,12 +325,10 @@ class Video extends Extension
         /** @var \Wszetko\Sitemap\Items\DataTypes\StringType $restrictionRelationship */
         $restrictionRelationship = $this->restriction
             ->getAttribute('relationship');
-
-        if (null !== $restrictionRelationship) {
-            $restrictionRelationship
-                ->setConversion('lower')
-                ->setAllowedValues('allow, deny');
-        }
+        $restrictionRelationship
+            ->setConversion('lower')
+            ->setAllowedValues('allow, deny')
+        ;
 
         $this->platform
             ->setConversion('lower')
@@ -331,13 +337,10 @@ class Video extends Extension
         /** @var \Wszetko\Sitemap\Items\DataTypes\StringType $platformRelationship */
         $platformRelationship = $this->platform
             ->getAttribute('relationship');
-
-        if (null !== $platformRelationship) {
-            $platformRelationship
-                ->setConversion('lower')
-                ->setAllowedValues('allow, deny')
-            ;
-        }
+        $platformRelationship
+            ->setConversion('lower')
+            ->setAllowedValues('allow, deny')
+        ;
 
         $this->price
             ->setMinValue(0)
@@ -346,33 +349,25 @@ class Video extends Extension
         /** @var \Wszetko\Sitemap\Items\DataTypes\StringType $priceCurrency */
         $priceCurrency = $this->price
             ->getAttribute('currency');
-
-        if (null !== $priceCurrency) {
-            $priceCurrency
-                ->setConversion('upper')
-                ->setRequired(true)
-                ->setValueRegex("/^(?'currency'[A-Z]{3})$/", 'currency');
-        }
+        $priceCurrency
+            ->setConversion('upper')
+            ->setRequired(true)
+            ->setValueRegex("/^(?'currency'[A-Z]{3})$/", 'currency')
+        ;
 
         /** @var \Wszetko\Sitemap\Items\DataTypes\StringType $priceType */
         $priceType = $this->price
             ->getAttribute('type');
-
-        if (null !== $priceType) {
-            $priceType
-                ->setConversion('lower')
-                ->setAllowedValues('rent, purchase');
-        }
+        $priceType
+            ->setConversion('lower')
+            ->setAllowedValues('rent, purchase');
 
         /** @var \Wszetko\Sitemap\Items\DataTypes\StringType $priceResolution */
         $priceResolution = $this->price
             ->getAttribute('resolution');
-
-        if (null !== $priceResolution) {
-            $priceResolution
-                ->setConversion('upper')
-                ->setAllowedValues('SD, HD');
-        }
+        $priceResolution
+            ->setConversion('upper')
+            ->setAllowedValues('SD, HD');
 
         $this->tag
             ->setMaxElements(32)

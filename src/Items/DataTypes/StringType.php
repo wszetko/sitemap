@@ -140,7 +140,7 @@ class StringType extends AbstractDataType
      */
     public function getValueRegex(): ?array
     {
-        if (!empty($this->regex) && !empty($this->regexGroup)) {
+        if (null !== $this->regex && '' !== $this->regex && null !== $this->regexGroup && '' !== $this->regexGroup) {
             return [$this->regexGroup => $this->regex];
         }
 
@@ -148,15 +148,15 @@ class StringType extends AbstractDataType
     }
 
     /**
-     * @param string $convertion
+     * @param string $conversion
      *
      * @return $this
      */
-    public function setConversion(string $convertion): self
+    public function setConversion(string $conversion): self
     {
-        if (in_array($convertion, ['upper', 'UPPER', 'Upper'])) {
+        if (in_array($conversion, ['upper', 'UPPER', 'Upper'], true)) {
             $this->conversion = 'upper';
-        } elseif (in_array($convertion, ['lower', 'LOWER', 'Lower'])) {
+        } elseif (in_array($conversion, ['lower', 'LOWER', 'Lower'], true)) {
             $this->conversion = 'lower';
         }
 
@@ -186,7 +186,11 @@ class StringType extends AbstractDataType
             $this->checkValue($value);
         }
 
-        if (empty($value) && $this->isRequired()) {
+        if (
+            (null === $value
+            || '' === $value)
+            && $this->isRequired()
+        ) {
             throw new InvalidArgumentException($this->getName() . ' need to be set.');
         }
 
@@ -198,8 +202,10 @@ class StringType extends AbstractDataType
     /**
      * @param string $value
      * @param-out null|string $value
+     *
+     * @return void
      */
-    private function checkValue(string &$value)
+    private function checkValue(string &$value):void
     {
         $value = trim($value);
         $this->checkValueLength($value);
@@ -210,8 +216,11 @@ class StringType extends AbstractDataType
 
     /**
      * @param null|string $value
+     * @param-out null|string $value
+     *
+     * @return void
      */
-    private function checkValueLength(?string &$value)
+    private function checkValueLength(?string &$value):void
     {
         if (null !== $value) {
             if (null !== $this->getMinLength() && mb_strlen($value) < $this->getMinLength()) {
@@ -226,8 +235,11 @@ class StringType extends AbstractDataType
 
     /**
      * @param null|string $value
+     * @param-out null|string $value
+     *
+     * @return void
      */
-    private function convertValue(?string &$value)
+    private function convertValue(?string &$value): void
     {
         if (null !== $value) {
             $conversion = $this->getConversion();
@@ -244,8 +256,11 @@ class StringType extends AbstractDataType
 
     /**
      * @param null|string $value
+     * @param-out null|string $value
+     *
+     * @return void
      */
-    private function checkIfValueIsInAllowedValues(?string &$value)
+    private function checkIfValueIsInAllowedValues(?string &$value): void
     {
         if (null !== $value) {
             $allowedValues = $this->getAllowedValues();
@@ -253,7 +268,7 @@ class StringType extends AbstractDataType
             if (null !== $allowedValues) {
                 $match = preg_grep("/{$value}/i", $allowedValues);
 
-                if (empty($match)) {
+                if ([] === $match) {
                     $value = null;
                 } else {
                     $value = array_values($match)[0];
@@ -264,16 +279,19 @@ class StringType extends AbstractDataType
 
     /**
      * @param null|string $value
+     * @param-out null|string $value
+     *
+     * @return void
      */
-    private function checkValueRegex(?string &$value)
+    private function checkValueRegex(?string &$value): void
     {
         if (null !== $value) {
             $regex = $this->getValueRegex();
 
-            if (!empty($regex)) {
-                preg_match_all(array_values($regex)[0], $value, $matches);
+            if (null !== $regex && [] !== $regex) {
+                $match = preg_match(array_values($regex)[0], $value);
 
-                if (empty($matches[array_key_first($regex)])) {
+                if (1 !== $match) {
                     $value = null;
                 }
             }

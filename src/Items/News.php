@@ -131,6 +131,7 @@ class News extends Extension
      *
      * @throws \ReflectionException
      * @throws \InvalidArgumentException
+     * @throws \Error
      */
     public function __construct(
         string $publicationName,
@@ -192,6 +193,8 @@ class News extends Extension
 
     /**
      * @return array
+     *
+     * @throws \Error
      */
     public function toArray(): array
     {

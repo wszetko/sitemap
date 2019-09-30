@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Wszetko\Sitemap\Items;
 
+use Error;
 use ReflectionClass;
 use ReflectionProperty;
 use Wszetko\Sitemap\Interfaces\DataType;
@@ -45,12 +46,19 @@ abstract class AbstractItem implements Item
             $data = $this->grabData($property);
 
             if (
-                is_array($data)
-                && !empty($data['type'])
-                && class_exists($data['type'])
-                && in_array('Wszetko\Sitemap\Interfaces\DataType', class_implements($data['type']))
+                is_array($data) &&
+                (
+                    isset($data['type']) &&
+                    '' !== $data['type']
+                ) &&
+                class_exists($data['type']) &&
+                in_array('Wszetko\Sitemap\Interfaces\DataType', class_implements($data['type']), true)
             ) {
-                if (!empty($data['dataType']) && class_exists($data['dataType'])) {
+                if (
+                    isset($data['dataType']) &&
+                    '' !== $data['dataType'] &&
+                    class_exists($data['dataType'])
+                ) {
                     $this->{$property->getName()} = new ArrayType($property->getName(), $data['dataType']);
                     $this->{$property->getName()}->getBaseDataType()->addAttributes($data['attributes']);
                 } else {
@@ -66,6 +74,8 @@ abstract class AbstractItem implements Item
      * @param mixed $arguments
      *
      * @return mixed
+     *
+     * @throws \Error
      */
     public function __call($name, $arguments)
     {
@@ -74,7 +84,7 @@ abstract class AbstractItem implements Item
 
         if (
             property_exists($this, $property) &&
-            in_array($operation, ['add', 'set', 'get']) &&
+            in_array($operation, ['add', 'set', 'get'], true) &&
             ($this->{$property} instanceof DataType)
         ) {
             switch ($operation) {
@@ -92,7 +102,6 @@ abstract class AbstractItem implements Item
                     return $this;
                 case 'get':
                     if (
-                        method_exists($this, 'getDomain') &&
                         method_exists($this->{$property}, 'setDomain') &&
                         null !== $this->getDomain()
                     ) {
@@ -102,6 +111,8 @@ abstract class AbstractItem implements Item
                     return $this->{$property}->getValue();
             }
         }
+
+        throw new Error('Call to undefined method ' . __CLASS__ . '::' . $name . '()');
     }
 
     /**
@@ -151,7 +162,7 @@ abstract class AbstractItem implements Item
                             $array[static::ELEMENT_NAME][$property][] = $element;
                         }
                     }
-                } elseif (!empty($data)) {
+                } elseif (null !== $data && '' !== $data) {
                     $array[static::ELEMENT_NAME][$property] = $data;
                 }
             }
@@ -191,7 +202,7 @@ abstract class AbstractItem implements Item
         ];
 
         foreach ($matches['type'] as $match) {
-            if (!empty($match)) {
+            if ('' !== $match && null !== $match) {
                 $results['type'] = $match;
 
                 break;
@@ -199,7 +210,7 @@ abstract class AbstractItem implements Item
         }
 
         foreach ($matches['dataType'] as $match) {
-            if (!empty($match)) {
+            if ('' !== $match && null !== $match) {
                 $results['dataType'] = $match;
 
                 break;
@@ -207,7 +218,12 @@ abstract class AbstractItem implements Item
         }
 
         foreach ($matches['attribute'] as $key => $match) {
-            if (!empty($match) && !empty($matches['attributeDataType'][$key + 1])) {
+            if (
+                '' !== $match &&
+                null !== $match &&
+                isset($matches['attributeDataType'][$key + 1]) &&
+                '' !== $matches['attributeDataType'][$key + 1]
+            ) {
                 $results['attributes'][$match] = $matches['attributeDataType'][$key + 1];
             }
         }

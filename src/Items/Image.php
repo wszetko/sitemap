@@ -87,6 +87,7 @@ class Image extends Extension
      * @param string $loc
      *
      * @throws \ReflectionException
+     * @throws \Error
      */
     public function __construct(string $loc)
     {

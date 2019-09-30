@@ -133,7 +133,7 @@ class ArrayType extends AbstractDataType
     {
         $values = parent::getValue();
 
-        if (empty($values)) {
+        if (null === $values || [] === $values) {
             return null;
         }
 
@@ -145,13 +145,17 @@ class ArrayType extends AbstractDataType
                 $this->propagateDomain($element);
                 $value = $element->getValue();
 
-                if (is_array($value) && !empty(array_values($value)[0])) {
+                if (
+                    is_array($value) &&
+                    isset(array_values($value)[0]) &&
+                    '' !== array_values($value)[0]
+                ) {
                     $key = array_key_first($value);
 
                     if (null !== $key) {
                         $result[$key] = array_values($value)[0];
                     }
-                } elseif (!empty($value)) {
+                } elseif (null !== $value && '' !== $value) {
                     $result[] = $value;
                 }
             }

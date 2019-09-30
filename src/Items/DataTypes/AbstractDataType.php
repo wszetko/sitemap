@@ -83,7 +83,7 @@ abstract class AbstractDataType implements DataType
         try {
             $attributes = $this->getAttributes();
 
-            if (!empty($attributes)) {
+            if ([] !== $attributes) {
                 return [$value => $attributes];
             }
         } catch (InvalidArgumentException $e) {
@@ -104,10 +104,10 @@ abstract class AbstractDataType implements DataType
         $this->value = $value;
 
         foreach ($parameters as $key => $attribute) {
-            if (!empty($attribute)) {
+            if (null !== $attribute && '' !== $attribute) {
                 $attr = array_keys($this->attributes)[$key];
 
-                if (!empty($attr)) {
+                if ('' !== $attr) {
                     $this->attributes[$attr]->setValue($attribute);
                 }
             }
@@ -152,7 +152,7 @@ abstract class AbstractDataType implements DataType
         foreach ($this->attributes as $name => $value) {
             $this->propagateDomain($value);
 
-            if (!empty($value->getValue())) {
+            if (null !== $value->getValue() && '' !== $value->getValue()) {
                 $attributes[$name] = $value->getValue();
             } elseif ($value->isRequired()) {
                 throw new InvalidArgumentException('Lack of required value');
