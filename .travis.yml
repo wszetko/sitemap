@@ -7,12 +7,12 @@ matrix:
         -   php: 7.0
             env:
                 - COLLECT_COVERAGE=true
-                - IGNORE_PLATFORMS=false
+                - IGNORE_PLATFORMS=true
                 - FULL_TEST=false
         -   php: 7.1
             env:
                 - COLLECT_COVERAGE=true
-                - IGNORE_PLATFORMS=false
+                - IGNORE_PLATFORMS=true
                 - FULL_TEST=false
         - php: 7.2
           env:
