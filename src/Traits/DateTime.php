@@ -53,7 +53,7 @@ trait DateTime
             ) {
                 $dateTime = $dateTime->format('Y-m-d');
             } else {
-                $dateTime = $dateTime->format(DateTimeInterface::W3C);
+                $dateTime = $dateTime->format(\DateTime::W3C);
             }
         } elseif ($required) {
             throw new InvalidArgumentException('Invalid date parameter.');

@@ -4,15 +4,10 @@ sudo: false
 
 matrix:
     include:
-        -   php: 7.0
-            env:
-                - COLLECT_COVERAGE=true
-                - IGNORE_PLATFORMS=true
-                - FULL_TEST=false
         -   php: 7.1
             env:
                 - COLLECT_COVERAGE=true
-                - IGNORE_PLATFORMS=true
+                - IGNORE_PLATFORMS=false
                 - FULL_TEST=false
         - php: 7.2
           env:
@@ -39,7 +34,8 @@ matrix:
         - php: nightly
 
 before_install:
-    travis_retry composer self-update
+    - travis_retry composer clear-cache
+    - travis_retry composer self-update
 
 install:
     - if [ "$IGNORE_PLATFORMS" == "true" ]; then travis_retry composer update --ignore-platform-reqs; fi
