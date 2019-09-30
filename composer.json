@@ -20,7 +20,8 @@
     "require": {
         "php": ">=7.0.2",
         "ext-intl": "*",
-        "ext-mbstring": "*"
+        "ext-mbstring": "*",
+        "symfony/polyfill-php73": "^1.12"
     },
     "suggest": {
         "ext-xmlwriter": "*",
@@ -47,10 +48,7 @@
     "autoload": {
         "psr-4": {
             "Wszetko\\Sitemap\\": "src"
-        },
-        "files": [
-            "src/Compatibility/array_key_first.php"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {
