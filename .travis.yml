@@ -4,22 +4,36 @@ sudo: false
 
 matrix:
     include:
+        -   php: 7.0
+            env:
+                - COLLECT_COVERAGE=true
+                - IGNORE_PLATFORMS=false
+                - FULL_TEST=false
+        -   php: 7.1
+            env:
+                - COLLECT_COVERAGE=true
+                - IGNORE_PLATFORMS=false
+                - FULL_TEST=false
         - php: 7.2
           env:
               - COLLECT_COVERAGE=true
               - IGNORE_PLATFORMS=false
+              - FULL_TEST=false
         - php: 7.3
           env:
               - COLLECT_COVERAGE=true
               - IGNORE_PLATFORMS=false
+              - FULL_TEST=true
         - php: 7.4snapshot
           env:
               - COLLECT_COVERAGE=false
               - IGNORE_PLATFORMS=true
+              - FULL_TEST=false
         - php: nightly
           env:
               - COLLECT_COVERAGE=false
               - IGNORE_PLATFORMS=true
+              - FULL_TEST=false
     allow_failures:
         - php: 7.4snapshot
         - php: nightly
@@ -32,7 +46,8 @@ install:
     - if [ "$IGNORE_PLATFORMS" == "false" ]; then travis_retry composer update; fi
 
 script:
-  - composer phpunit
+    - if [ "$FULL_TEST" == "true" ]; then composer test; fi
+    - if [ "$FULL_TEST" == "false" ]; then composer phpunit; fi
 
 after_script:
     - if [ "$COLLECT_COVERAGE" == "true" ]; then wget https://scrutinizer-ci.com/ocular.phar && php ocular.phar code-coverage:upload --format=php-clover build/clover.xml; fi
