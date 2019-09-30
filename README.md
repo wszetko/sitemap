@@ -16,18 +16,46 @@ Installation
 $ composer require wszetko/sitemap
 ```
 
+### Requirements
+
+While script should run on PHP 7.0.2 or newer it's recommend at least PHP 7.1. PHP 7.2 or newer is recommended.
+
 Testing
 -------
 
 The library has a :
 
-- a [PHPUnit](https://phpunit.de) test suite
-- a coding style compliance test suite using [PHP CS Fixer](http://cs.sensiolabs.org/).
+- a [PHPUnit](https://phpunit.de) test suite,
+- other tools using in project developement:
+    - [PHP CS Fixer](http://cs.sensiolabs.org/),
+    - [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer),
+    - [PHP Static Analysis Tool](https://github.com/phpstan/phpstan),
+    - [Copy/Paste Detector](https://github.com/sebastianbergmann/phpcpd),
+    - [PHP Mess Detector](https://phpmd.org),
+    - [PhpMetrics](https://www.phpmetrics.org/),
+    - [PHP Parallel Lint](https://github.com/JakubOnderka/PHP-Parallel-Lint),
+    - [Psalm](https://github.com/vimeo/psalm),
+    - [PHP Magic Number Detector](https://github.com/povils/phpmnd),
+    - [PhpCodeAnalyzer](https://github.com/wapmorgan/PhpCodeAnalyzer),
+    - [phploc](https://github.com/sebastianbergmann/phploc),
+    - [SensioLabs Security Checker](https://github.com/sensiolabs/security-checker).
 
-To run the tests, run the following command from the project folder.
+There are prepared composer scripts to run. To see full list please type in console:
 
-``` bash
+```bash
+$ composer list
+```
+
+To run the *full* tests, run the following command from the project folder:
+
+```bash
 $ composer test
+```
+> Please note that those test should run on PHP 7.1 or higher.
+
+If You want to run just PHPUnit tests please run:
+```bash
+$ composer phpunit
 ```
 
 To do
