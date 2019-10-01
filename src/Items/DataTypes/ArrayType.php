@@ -48,7 +48,9 @@ class ArrayType extends AbstractDataType
         $baseDataType = new $dataType($this->getName());
 
         if (($baseDataType instanceof AbstractDataType) === false) {
+            // @codeCoverageIgnoreStart
             throw new InvalidArgumentException('Provided DataType is invalid.');
+            // @codeCoverageIgnoreEnd
         }
 
         $this->baseDataType = $baseDataType;

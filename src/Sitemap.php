@@ -389,7 +389,9 @@ class Sitemap
             if (false !== $tempDir) {
                 $this->sitemapTempDirectory = $tempDir;
             } else {
+                // @codeCoverageIgnoreStart
                 throw new Exception('Can\'t get temporary directory.');
+                // @codeCoverageIgnoreEnd
             }
         }
 
@@ -415,7 +417,9 @@ class Sitemap
         }
 
         if (false === $directory) {
+            // @codeCoverageIgnoreStart
             throw new Exception('Can\'t get temporary directory.');
+            // @codeCoverageIgnoreEnd
         }
 
         return $directory;
@@ -621,28 +625,30 @@ class Sitemap
      */
     public function getSitepamsDirectory(): string
     {
-        $directory = realpath($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory);
-
-        if (false === $directory) {
-            mkdir($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory, 0777, true);
-            $directory = realpath($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory);
-        }
-
-        if (false === $directory) {
-            throw new Exception('Can\'t get sitemap directory.');
-        }
-
-        return $directory;
+        return $this->sitepamsDirectory;
     }
 
     /**
      * @param string $sitepamsDirectory
      *
      * @return \Wszetko\Sitemap\Sitemap
+     *
+     * @throws \Exception
      */
     public function setSitepamsDirectory(string $sitepamsDirectory): self
     {
-        $this->sitepamsDirectory = $sitepamsDirectory;
+        $directory = realpath($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $sitepamsDirectory);
+
+        if (false === $directory) {
+            mkdir($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $sitepamsDirectory, 0777, true);
+            $directory = realpath($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $sitepamsDirectory);
+        }
+
+        if (false === $directory) {
+            throw new Exception('Can\'t get sitemap directory.');
+        }
+
+        $this->sitepamsDirectory = $directory;
 
         return $this;
     }

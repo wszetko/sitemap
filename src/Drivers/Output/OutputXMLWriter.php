@@ -213,13 +213,7 @@ class OutputXMLWriter extends AbstractOutput
     private function addElementArray(string $element, array $value, ?string $namespace = null): void
     {
         if (!$this->isAssoc($value)) {
-            if ($value !== []) {
-                $this->addElementArrayNonAssoc($element, $value, $namespace);
-            } else {
-                /** @var \XMLWriter $xmlWriter */
-                $xmlWriter = $this->getXMLWriter();
-                $xmlWriter->writeElement(($namespace !== null ? $namespace . ':' : '') . $element);
-            }
+            $this->addElementArrayNonAssoc($element, $value, $namespace);
         } else {
             $this->addElementArrayAssoc($element, $value, $namespace);
         }
@@ -241,14 +235,8 @@ class OutputXMLWriter extends AbstractOutput
                 $xmlWriter->writeAttribute($attribute, $val);
             }
 
-            if (isset($value['_value'])) {
-                if (is_array($value['_value'])) {
-                    foreach ($value['_value'] as $el => $val) {
-                        $this->addElement($el, $val);
-                    }
-                } else {
-                    $xmlWriter->text((string) $value['_value']);
-                }
+            if (isset($value['_value']) && is_string($value['_value'])) {
+                $xmlWriter->text((string) $value['_value']);
             }
         } else {
             foreach ($value as $el => $val) {

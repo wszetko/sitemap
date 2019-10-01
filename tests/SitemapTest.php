@@ -78,9 +78,9 @@ class SitemapTest extends TestCase
      */
     public function testPublicDirectoryException()
     {
-        $sitemap = new Sitemap('https://example.com');
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Sitemap directory does not exists.');
+        $sitemap = new Sitemap('https://example.com');
         $sitemap->setPublicDirectory(__DIR__ . 'NotExists');
     }
 
@@ -98,6 +98,14 @@ class SitemapTest extends TestCase
         $this->assertInstanceOf(OutputXMLWriter::class, $sitemap->getXml());
     }
 
+    public function testXMLException()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('XML writer class is not set.');
+        $sitemap = new Sitemap('https://example.com');
+        $sitemap->getXml();
+    }
+
     public function testTempDirectoryCase1()
     {
         $sitemap = new Sitemap('https://example.com');
@@ -107,9 +115,10 @@ class SitemapTest extends TestCase
     public function testTempDirectoryCase2()
     {
         $sitemap = new Sitemap('https://example.com');
-        $sitemap->setSitepamsDirectory('sitemaps');
+        $sitemap->setPublicDirectory(sys_get_temp_dir());
         $this->assertStringContainsString(
-            $sitemap->getTempDirectory() . DIRECTORY_SEPARATOR, $sitemap->getSitepamsTempDirectory()
+            $sitemap->getTempDirectory(),
+            $sitemap->getSitepamsTempDirectory()
         );
     }
 
@@ -159,10 +168,10 @@ class SitemapTest extends TestCase
         $sitemap = new Sitemap('https://example.com');
         $sitemap->setDataCollector(Memory::class);
         $items = [new Url('/'), new Url('/test')];
-        $sitemap->addItems($items);
+        $sitemap->addItems($items, 'test');
 
         if ($sitemap->getDataCollector() !== null) {
-            $result = $sitemap->getDataCollector()->fetchAll($sitemap->getDefaultFilename());
+            $result = $sitemap->getDataCollector()->fetchAll('test');
             $this->assertEquals([
                 ['url' => ['loc' => 'https://example.com/']],
                 ['url' => ['loc' => 'https://example.com/test']]
