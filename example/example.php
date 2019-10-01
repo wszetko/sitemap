@@ -30,7 +30,7 @@ try {
 
     // Set up Sitemap configuration
     $sitemap->setPublicDirectory(__DIR__ . DIRECTORY_SEPARATOR . 'sitemap');
-    $sitemap->setSitepamsDirectory('sitemaps');
+    $sitemap->setSitemapsDirectory('sitemaps');
     $sitemap->setDataCollector(Memory::class);
     $sitemap->setUseCompression(false);
 

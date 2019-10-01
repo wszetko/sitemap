@@ -69,8 +69,12 @@ class SitemapTest extends TestCase
     public function testPublicDirectory()
     {
         $sitemap = new Sitemap('https://example.com');
-        $sitemap->setPublicDirectory(__DIR__);
-        $this->assertEquals(__DIR__, $sitemap->getPublicDirectory());
+        $sitemap->setPublicDirectory(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemap');
+        $this->assertEquals(
+            realpath(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemap'),
+            $sitemap->getPublicDirectory()
+        );
+        rmdir(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemap');
     }
 
     /**
@@ -79,11 +83,64 @@ class SitemapTest extends TestCase
     public function testPublicDirectoryException()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Sitemap directory does not exists.');
+        $this->expectExceptionMessage('Public directory is not set.');
         $sitemap = new Sitemap('https://example.com');
-        $sitemap->setPublicDirectory(__DIR__ . 'NotExists');
+        $sitemap->getPublicDirectory();
     }
 
+    /**
+     * @throws \Exception
+     */
+    public function testSitemapsDirectoryCase1()
+    {
+        $sitemap = new Sitemap('https://example.com');
+        $sitemap->setPublicDirectory(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'public');
+        $this->assertEquals($sitemap->getPublicDirectory(), $sitemap->getSitemapsDirectory());
+        rmdir(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'public');
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testSitemapsDirectoryCase2()
+    {
+        $sitemap = new Sitemap('https://example.com');
+        $sitemap->setPublicDirectory(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'public');
+        $sitemap->setSitemapsDirectory('sitemaps');
+        $this->assertEquals(
+            $sitemap->getPublicDirectory() . DIRECTORY_SEPARATOR . 'sitemaps',
+            $sitemap->getSitemapsDirectory()
+        );
+        rmdir(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sitemaps');
+        rmdir(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'public');
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testTempDirectoryCase1()
+    {
+        $sitemap = new Sitemap('https://example.com');
+        $this->assertStringContainsString(DIRECTORY_SEPARATOR . 'sitemap', $sitemap->getTempDirectory());
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testTempDirectoryCase2()
+    {
+        $sitemap = new Sitemap('https://example.com');
+        $sitemap->setPublicDirectory(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemap');
+        $this->assertStringContainsString(
+            $sitemap->getTempDirectory(),
+            $sitemap->getSitepamsTempDirectory()
+        );
+        rmdir(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemap');
+    }
+
+    /**
+     * @throws \Exception
+     */
     public function testXMLCase1()
     {
         $sitemap = new Sitemap('https://example.com');
@@ -91,6 +148,9 @@ class SitemapTest extends TestCase
         $this->assertInstanceOf(OutputXMLWriter::class, $sitemap->getXml());
     }
 
+    /**
+     * @throws \Exception
+     */
     public function testXMLCase2()
     {
         $sitemap = new Sitemap('https://example.com');
@@ -98,28 +158,15 @@ class SitemapTest extends TestCase
         $this->assertInstanceOf(OutputXMLWriter::class, $sitemap->getXml());
     }
 
+    /**
+     * @throws \Exception
+     */
     public function testXMLException()
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('XML writer class is not set.');
         $sitemap = new Sitemap('https://example.com');
         $sitemap->getXml();
-    }
-
-    public function testTempDirectoryCase1()
-    {
-        $sitemap = new Sitemap('https://example.com');
-        $this->assertStringContainsString(DIRECTORY_SEPARATOR . 'sitemap', $sitemap->getTempDirectory());
-    }
-
-    public function testTempDirectoryCase2()
-    {
-        $sitemap = new Sitemap('https://example.com');
-        $sitemap->setPublicDirectory(sys_get_temp_dir());
-        $this->assertStringContainsString(
-            $sitemap->getTempDirectory(),
-            $sitemap->getSitepamsTempDirectory()
-        );
     }
 
     /**

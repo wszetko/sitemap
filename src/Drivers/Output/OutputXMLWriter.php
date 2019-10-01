@@ -236,7 +236,7 @@ class OutputXMLWriter extends AbstractOutput
             }
 
             if (isset($value['_value']) && is_string($value['_value'])) {
-                $xmlWriter->text((string) $value['_value']);
+                $xmlWriter->text($value['_value']);
             }
         } else {
             foreach ($value as $el => $val) {

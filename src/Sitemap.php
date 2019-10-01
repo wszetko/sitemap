@@ -20,6 +20,7 @@ use RecursiveIteratorIterator;
 use RegexIterator;
 use Wszetko\Sitemap\Drivers\DataCollectors\AbstractDataCollector;
 use Wszetko\Sitemap\Drivers\Output\OutputXMLWriter;
+use Wszetko\Sitemap\Helpers\Directory;
 use Wszetko\Sitemap\Interfaces\DataCollector;
 use Wszetko\Sitemap\Interfaces\XML;
 use Wszetko\Sitemap\Traits\Domain;
@@ -109,7 +110,7 @@ class Sitemap
      *
      * @var string
      */
-    private $sitepamsDirectory = '';
+    private $sitemapsDirectory = '';
 
     /**
      * Path to temporary directory.
@@ -217,30 +218,6 @@ class Sitemap
     }
 
     /**
-     * Get default filename for sitemap file.
-     *
-     * @return string
-     */
-    public function getDefaultFilename(): string
-    {
-        return $this->defaultFilename;
-    }
-
-    /**
-     * Set default filename for sitemap file.
-     *
-     * @param string $defaultFilename
-     *
-     * @return \Wszetko\Sitemap\Sitemap
-     */
-    public function setDefaultFilename(string $defaultFilename): self
-    {
-        $this->defaultFilename = $defaultFilename;
-
-        return $this;
-    }
-
-    /**
      * Get DataCollecotr Object.
      *
      * @return DataCollector
@@ -276,59 +253,6 @@ class Sitemap
         } else {
             throw new InvalidArgumentException($driver . ' data collector does not exists.');
         }
-
-        return $this;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function generate(): void
-    {
-        if ('' === $this->getPublicDirectory()) {
-            throw new Exception('Public directory is not set.');
-        }
-
-        if ('' === $this->getDomain()) {
-            throw new Exception('Domain is not set.');
-        }
-
-        if (null === $this->xml) {
-            $this->setXml(OutputXMLWriter::class, ['domain' => $this->getDomain()]);
-        }
-
-        $this->removeDir($this->getTempDirectory());
-        $this->getXml()->setWorkDir($this->getSitepamsTempDirectory());
-        $sitemaps = $this->generateSitemaps();
-        $this->getXml()->setWorkDir($this->getTempDirectory());
-        $this->generateSitemapsIndex($sitemaps);
-        $this->publishSitemap();
-    }
-
-    /**
-     * @return string
-     */
-    public function getPublicDirectory(): string
-    {
-        return $this->publicDirectory;
-    }
-
-    /**
-     * @param string $publicDirectory
-     *
-     * @throws Exception
-     *
-     * @return \Wszetko\Sitemap\Sitemap
-     */
-    public function setPublicDirectory(string $publicDirectory): self
-    {
-        $publicDirectory = realpath($publicDirectory);
-
-        if (false === $publicDirectory) {
-            throw new Exception('Sitemap directory does not exists.');
-        }
-
-        $this->publicDirectory = $publicDirectory;
 
         return $this;
     }
@@ -371,58 +295,24 @@ class Sitemap
     }
 
     /**
-     * @throws \Exception
-     *
-     * @return string
+     * @throws Exception
      */
-    public function getTempDirectory(): string
+    public function generate(): void
     {
-        if (null === $this->sitemapTempDirectory || '' == $this->sitemapTempDirectory) {
-            $hash = md5(microtime());
-
-            if (!is_dir(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemap' . $hash)) {
-                mkdir(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemap' . $hash);
-            }
-
-            $tempDir = realpath(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemap' . $hash);
-
-            if (false !== $tempDir) {
-                $this->sitemapTempDirectory = $tempDir;
-            } else {
-                // @codeCoverageIgnoreStart
-                throw new Exception('Can\'t get temporary directory.');
-                // @codeCoverageIgnoreEnd
-            }
+        if ('' === $this->getDomain()) {
+            throw new Exception('Domain is not set.');
         }
 
-        return $this->sitemapTempDirectory;
-    }
-
-    /**
-     * @throws \Exception
-     *
-     * @return string
-     */
-    public function getSitepamsTempDirectory(): string
-    {
-        $directory = realpath($this->getTempDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory);
-
-        if (false === $directory) {
-            mkdir(
-                $this->getTempDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory,
-                0777,
-                true
-            );
-            $directory = realpath($this->getTempDirectory() . DIRECTORY_SEPARATOR . $this->sitepamsDirectory);
+        if (null === $this->xml) {
+            $this->setXml(OutputXMLWriter::class, ['domain' => $this->getDomain()]);
         }
 
-        if (false === $directory) {
-            // @codeCoverageIgnoreStart
-            throw new Exception('Can\'t get temporary directory.');
-            // @codeCoverageIgnoreEnd
-        }
-
-        return $directory;
+        Directory::removeDir($this->getTempDirectory());
+        $this->getXml()->setWorkDir($this->getSitepamsTempDirectory());
+        $sitemaps = $this->generateSitemaps();
+        $this->getXml()->setWorkDir($this->getTempDirectory());
+        $this->generateSitemapsIndex($sitemaps);
+        $this->publishSitemap();
     }
 
     /**
@@ -500,52 +390,6 @@ class Sitemap
     }
 
     /**
-     * @return string
-     */
-    public function getSeparator(): string
-    {
-        return $this->separator;
-    }
-
-    /**
-     * @param string $separator
-     *
-     * @return \Wszetko\Sitemap\Sitemap
-     */
-    public function setSeparator(string $separator): self
-    {
-        $this->separator = $separator;
-
-        return $this;
-    }
-
-    /**
-     * Check if compression is used.
-     *
-     * @return bool
-     */
-    public function isUseCompression(): bool
-    {
-        return $this->useCompression;
-    }
-
-    /**
-     * Set whether to use compression or not.
-     *
-     * @param bool $useCompression
-     *
-     * @return \Wszetko\Sitemap\Sitemap
-     */
-    public function setUseCompression(bool $useCompression): self
-    {
-        if ($useCompression && extension_loaded('zlib')) {
-            $this->useCompression = $useCompression;
-        }
-
-        return $this;
-    }
-
-    /**
      * @param array $sitemaps
      *
      * @throws Exception
@@ -568,7 +412,7 @@ class Sitemap
             $this->getXml()->addSitemap((string) $this->getDomain() . '/' . ltrim(str_replace(
                 $this->getPublicDirectory(),
                 '',
-                $this->getSitepamsDirectory()
+                $this->getSitemapsDirectory()
             ), DIRECTORY_SEPARATOR) . '/' . $sitemap, $lastmod);
             ++$counter;
 
@@ -592,93 +436,6 @@ class Sitemap
         }
 
         return $files;
-    }
-
-    /**
-     * Get filename of sitemap index file.
-     *
-     * @return string
-     */
-    public function getIndexFilename(): string
-    {
-        return $this->indexFilename;
-    }
-
-    /**
-     * Set filename of sitemap index file.
-     *
-     * @param string $indexFilename
-     *
-     * @return \Wszetko\Sitemap\Sitemap
-     */
-    public function setIndexFilename(string $indexFilename): self
-    {
-        $this->indexFilename = $indexFilename;
-
-        return $this;
-    }
-
-    /**
-     * @throws \Exception
-     *
-     * @return string
-     */
-    public function getSitepamsDirectory(): string
-    {
-        return $this->sitepamsDirectory;
-    }
-
-    /**
-     * @param string $sitepamsDirectory
-     *
-     * @return \Wszetko\Sitemap\Sitemap
-     *
-     * @throws \Exception
-     */
-    public function setSitepamsDirectory(string $sitepamsDirectory): self
-    {
-        $directory = realpath($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $sitepamsDirectory);
-
-        if (false === $directory) {
-            mkdir($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $sitepamsDirectory, 0777, true);
-            $directory = realpath($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $sitepamsDirectory);
-        }
-
-        if (false === $directory) {
-            throw new Exception('Can\'t get sitemap directory.');
-        }
-
-        $this->sitepamsDirectory = $directory;
-
-        return $this;
-    }
-
-    /**
-     * @param string $dir
-     *
-     * @return void
-     */
-    private function removeDir($dir): void
-    {
-        if (is_dir($dir)) {
-            return;
-        }
-
-        $objects = scandir($dir);
-
-        if (false !== $objects) {
-            foreach ($objects as $object) {
-                if ('.' != $object && '..' != $object) {
-                    if ('dir' == filetype($dir . '/' . $object)) {
-                        $this->removeDir($dir . '/' . $object);
-                    } else {
-                        unlink($dir . '/' . $object);
-                    }
-                }
-            }
-
-            rmdir($dir);
-        }
     }
 
     /**
@@ -737,7 +494,7 @@ class Sitemap
     private function publishSitemap(): void
     {
         // Clear previous sitemaps
-        $this->removeDir($this->getSitepamsDirectory());
+        Directory::removeDir($this->getSitemapsDirectory());
         $publicDir = scandir($this->getPublicDirectory());
 
         if (is_array($publicDir)) {
@@ -753,7 +510,6 @@ class Sitemap
             }
         }
 
-        $this->getSitepamsDirectory(); //To create sitemaps directory
         $dir = new RecursiveDirectoryIterator($this->getTempDirectory());
         $iterator = new RecursiveIteratorIterator($dir);
         $files = new RegexIterator(
@@ -777,7 +533,201 @@ class Sitemap
             rename($file, $destination);
         }
 
-        $this->removeDir($this->getTempDirectory());
+        Directory::removeDir($this->getTempDirectory());
+    }
+
+    /**
+     * Get filename of sitemap index file.
+     *
+     * @return string
+     */
+    public function getIndexFilename(): string
+    {
+        return $this->indexFilename;
+    }
+
+    /**
+     * Set filename of sitemap index file.
+     *
+     * @param string $indexFilename
+     *
+     * @return \Wszetko\Sitemap\Sitemap
+     */
+    public function setIndexFilename(string $indexFilename): self
+    {
+        $this->indexFilename = $indexFilename;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     *
+     * @throws \Exception
+     */
+    public function getPublicDirectory(): string
+    {
+        if ('' === $this->publicDirectory) {
+            throw new Exception('Public directory is not set.');
+        }
+
+        return $this->publicDirectory;
+    }
+
+    /**
+     * @param string $publicDirectory
+     *
+     * @throws Exception
+     *
+     * @return \Wszetko\Sitemap\Sitemap
+     */
+    public function setPublicDirectory(string $publicDirectory): self
+    {
+        $this->publicDirectory = Directory::checkDirectory($publicDirectory);
+
+        return $this;
+    }
+
+
+
+    /**
+     * @throws \Exception
+     *
+     * @return string
+     */
+    public function getSitemapsDirectory(): string
+    {
+        if ('' === $this->sitemapsDirectory) {
+            $this->setSitemapsDirectory('');
+        }
+
+        return $this->sitemapsDirectory;
+    }
+
+    /**
+     * @param string $sitemapsDirectory
+     *
+     * @return \Wszetko\Sitemap\Sitemap
+     * @throws \Exception
+     */
+    public function setSitemapsDirectory(string $sitemapsDirectory): self
+    {
+        $this->sitemapsDirectory = Directory::checkDirectory(
+            $this->getPublicDirectory() . DIRECTORY_SEPARATOR . $sitemapsDirectory
+        );
+
+        return $this;
+    }
+
+    /**
+     * @param string $tempDirectory
+     *
+     * @return $this
+     *
+     * @throws \Exception
+     */
+    public function setTempDirectory(string $tempDirectory): self
+    {
+        $this->sitemapTempDirectory = Directory::checkDirectory($tempDirectory);
+
+        return $this;
+    }
+
+    /**
+     * @throws \Exception
+     *
+     * @return string
+     */
+    public function getTempDirectory(): string
+    {
+        if (null === $this->sitemapTempDirectory || '' == $this->sitemapTempDirectory) {
+            $hash = md5(microtime());
+            $this->setTempDirectory(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemap' . $hash);
+        }
+
+        return $this->sitemapTempDirectory;
+    }
+
+    /**
+     * @throws \Exception
+     *
+     * @return string
+     */
+    public function getSitepamsTempDirectory(): string
+    {
+        $sitemapsDirectory = str_replace($this->getPublicDirectory(), '', $this->getSitemapsDirectory());
+
+        return Directory::checkDirectory($this->getTempDirectory() . DIRECTORY_SEPARATOR . $sitemapsDirectory);
+    }
+
+    /**
+     * @return string
+     */
+    public function getSeparator(): string
+    {
+        return $this->separator;
+    }
+
+    /**
+     * @param string $separator
+     *
+     * @return \Wszetko\Sitemap\Sitemap
+     */
+    public function setSeparator(string $separator): self
+    {
+        $this->separator = $separator;
+
+        return $this;
+    }
+
+    /**
+     * Check if compression is used.
+     *
+     * @return bool
+     */
+    public function isUseCompression(): bool
+    {
+        return $this->useCompression;
+    }
+
+    /**
+     * Set whether to use compression or not.
+     *
+     * @param bool $useCompression
+     *
+     * @return \Wszetko\Sitemap\Sitemap
+     */
+    public function setUseCompression(bool $useCompression): self
+    {
+        if ($useCompression && extension_loaded('zlib')) {
+            $this->useCompression = $useCompression;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get default filename for sitemap file.
+     *
+     * @return string
+     */
+    public function getDefaultFilename(): string
+    {
+        return $this->defaultFilename;
+    }
+
+    /**
+     * Set default filename for sitemap file.
+     *
+     * @param string $defaultFilename
+     *
+     * @return \Wszetko\Sitemap\Sitemap
+     */
+    public function setDefaultFilename(string $defaultFilename): self
+    {
+        $this->defaultFilename = $defaultFilename;
+
+        return $this;
     }
 
     /**

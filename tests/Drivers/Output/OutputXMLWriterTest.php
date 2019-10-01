@@ -98,6 +98,7 @@ class OutputXMLWriterTest extends TestCase
         $driver = new OutputXMLWriter(['domain' => 'https://example.com']);
         $dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemapTest' . date('Y-m-d_H_i_s');
         mkdir($dir);
+        $dir = (string) realpath($dir);
         $driver->setWorkDir($dir);
         $driver->openSitemap('sitemap.xml');
         $driver->closeSitemap();
@@ -110,6 +111,7 @@ class OutputXMLWriterTest extends TestCase
 
         $driver = new OutputXMLWriter(['domain' => 'https://example.com']);
         $dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemapTest' . date('Y-m-d_H_i_s');
+        $dir = (string) realpath($dir);
         $driver->setWorkDir($dir);
         $extensions = ['mobile' => Mobile::NAMESPACE_URL];
         $driver->openSitemap('sitemap.xml', $extensions);
