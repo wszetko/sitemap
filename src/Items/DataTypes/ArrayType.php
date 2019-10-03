@@ -24,24 +24,27 @@ use Wszetko\Sitemap\Interfaces\DataType;
 class ArrayType extends AbstractDataType
 {
     /**
+     * Number of maximum elements to keep.
+     *
      * @var null|int
      */
     protected $maxElements;
 
     /**
+     * Base object that are used to create elements.
+     *
      * @var \Wszetko\Sitemap\Items\DataTypes\AbstractDataType
      */
     private $baseDataType;
 
     /**
-     * ArrayType constructor.
+     * @inheritDoc
      *
-     * @param mixed $name
-     * @param mixed $dataType
+     * @var string $dataType
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($name, $dataType)
+    public function __construct($name, string $dataType)
     {
         parent::__construct($name);
 
@@ -58,6 +61,8 @@ class ArrayType extends AbstractDataType
     }
 
     /**
+     * Return object to create new element.
+     *
      * @return \Wszetko\Sitemap\Items\DataTypes\AbstractDataType
      */
     public function getBaseDataType(): AbstractDataType
@@ -66,6 +71,8 @@ class ArrayType extends AbstractDataType
     }
 
     /**
+     * Return maximum number of elements to handle.
+     *
      * @return null|int
      */
     public function getMaxElements(): ?int
@@ -74,6 +81,8 @@ class ArrayType extends AbstractDataType
     }
 
     /**
+     * Set maximum number of elements to handle.
+     *
      * @param int $maxElements
      *
      * @return self
@@ -86,10 +95,7 @@ class ArrayType extends AbstractDataType
     }
 
     /**
-     * @param mixed $value
-     * @param array $parameters
-     *
-     * @return static
+     * @inheritDoc
      */
     public function setValue($value, $parameters = []): DataType
     {
@@ -105,6 +111,8 @@ class ArrayType extends AbstractDataType
     }
 
     /**
+     * Add single element to collection.
+     *
      * @param mixed $value
      * @param array $parameters
      *
@@ -129,7 +137,7 @@ class ArrayType extends AbstractDataType
     }
 
     /**
-     * @return mixed
+     * @inheritDoc
      */
     public function getValue()
     {

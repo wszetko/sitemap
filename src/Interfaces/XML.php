@@ -28,29 +28,42 @@ interface XML
     public function __construct(array $config);
 
     /**
+     * Set path to directory on which class is working on.
+     *
      * @param string $dir
      */
     public function setWorkDir(string $dir): void;
 
     /**
+     * Get path to directory on which class is working on.
+     *
      * @return null|string
      */
     public function getWorkDir(): ?string;
 
     /**
+     * Return current sitemap file size.
+     *
      * @return int
      */
     public function getSitemapSize(): int;
 
     /**
+     * Make sitemap file and put proper tags on it.
+     *
      * @param string $sitemap
      * @param array  $extensions
      */
     public function openSitemap(string $sitemap, array $extensions): void;
 
+    /**
+     * Close sitemap file and put proper tags on it.
+     */
     public function closeSitemap(): void;
 
     /**
+     * Add url to current sitemap.
+     *
      * @param array $element
      *
      * @return mixed
@@ -58,13 +71,20 @@ interface XML
     public function addUrl(array $element);
 
     /**
+     * Make sitemap index file and put proper tags on it.
+     *
      * @param string $sitemap
      */
     public function openSitemapIndex(string $sitemap): void;
 
+    /**
+     * Close sitemap index file and put proper tags on it.
+     */
     public function closeSitemapIndex(): void;
 
     /**
+     * Add sitemap to sitemap index.
+     *
      * @param string      $sitemap
      * @param null|string $lastmod
      *

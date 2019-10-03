@@ -67,10 +67,7 @@ class HrefLang extends Extension
 
         if ($baseType instanceof StringType) {
             $baseType
-                ->setValueRegex(
-                    "/^(?'hreflang'([a-z]{2}|(x))((-)([A-Za-z]{2}|[A-Z]([a-z]|[a-z]{3})|(default)))?)$/",
-                    'hreflang'
-                )
+                ->setValueRegex("/^(([a-z]{2}|(x))((-)([A-Za-z]{2}|[A-Z]([a-z]|[a-z]{3})|(default)))?)$/")
                 ->setRequired(true)
             ;
             $hrefAttribute =  $baseType->getAttribute('href');

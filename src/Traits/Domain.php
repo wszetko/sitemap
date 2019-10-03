@@ -31,6 +31,8 @@ trait Domain
     private $domain;
 
     /**
+     * Return domain name.
+     *
      * @return null|string
      */
     public function getDomain(): ?string
@@ -39,6 +41,8 @@ trait Domain
     }
 
     /**
+     * Set domain name.
+     *
      * @param null|string $domain
      *
      * @return static

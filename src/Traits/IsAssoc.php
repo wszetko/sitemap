@@ -13,9 +13,16 @@ declare(strict_types=1);
 
 namespace Wszetko\Sitemap\Traits;
 
+/**
+ * Trait IsAssoc
+ *
+ * @package Wszetko\Sitemap\Traits
+ */
 trait IsAssoc
 {
     /**
+     * Check if array is associative.
+     *
      * @param array $array
      *
      * @return bool

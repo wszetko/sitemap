@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Wszetko\Sitemap\Drivers\Output;
 
+use InvalidArgumentException;
 use Wszetko\Sitemap\Interfaces\XML;
 use Wszetko\Sitemap\Traits\Domain;
 use Wszetko\Sitemap\Traits\IsAssoc;
@@ -28,21 +29,36 @@ abstract class AbstractOutput implements XML
     use Domain;
 
     /**
-     * @var mixed
-     */
-    protected $XMLWriter;
-
-    /**
+     * Name of current sitemap.
+     *
      * @var string
      */
     private $currentSitemap;
 
     /**
+     * Path of current work directory.
+     *
      * @var null|string
      */
     private $workDir;
 
     /**
+     * @inheritDoc
+     *
+     * @throws InvalidArgumentException
+     */
+    public function __construct(array $config)
+    {
+        if (!isset($config['domain'])) {
+            throw new InvalidArgumentException('Domain is not set.');
+        }
+
+        $this->setDomain($config['domain']);
+    }
+
+    /**
+     * Return current sitemap name.
+     *
      * @return string
      */
     public function getCurrentSitemap(): string
@@ -51,6 +67,8 @@ abstract class AbstractOutput implements XML
     }
 
     /**
+     * Set current sitemap name.
+     *
      * @param string $currentSitemap
      */
     public function setCurrentSitemap(string $currentSitemap): void
@@ -59,7 +77,7 @@ abstract class AbstractOutput implements XML
     }
 
     /**
-     * @return null|string
+     * @inheritDoc
      */
     public function getWorkDir(): ?string
     {
@@ -67,7 +85,7 @@ abstract class AbstractOutput implements XML
     }
 
     /**
-     * @param string $dir
+     * @inheritDoc
      */
     public function setWorkDir(string $dir): void
     {
@@ -75,14 +93,8 @@ abstract class AbstractOutput implements XML
     }
 
     /**
-     * @return mixed
-     */
-    protected function getXMLWriter()
-    {
-        return $this->XMLWriter;
-    }
-
-    /**
+     * Return full path of current sitemap.
+     *
      * @return string
      */
     protected function getSitemapFileFullPath(): string

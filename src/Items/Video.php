@@ -319,7 +319,7 @@ class Video extends Extension
         ;
         $this->restriction
             ->setConversion('upper')
-            ->setValueRegex("/^(?'countries'[A-Z]{2}( +[A-Z]{2})*)?$/", 'countries')
+            ->setValueRegex("/^([A-Z]{2}( +[A-Z]{2})*)?$/")
         ;
         /** @var \Wszetko\Sitemap\Items\DataTypes\StringType $restrictionRelationship */
         $restrictionRelationship = $this->restriction
@@ -331,7 +331,7 @@ class Video extends Extension
 
         $this->platform
             ->setConversion('lower')
-            ->setValueRegex("/^(?'platform'(web|mobile|tv)( (web|mobile|tv))*)?/", 'platform')
+            ->setValueRegex("/^((web|mobile|tv)( (web|mobile|tv))*)?/")
         ;
         /** @var \Wszetko\Sitemap\Items\DataTypes\StringType $platformRelationship */
         $platformRelationship = $this->platform
@@ -351,7 +351,7 @@ class Video extends Extension
         $priceCurrency
             ->setConversion('upper')
             ->setRequired(true)
-            ->setValueRegex("/^(?'currency'[A-Z]{3})$/", 'currency')
+            ->setValueRegex("/^([A-Z]{3})$/")
         ;
 
         /** @var \Wszetko\Sitemap\Items\DataTypes\StringType $priceType */

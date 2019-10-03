@@ -24,36 +24,43 @@ use Wszetko\Sitemap\Interfaces\DataType;
 class StringType extends AbstractDataType
 {
     /**
+     * Minimum length of string.
+     *
      * @var int
      */
     protected $minLength;
 
     /**
+     * Maximum length of string.
+     *
      * @var int
      */
     protected $maxLength;
 
     /**
+     * List of allowed values that can be set.
+     *
      * @var null|array
      */
     protected $allowedValues;
 
     /**
+     * Regular expression to test value.
+     *
      * @var string
      */
     protected $regex;
 
     /**
-     * @var string
-     */
-    protected $regexGroup;
-
-    /**
+     * Type of string conversion.
+     *
      * @var null|string
      */
     protected $conversion;
 
     /**
+     * Return minimal string length.
+     *
      * @return null|int
      */
     public function getMinLength(): ?int
@@ -62,6 +69,8 @@ class StringType extends AbstractDataType
     }
 
     /**
+     * Set minimal string length.
+     *
      * @param int $minLength
      *
      * @return \Wszetko\Sitemap\Items\DataTypes\StringType
@@ -74,6 +83,8 @@ class StringType extends AbstractDataType
     }
 
     /**
+     * Return maximum string length.
+     *
      * @return null|int
      */
     public function getMaxLength(): ?int
@@ -82,6 +93,8 @@ class StringType extends AbstractDataType
     }
 
     /**
+     * Set maximum string length.
+     *
      * @param int $maxLength
      *
      * @return self
@@ -94,6 +107,8 @@ class StringType extends AbstractDataType
     }
 
     /**
+     * Return list of allowed values.
+     *
      * @return null|array
      */
     public function getAllowedValues(): ?array
@@ -102,6 +117,8 @@ class StringType extends AbstractDataType
     }
 
     /**
+     * Set list of allowed values.
+     *
      * @param null|array|string $allowedValues
      *
      * @return \Wszetko\Sitemap\Items\DataTypes\StringType
@@ -122,32 +139,36 @@ class StringType extends AbstractDataType
     }
 
     /**
+     * Set regular expression to test value.
+     *
      * @param string $regex
-     * @param string $regexGroup
      *
      * @return \Wszetko\Sitemap\Items\DataTypes\StringType
      */
-    public function setValueRegex(string $regex, string $regexGroup): self
+    public function setValueRegex(string $regex): self
     {
         $this->regex = $regex;
-        $this->regexGroup = $regexGroup;
 
         return $this;
     }
 
     /**
-     * @return null|array
+     * Return regular expression to test value.
+     *
+     * @return null|string
      */
-    public function getValueRegex(): ?array
+    public function getValueRegex(): ?string
     {
-        if (null !== $this->regex && '' !== $this->regex && null !== $this->regexGroup && '' !== $this->regexGroup) {
-            return [$this->regexGroup => $this->regex];
+        if (null !== $this->regex && '' !== $this->regex) {
+            return $this->regex;
         }
 
         return null;
     }
 
     /**
+     * Set conversion of value.
+     *
      * @param string $conversion
      *
      * @return $this
@@ -164,6 +185,8 @@ class StringType extends AbstractDataType
     }
 
     /**
+     * Return conversion of value.
+     *
      * @return null|string
      */
     public function getConversion(): ?string
@@ -172,10 +195,7 @@ class StringType extends AbstractDataType
     }
 
     /**
-     * @param mixed $value
-     * @param array $parameters
-     *
-     * @return static
+     * @inheritDoc
      *
      * @throws \InvalidArgumentException
      */
@@ -200,12 +220,14 @@ class StringType extends AbstractDataType
     }
 
     /**
+     * Parse value if is valid one.
+     *
      * @param string $value
      * @param-out null|string $value
      *
      * @return void
      */
-    private function checkValue(string &$value):void
+    private function checkValue(string &$value): void
     {
         $value = trim($value);
         $this->checkValueLength($value);
@@ -215,12 +237,14 @@ class StringType extends AbstractDataType
     }
 
     /**
+     * Check if value have valid length.
+     *
      * @param null|string $value
      * @param-out null|string $value
      *
      * @return void
      */
-    private function checkValueLength(?string &$value):void
+    private function checkValueLength(?string &$value): void
     {
         if (null !== $value) {
             if (null !== $this->getMinLength() && mb_strlen($value) < $this->getMinLength()) {
@@ -234,6 +258,8 @@ class StringType extends AbstractDataType
     }
 
     /**
+     * Convert value if needed.
+     *
      * @param null|string $value
      * @param-out null|string $value
      *
@@ -255,6 +281,8 @@ class StringType extends AbstractDataType
     }
 
     /**
+     * Check if value is in allowed list.
+     *
      * @param null|string $value
      * @param-out null|string $value
      *
@@ -278,6 +306,8 @@ class StringType extends AbstractDataType
     }
 
     /**
+     * Test value with provided regular expression.
+     *
      * @param null|string $value
      * @param-out null|string $value
      *
@@ -288,8 +318,8 @@ class StringType extends AbstractDataType
         if (null !== $value) {
             $regex = $this->getValueRegex();
 
-            if (null !== $regex && [] !== $regex) {
-                $match = preg_match(array_values($regex)[0], $value);
+            if (null !== $regex && '' !== $regex) {
+                $match = preg_match($regex, $value);
 
                 if (1 !== $match) {
                     $value = null;

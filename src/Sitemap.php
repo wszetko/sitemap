@@ -96,7 +96,7 @@ class Sitemap
      *
      * @var int
      */
-    public const SITEMAP_MAX_SIZE = 52000000;
+    public const SITEMAP_MAX_SIZE = 52000000; // ~49,6MB - to have some limit to close file
 
     /**
      * Path on disk to public directory.
@@ -136,9 +136,9 @@ class Sitemap
     /**
      * DataCollector instance.
      *
-     * @var DataCollector
+     * @var null|DataCollector
      */
-    private $dataCollector;
+    private $dataCollector = null;
 
     /**
      * Use compression.
@@ -150,19 +150,19 @@ class Sitemap
     /**
      * XML Writer object.
      *
-     * @var XML
+     * @var null|XML
      */
-    private $xml;
+    private $xml = null;
 
     /**
      * Separator to be used in Sitemap filenames.
      *
      * @var string
      */
-    private $separator = '-'; // ~49,6MB - to have some limit to close file
+    private $separator = '-';
 
     /**
-     * Construktor.
+     * Class constructor.
      *
      * @param string $domain
      *
@@ -176,6 +176,8 @@ class Sitemap
     }
 
     /**
+     * Add URL to specific group.
+     *
      * @param Items\Url   $item
      * @param null|string $group
      *
@@ -201,6 +203,8 @@ class Sitemap
     }
 
     /**
+     * Add multiple URLs to specific group.
+     *
      * @param array       $items
      * @param null|string $group
      *
@@ -218,7 +222,7 @@ class Sitemap
     }
 
     /**
-     * Get DataCollecotr Object.
+     * Return DataCollecotr Object.
      *
      * @return DataCollector
      *
@@ -229,10 +233,13 @@ class Sitemap
         if (null === $this->dataCollector) {
             throw new Exception('DataCollector is not set.');
         }
+
         return $this->dataCollector;
     }
 
     /**
+     * Set DataCollector driver with configuration.
+     *
      * @param string $driver
      * @param array  $config
      *
@@ -247,10 +254,10 @@ class Sitemap
 
             if ($dataCollector instanceof AbstractDataCollector) {
                 $this->dataCollector = $dataCollector;
-            } else {
-                throw new InvalidArgumentException($driver . ' data collector does not exists.');
             }
-        } else {
+        }
+
+        if (null === $this->dataCollector) {
             throw new InvalidArgumentException($driver . ' data collector does not exists.');
         }
 
@@ -258,6 +265,8 @@ class Sitemap
     }
 
     /**
+     * Return XML driver object.
+     *
      * @return XML
      *
      * @throws \Exception
@@ -272,10 +281,14 @@ class Sitemap
     }
 
     /**
+     * Set XML driver with configuration.
+     *
      * @param string $driver
      * @param array  $config
      *
      * @return \Wszetko\Sitemap\Sitemap
+     *
+     * @throws \Exception
      */
     public function setXml(string $driver, array $config = []): self
     {
@@ -291,10 +304,16 @@ class Sitemap
             }
         }
 
+        if (null === $this->xml) {
+            throw new Exception('XML writer class is not set.');
+        }
+
         return $this;
     }
 
     /**
+     * Generate sitemaps, sitemaps index and publish them.
+     *
      * @throws Exception
      */
     public function generate(): void
@@ -316,6 +335,8 @@ class Sitemap
     }
 
     /**
+     * Generates sitemaps based on collected data.
+     *
      * @throws Exception
      *
      * @return array
@@ -390,6 +411,8 @@ class Sitemap
     }
 
     /**
+     * Generates sitemap index for generated sitemaps.
+     *
      * @param array $sitemaps
      *
      * @throws Exception
@@ -439,6 +462,8 @@ class Sitemap
     }
 
     /**
+     * Gzip sitemap files and put them in specified directory.
+     *
      * @param string $dir
      * @param array  $files
      *
@@ -487,29 +512,15 @@ class Sitemap
     }
 
     /**
+     * Copy generated sitemaps to their destination.
+     *
      * @throws \Exception
      *
      * @return void
      */
     private function publishSitemap(): void
     {
-        // Clear previous sitemaps
-        Directory::removeDir($this->getSitemapsDirectory());
-        $publicDir = scandir($this->getPublicDirectory());
-
-        if (is_array($publicDir)) {
-            foreach ($publicDir as $file) {
-                if (
-                    1 === preg_match(
-                        '/^(' . $this->getIndexFilename() . ')((-)[\d]+)?(' . $this->getExt() . ')$/',
-                        $file
-                    )
-                ) {
-                    unlink($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $file);
-                }
-            }
-        }
-
+        $this->clearPreviousSitemaps();
         $dir = new RecursiveDirectoryIterator($this->getTempDirectory());
         $iterator = new RecursiveIteratorIterator($dir);
         $files = new RegexIterator(
@@ -537,6 +548,37 @@ class Sitemap
     }
 
     /**
+     * Remove previous sitemap files.
+     *
+     * @throws \Exception
+     *
+     * @return void
+     */
+    private function clearPreviousSitemaps(): void
+    {
+        $sitemapDir = str_replace($this->getPublicDirectory(), '', $this->getSitemapsDirectory());
+
+        if ('' !== $sitemapDir) {
+            Directory::removeDir($this->getSitemapsDirectory());
+        }
+
+        $publicDir = scandir($this->getPublicDirectory());
+
+        if (is_array($publicDir)) {
+            foreach ($publicDir as $file) {
+                if (
+                    1 === preg_match(
+                        '/^(' . $this->getIndexFilename() . ')((-)[\d]+)?(' . self::EXT . '|' . self::GZ_EXT . ')$/',
+                        $file
+                    )
+                ) {
+                    unlink($this->getPublicDirectory() . DIRECTORY_SEPARATOR . $file);
+                }
+            }
+        }
+    }
+
+    /**
      * Get filename of sitemap index file.
      *
      * @return string
@@ -561,6 +603,8 @@ class Sitemap
     }
 
     /**
+     * Get public directory path.
+     *
      * @return string
      *
      * @throws \Exception
@@ -575,6 +619,8 @@ class Sitemap
     }
 
     /**
+     * Set public directory path.
+     *
      * @param string $publicDirectory
      *
      * @throws Exception
@@ -591,6 +637,8 @@ class Sitemap
 
 
     /**
+     * Get sitemaps directory path.
+     *
      * @throws \Exception
      *
      * @return string
@@ -605,6 +653,8 @@ class Sitemap
     }
 
     /**
+     * Set sitemaps directory path.
+     *
      * @param string $sitemapsDirectory
      *
      * @return \Wszetko\Sitemap\Sitemap
@@ -620,20 +670,8 @@ class Sitemap
     }
 
     /**
-     * @param string $tempDirectory
+     * Get temporary directory path.
      *
-     * @return $this
-     *
-     * @throws \Exception
-     */
-    public function setTempDirectory(string $tempDirectory): self
-    {
-        $this->sitemapTempDirectory = Directory::checkDirectory($tempDirectory);
-
-        return $this;
-    }
-
-    /**
      * @throws \Exception
      *
      * @return string
@@ -649,6 +687,24 @@ class Sitemap
     }
 
     /**
+     * Set temporary directory path.
+     *
+     * @param string $tempDirectory
+     *
+     * @return $this
+     *
+     * @throws \Exception
+     */
+    public function setTempDirectory(string $tempDirectory): self
+    {
+        $this->sitemapTempDirectory = Directory::checkDirectory($tempDirectory);
+
+        return $this;
+    }
+
+    /**
+     * Get temporary sitemaps directory path.
+     *
      * @throws \Exception
      *
      * @return string
@@ -661,14 +717,8 @@ class Sitemap
     }
 
     /**
-     * @return string
-     */
-    public function getSeparator(): string
-    {
-        return $this->separator;
-    }
-
-    /**
+     * Get separator for filenames.
+     *
      * @param string $separator
      *
      * @return \Wszetko\Sitemap\Sitemap
@@ -681,16 +731,18 @@ class Sitemap
     }
 
     /**
-     * Check if compression is used.
+     * Set separator for filenames.
      *
-     * @return bool
+     * @return string
      */
-    public function isUseCompression(): bool
+    public function getSeparator(): string
     {
-        return $this->useCompression;
+        return $this->separator;
     }
 
     /**
+     * Set if sitemaps files should be GZiped.
+     *
      * Set whether to use compression or not.
      *
      * @param bool $useCompression
@@ -707,13 +759,15 @@ class Sitemap
     }
 
     /**
-     * Get default filename for sitemap file.
+     * Checi fi sitemaps files should be GZiped.
      *
-     * @return string
+     * Check if compression is used.
+     *
+     * @return bool
      */
-    public function getDefaultFilename(): string
+    public function isUseCompression(): bool
     {
-        return $this->defaultFilename;
+        return $this->useCompression;
     }
 
     /**
@@ -731,6 +785,18 @@ class Sitemap
     }
 
     /**
+     * Get default filename for sitemap file.
+     *
+     * @return string
+     */
+    public function getDefaultFilename(): string
+    {
+        return $this->defaultFilename;
+    }
+
+    /**
+     * Get extension for sitemap files.
+     *
      * @return string
      */
     private function getExt(): string

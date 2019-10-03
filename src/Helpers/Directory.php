@@ -64,12 +64,14 @@ class Directory
 
         if (false !== $objects) {
             foreach ($objects as $object) {
-                if ('.' != $object && '..' != $object) {
-                    if ('dir' == filetype($dir . '/' . $object)) {
-                        self::removeDir($dir . '/' . $object);
-                    } else {
-                        unlink($dir . '/' . $object);
-                    }
+                if ('.' === $object || '..' === $object) {
+                    continue;
+                }
+
+                if (is_dir($dir . '/' . $object)) {
+                    self::removeDir($dir . '/' . $object);
+                } else {
+                    unlink($dir . '/' . $object);
                 }
             }
         }

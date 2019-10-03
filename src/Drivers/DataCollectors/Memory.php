@@ -23,23 +23,28 @@ use Wszetko\Sitemap\Items\Url;
 class Memory extends AbstractDataCollector
 {
     /**
+     * Collection of added URLs.
+     *
      * @var array
      */
     private $items = [];
 
     /**
-     * @var array
+     * Number of elements in each group.
+     *
+     * @var int[]
      */
     private $element = [];
 
     /**
+     * Array of used extensions.
+     *
      * @var array
      */
     private $extensions = [];
 
     /**
-     * @param Url    $item
-     * @param string $group
+     * @inheritDoc
      */
     public function add(Url $item, string $group): void
     {
@@ -52,7 +57,7 @@ class Memory extends AbstractDataCollector
     }
 
     /**
-     * @param array $extensions
+     * @inheritDoc
      */
     public function addExtensions(array $extensions): void
     {
@@ -64,9 +69,7 @@ class Memory extends AbstractDataCollector
     }
 
     /**
-     * @param string $group
-     *
-     * @return array
+     * @inheritDoc
      */
     public function fetch(string $group): ?array
     {
@@ -74,7 +77,7 @@ class Memory extends AbstractDataCollector
             return null;
         }
 
-        $element = (int) $this->getGroupElement($group);
+        $element = $this->getGroupElementsCount($group);
 
         if (($element + 1) > $this->getGroupCount($group)) {
             return null;
@@ -87,9 +90,7 @@ class Memory extends AbstractDataCollector
     }
 
     /**
-     * @param string $group
-     *
-     * @return int
+     * @inheritDoc
      */
     public function getGroupCount(string $group): int
     {
@@ -97,9 +98,7 @@ class Memory extends AbstractDataCollector
     }
 
     /**
-     * @param null|string $group
-     *
-     * @return null|array
+     * @inheritDoc
      */
     public function fetchAll(?string $group = null): ?array
     {
@@ -115,19 +114,15 @@ class Memory extends AbstractDataCollector
     }
 
     /**
-     * @param string $group
-     *
-     * @return bool
+     * @inheritDoc
      */
     public function isLast(string $group): bool
     {
-        return !isset($this->items[$group][(int) $this->getGroupElement($group) + 1]);
+        return !isset($this->items[$group][$this->getGroupElementsCount($group) + 1]);
     }
 
     /**
-     * @param string $group
-     *
-     * @return array
+     * @inheritDoc
      */
     public function fetchGroup(string $group): array
     {
@@ -135,7 +130,7 @@ class Memory extends AbstractDataCollector
     }
 
     /**
-     * @return int
+     * @inheritDoc
      */
     public function getGroupsCount(): int
     {
@@ -143,7 +138,7 @@ class Memory extends AbstractDataCollector
     }
 
     /**
-     * @return array
+     * @inheritDoc
      */
     public function getGroups(): array
     {
@@ -151,7 +146,7 @@ class Memory extends AbstractDataCollector
     }
 
     /**
-     * @return int
+     * @inheritDoc
      */
     public function getCount(): int
     {
@@ -165,7 +160,7 @@ class Memory extends AbstractDataCollector
     }
 
     /**
-     * @return array
+     * @inheritDoc
      */
     public function getExtensions(): array
     {
@@ -173,11 +168,13 @@ class Memory extends AbstractDataCollector
     }
 
     /**
+     * Return number of elements in group.
+     *
      * @param string $group
      *
-     * @return null|int
+     * @return int
      */
-    private function getGroupElement(string $group): ?int
+    private function getGroupElementsCount(string $group): int
     {
         if (!isset($this->element[$group])) {
             $this->element[$group] = 0;
@@ -187,6 +184,8 @@ class Memory extends AbstractDataCollector
     }
 
     /**
+     * Increment number of elements in group.
+     *
      * @param string $group
      */
     private function incrementGroupElement(string $group): void

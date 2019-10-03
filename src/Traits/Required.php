@@ -26,6 +26,8 @@ trait Required
     private $required = false;
 
     /**
+     * Check if field is required.
+     *
      * @return bool
      */
     public function isRequired(): bool
@@ -34,6 +36,8 @@ trait Required
     }
 
     /**
+     * Set if field is required.
+     *
      * @param bool $required
      *
      * @return static

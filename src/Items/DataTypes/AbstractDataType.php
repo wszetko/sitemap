@@ -29,16 +29,22 @@ abstract class AbstractDataType implements DataType
     use Domain;
 
     /**
+     * Property that handle value.
+     *
      * @var mixed
      */
     protected $value;
 
     /**
+     * Property that handle attributes.
+     *
      * @var array
      */
     protected $attributes = [];
 
     /**
+     * DataType name.
+     *
      * @var string
      */
     private $name;
@@ -66,6 +72,8 @@ abstract class AbstractDataType implements DataType
     }
 
     /**
+     * Return name od DataType.
+     *
      * @return string
      */
     public function getName(): string
@@ -74,7 +82,7 @@ abstract class AbstractDataType implements DataType
     }
 
     /**
-     * @return null|mixed
+     * @inheritDoc
      */
     public function getValue()
     {
@@ -94,10 +102,7 @@ abstract class AbstractDataType implements DataType
     }
 
     /**
-     * @param mixed $value
-     * @param array $parameters
-     *
-     * @return static
+     * @inheritDoc
      */
     public function setValue($value, $parameters = []): DataType
     {
@@ -117,6 +122,8 @@ abstract class AbstractDataType implements DataType
     }
 
     /**
+     * Add multiple attrubutes do DataType.
+     *
      * @param mixed $attributes
      *
      * @return static
@@ -131,6 +138,8 @@ abstract class AbstractDataType implements DataType
     }
 
     /**
+     * Return object used to handle provided attribute.
+     *
      * @param mixed $name
      *
      * @return null|AbstractDataType
@@ -141,6 +150,8 @@ abstract class AbstractDataType implements DataType
     }
 
     /**
+     * Return all attributes values.
+     *
      * @throws \InvalidArgumentException
      *
      * @return array
@@ -163,6 +174,8 @@ abstract class AbstractDataType implements DataType
     }
 
     /**
+     * Pass domain name to attributes if necessary.
+     *
      * @param mixed $target
      */
     public function propagateDomain(&$target): void

@@ -23,10 +23,7 @@ use Wszetko\Sitemap\Interfaces\DataType;
 class YesNoType extends AbstractDataType
 {
     /**
-     * @param mixed $value
-     * @param array $parameters
-     *
-     * @return static
+     * @inheritDoc
      */
     public function setValue($value, $parameters = []): DataType
     {

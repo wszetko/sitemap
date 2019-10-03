@@ -23,21 +23,29 @@ use Wszetko\Sitemap\Interfaces\DataType;
 class FloatType extends AbstractDataType
 {
     /**
+     * Number of decimal digits.
+     *
      * @var int
      */
     protected $precision = 0;
 
     /**
+     * Minimal value that DataType can handle.
+     *
      * @var float|int
      */
     private $minValue;
 
     /**
+     * Maximum value that DataType can handle.
+     *
      * @var float|int
      */
     private $maxValue;
 
     /**
+     * Return minimal value that DataType can handle.
+     *
      * @return null|float
      */
     public function getMinValue(): ?float
@@ -46,6 +54,8 @@ class FloatType extends AbstractDataType
     }
 
     /**
+     * Set minimal value that DataType can handle.
+     *
      * @param float $minValue
      *
      * @return \Wszetko\Sitemap\Items\DataTypes\FloatType
@@ -58,6 +68,8 @@ class FloatType extends AbstractDataType
     }
 
     /**
+     * Return maximum value that DataType can handle.
+     *
      * @return null|float
      */
     public function getMaxValue(): ?float
@@ -66,6 +78,8 @@ class FloatType extends AbstractDataType
     }
 
     /**
+     * Set maximum value that DataType can handle.
+     *
      * @param float $maxValue
      *
      * @return \Wszetko\Sitemap\Items\DataTypes\FloatType
@@ -78,6 +92,8 @@ class FloatType extends AbstractDataType
     }
 
     /**
+     * Return number of decimal digits to use in DataType.
+     *
      * @return int
      */
     public function getPrecision(): int
@@ -86,6 +102,8 @@ class FloatType extends AbstractDataType
     }
 
     /**
+     * Set number of decimal digits to use in DataType.
+     *
      * @param int $precision
      *
      * @return \Wszetko\Sitemap\Items\DataTypes\FloatType
@@ -98,10 +116,7 @@ class FloatType extends AbstractDataType
     }
 
     /**
-     * @param mixed $value
-     * @param array $parameters
-     *
-     * @return static
+     * @inheritDoc
      */
     public function setValue($value, $parameters = []): DataType
     {

@@ -147,7 +147,7 @@ class News extends Extension
         $this->setPublicationName($publicationName);
         $this->publicationLanguage
             ->setConversion('lower')
-            ->setValueRegex("/^(?'lang'zh-cn|zh-tw|([a-z]{2,3}))?$/", 'lang')
+            ->setValueRegex("/^(zh-cn|zh-tw|([a-z]{2,3}))?$/")
             ->setRequired(true)
         ;
         $this->publicationDate
@@ -182,7 +182,7 @@ class News extends Extension
         if ($stickTickersValue instanceof StringType) {
             /** @var $stickTickersValue \Wszetko\Sitemap\Items\DataTypes\StringType */
             $stickTickersValue
-                ->setValueRegex("/^(?'stockTickers'\\w+:\\w+)?$/", 'stockTickers')
+                ->setValueRegex("/^(\\w+:\\w+)?$/")
             ;
         } else {
             // @codeCoverageIgnoreStart

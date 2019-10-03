@@ -21,7 +21,7 @@ namespace Wszetko\Sitemap\Items\DataTypes;
 class IntegerType extends FloatType
 {
     /**
-     * @return null|string
+     * @inheritDoc
      */
     public function getValue()
     {

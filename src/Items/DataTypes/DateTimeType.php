@@ -26,10 +26,7 @@ class DateTimeType extends AbstractDataType
     use DateTime;
 
     /**
-     * @param mixed $value
-     * @param array $parameters
-     *
-     * @return static
+     * @inheritDoc
      *
      * @throws \InvalidArgumentException
      */

@@ -24,6 +24,8 @@ use InvalidArgumentException;
 trait DateTime
 {
     /**
+     * Get date and format it to proper format. Throws exceptions if is not valid date and is required.
+     *
      * @param DateTimeInterface|string $dateTime
      * @param bool                     $required
      *

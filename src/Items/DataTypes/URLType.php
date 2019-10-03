@@ -30,7 +30,7 @@ class URLType extends StringType
     protected $external = false;
 
     /**
-     * @return null|array|string
+     * @inheritDoc
      *
      * @throws \InvalidArgumentException
      */
@@ -61,6 +61,8 @@ class URLType extends StringType
     }
 
     /**
+     * Return if URL can be external.
+     *
      * @return bool
      */
     public function isExternal(): bool

@@ -57,7 +57,8 @@ abstract class AbstractItem implements Item
                 if (
                     isset($data['dataType']) &&
                     '' !== $data['dataType'] &&
-                    class_exists($data['dataType'])
+                    class_exists($data['dataType']) &&
+                    in_array('Wszetko\Sitemap\Interfaces\DataType', class_implements($data['dataType']), true)
                 ) {
                     $this->{$property->getName()} = new ArrayType($property->getName(), $data['dataType']);
                     $this->{$property->getName()}->getBaseDataType()->addAttributes($data['attributes']);

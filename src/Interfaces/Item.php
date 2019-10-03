@@ -36,6 +36,8 @@ interface Item
     public const ELEMENT_NAME = null;
 
     /**
+     * Return array with object contents.
+     *
      * @return array
      */
     public function toArray(): array;

@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Wszetko\Sitemap\Drivers\Output;
 
 use Exception;
-use InvalidArgumentException;
 use Wszetko\Sitemap\Sitemap;
 use XMLWriter;
 
@@ -26,25 +25,35 @@ use XMLWriter;
 class OutputXMLWriter extends AbstractOutput
 {
     /**
-     * XMLWriter constructor.
+     * Object which will be used to create XML files.
      *
-     * @param array $config
+     * @var mixed
+     */
+    private $XMLWriter;
+
+    /**
+     * @inheritDoc
      *
      * @throws \InvalidArgumentException
      */
     public function __construct(array $config)
     {
-        if (!isset($config['domain'])) {
-            throw new InvalidArgumentException('Domain is not set.');
-        }
-
+        parent::__construct($config);
         $this->XMLWriter = new XMLWriter();
-        $this->setDomain($config['domain']);
     }
 
     /**
-     * @param string $sitemap
-     * @param array  $extensions
+     * Return XMLWriter object.
+     *
+     * @return mixed
+     */
+    protected function getXMLWriter()
+    {
+        return $this->XMLWriter;
+    }
+
+    /**
+     * @inheritDoc
      */
     public function openSitemap(string $sitemap, array $extensions = []): void
     {
@@ -65,6 +74,8 @@ class OutputXMLWriter extends AbstractOutput
     }
 
     /**
+     * @inheritDoc
+     *
      * @throws \Exception
      */
     public function closeSitemap(): void
@@ -78,7 +89,7 @@ class OutputXMLWriter extends AbstractOutput
     }
 
     /**
-     * @return int
+     * @inheritDoc
      */
     public function getSitemapSize(): int
     {
@@ -88,7 +99,7 @@ class OutputXMLWriter extends AbstractOutput
     }
 
     /**
-     * @param array $element
+     * @inheritDoc
      */
     public function addUrl(array $element): void
     {
@@ -100,7 +111,7 @@ class OutputXMLWriter extends AbstractOutput
     }
 
     /**
-     * @param string $sitemap
+     * @inheritDoc
      */
     public function openSitemapIndex(string $sitemap): void
     {
@@ -116,6 +127,8 @@ class OutputXMLWriter extends AbstractOutput
     }
 
     /**
+     * @inheritDoc
+     *
      * @throws \Exception
      */
     public function closeSitemapIndex(): void
@@ -129,8 +142,7 @@ class OutputXMLWriter extends AbstractOutput
     }
 
     /**
-     * @param string      $sitemap
-     * @param null|string $lastmod
+     * @inheritDoc
      */
     public function addSitemap(string $sitemap, string $lastmod = null): void
     {
@@ -156,7 +168,7 @@ class OutputXMLWriter extends AbstractOutput
     }
 
     /**
-     * Remove whitespace chars from end of file (Google don't like them).
+     * Remove whitespace chars from end of file (Google don't like them) and close file.
      *
      * @throws Exception
      *
@@ -184,6 +196,8 @@ class OutputXMLWriter extends AbstractOutput
     }
 
     /**
+     * Add element to current file.
+     *
      * @param string      $element
      * @param mixed       $value
      * @param null|string $namespace
@@ -201,25 +215,19 @@ class OutputXMLWriter extends AbstractOutput
         if (isset($value['_namespace'])) {
             $this->addElement($value['_element'], $value[$value['_element']], $value['_namespace']);
         } else {
-            $this->addElementArray($element, $value, $namespace);
+            if (!$this->isAssoc($value)) {
+                foreach ($value as $val) {
+                    $this->addElement($element, $val, $namespace);
+                }
+            } else {
+                $this->addElementArrayAssoc($element, $value, $namespace);
+            }
         }
     }
 
     /**
-     * @param string      $element
-     * @param array       $value
-     * @param null|string $namespace
-     */
-    private function addElementArray(string $element, array $value, ?string $namespace = null): void
-    {
-        if (!$this->isAssoc($value)) {
-            $this->addElementArrayNonAssoc($element, $value, $namespace);
-        } else {
-            $this->addElementArrayAssoc($element, $value, $namespace);
-        }
-    }
-
-    /**
+     * Add element of associate array to current file.
+     *
      * @param string      $element
      * @param mixed       $value
      * @param string|null $namespace
@@ -249,17 +257,5 @@ class OutputXMLWriter extends AbstractOutput
         }
 
         $xmlWriter->endElement();
-    }
-
-    /**
-     * @param string      $element
-     * @param mixed       $value
-     * @param null|string $namespace
-     */
-    private function addElementArrayNonAssoc(string $element, $value, ?string $namespace = null): void
-    {
-        foreach ($value as $val) {
-            $this->addElement($element, $val, $namespace);
-        }
     }
 }
