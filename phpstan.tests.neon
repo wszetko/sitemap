@@ -6,3 +6,7 @@ parameters:
     level: max
     paths:
         - tests
+    autoload_directories:
+    		- tests
+    autoload_files:
+    		- %rootDir%/../../../tests/SitemapTestsAssets/InvalidXMLWriter.php

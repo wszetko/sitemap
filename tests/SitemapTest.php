@@ -161,6 +161,18 @@ class SitemapTest extends TestCase
     /**
      * @throws \Exception
      */
+    public function testXMLCase3()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('XML writer class is not set.');
+        $sitemap = new Sitemap('https://example.com');
+        require_once __DIR__ . DIRECTORY_SEPARATOR . 'SitemapTestsAssets' . DIRECTORY_SEPARATOR . 'InvalidXMLWriter.php';
+        $sitemap->setXml(\Wszetko\Sitemap\Tests\SitemapTestAssets\InvalidXMLWriter::class, []);
+    }
+
+    /**
+     * @throws \Exception
+     */
     public function testXMLException()
     {
         $this->expectException(\Exception::class);

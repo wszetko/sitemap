@@ -9,19 +9,11 @@
     <description>
         Rule sets for Wszetko Sitemap
     </description>
-
-    <!-- Import the entire clean code rule set -->
     <rule ref="rulesets/cleancode.xml/IfStatementAssignment" />
     <rule ref="rulesets/cleancode.xml/DuplicatedArrayKey" />
-    <!-- Import the entire code size rule set -->
     <rule ref="rulesets/codesize.xml" />
-    <!-- Import the entire controversial rule set -->
     <rule ref="rulesets/controversial.xml" />
-    <!-- Import the entire design rule set -->
     <rule ref="rulesets/design.xml" />
-    <!-- Import the entire naming rule set -->
     <rule ref="rulesets/naming.xml" />
-    <!-- Import the entire unused code rule set -->
     <rule ref="rulesets/unusedcode.xml" />
-
 </ruleset>

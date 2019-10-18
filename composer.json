@@ -5,7 +5,14 @@
     "keywords": [
         "sitemap",
         "sitemaps",
-        "generator"
+        "generator",
+        "XML",
+        "xml-sitemap",
+        "xml-sitemaps",
+        "sitemap-generator",
+        "sitemaps-generator",
+        "sitemap-xml",
+        "sitemaps-xml"
     ],
     "homepage": "https://wszetko.pl",
     "license": "MIT",
@@ -37,7 +44,7 @@
         "phpstan/phpstan-phpunit": "^0.11.2",
         "phpstan/phpstan-strict-rules": "^0.11.1",
         "phpstan/phpstan-deprecation-rules": "^0.11.2",
-        "vimeo/psalm": "dev-master",
+        "vimeo/psalm": "^3.6",
         "jakub-onderka/php-parallel-lint": "^1.0",
         "jakub-onderka/php-console-highlighter": "^0.4.0",
         "sensiolabs/security-checker": "^6.0",
