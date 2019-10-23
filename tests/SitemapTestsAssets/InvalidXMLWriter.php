@@ -15,5 +15,4 @@ namespace Wszetko\Sitemap\Tests\SitemapTestAssets;
 
 class InvalidXMLWriter
 {
-
 }
