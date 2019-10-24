@@ -18,7 +18,7 @@ $ composer require wszetko/sitemap
 
 ### Requirements
 
-While script should run on PHP 7.0.2 or newer it's recommend at least PHP 7.1. PHP 7.2 or newer is recommended.
+PHP 7.2 or newer is recommended.
 
 Testing
 -------

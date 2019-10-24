@@ -4,11 +4,6 @@ sudo: false
 
 matrix:
     include:
-        -   php: 7.1
-            env:
-                - COLLECT_COVERAGE=true
-                - IGNORE_PLATFORMS=false
-                - FULL_TEST=false
         - php: 7.2
           env:
               - COLLECT_COVERAGE=true
