@@ -30,7 +30,9 @@
         "php": ">=7.1",
         "ext-intl": "*",
         "ext-mbstring": "*",
-        "symfony/polyfill-php73": "^1.12"
+        "symfony/polyfill-php73": "^1.12",
+        "league/uri": "^6.0",
+        "league/uri-components": "^2.0"
     },
     "suggest": {
         "ext-xmlwriter": "*",

@@ -13,6 +13,19 @@ declare(strict_types=1);
 
 namespace Wszetko\Sitemap\Helpers;
 
+use League\Uri\Components\Domain;
+use League\Uri\Components\Fragment;
+use League\Uri\Components\Host;
+use League\Uri\Components\Path;
+use League\Uri\Components\Port;
+use League\Uri\Components\Query;
+use League\Uri\Components\Scheme;
+use League\Uri\Components\UserInfo;
+use League\Uri\Exceptions\SyntaxError;
+use League\Uri\Uri;
+use League\Uri\UriModifier;
+use League\Uri\UriString;
+
 /**
  * Class Url.
  *
@@ -25,109 +38,44 @@ class Url
      *
      * @return bool|string
      *
-     * @see https://bugs.php.net/bug.php?id=52923
-     * @see https://www.php.net/manual/en/function.parse-url.php#114817
+     * @throws \League\Uri\Exceptions\SyntaxError
      */
     public static function normalizeUrl(string $url)
     {
-        $encodedUrl = preg_replace_callback(
-            '%[^:/@?&=#]+%usD',
-            function ($matches) {
-                return rawurlencode($matches[0]);
-            },
-            $url
-        );
-
-        if (null === $encodedUrl) {
-            // @codeCoverageIgnoreStart
-            return false;
-            // @codeCoverageIgnoreEnd
-        }
-
-        $url = parse_url($encodedUrl);
-
-        if (false === $url || false === isset($url['host'])) {
-            return false;
-        }
-
-        $url = array_map('urldecode', $url);
-        $url['host'] = idn_to_ascii($url['host'], IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46);
-
-        if (
-            !isset($url['scheme']) ||
-            '' === $url['scheme'] ||
-            false === is_string($url['host']) ||
-            false === self::checkDomain($url['host'])
-        ) {
-            return false;
-        }
-
-        if (isset($url['path']) && '' !== $url['path']) {
-            $url['path'] = explode('/', $url['path']);
+        try {
+            $uri = UriModifier::removeDotSegments(Uri::createFromString($url));
             $parts = [];
+            $parts['scheme'] = Scheme::createFromUri($uri)->getContent();
+            $parts['user'] = UserInfo::createFromUri($uri)->getUser();
+            $parts['pass'] = UserInfo::createFromUri($uri)->getPass();
+            $parts['host'] = Host::createFromUri($uri);
+            $parts['port'] = Port::createFromUri($uri)->getContent();
+            $parts['path'] = Path::createFromUri($uri)->getContent();
+            $parts['query'] = Query::createFromUri($uri)->getContent();
+            $parts['fragment'] = Fragment::createFromUri($uri)->getContent();
 
-            foreach ($url['path'] as $element) {
-                switch ($element) {
-                    case '.':
-                        break;
-                    case '..':
-                        array_pop($parts);
+            if (
+                '' === $parts['scheme'] ||
+                null === $parts['scheme'] ||
+                '' === $parts['host']->getContent() ||
+                null === $parts['host']->getContent() ||
+                (false === $parts['host']->isDomain() && false === $parts['host']->isIp())
+            ) {
+                return false;
+            }
 
-                        break;
-                    default:
-                        $parts[] = rawurlencode($element);
-
-                        break;
+            if (true === $parts['host']->isDomain()) {
+                $domain = new Domain($parts['host']);
+                if (true === $domain->isAbsolute()) {
+                    return false;
                 }
             }
 
-            $url['path'] = implode('/', $parts);
-        }
+            $parts['host'] = (string) $parts['host'];
 
-        if (isset($url['query']) && is_string($url['query']) && '' !== $url['query']) {
-            parse_str($url['query'], $query);
-            array_walk($query, function (&$val, &$var) {
-                $var = rawurlencode($var);
-                $val = rawurlencode($val);
-            });
-            $url['query'] = http_build_query($query);
-        }
-
-        $user = '';
-
-        if (isset($url['user']) && is_string($url['user']) && '' !== $url['user']) {
-            $user = $url['user'];
-
-            if (isset($url['pass']) && is_string($url['pass']) && '' !== $url['pass']) {
-                $user .= ':' . $url['pass'];
-            }
-
-            $user .= '@';
-        }
-
-        return
-            $url['scheme'] . '://'
-            . $user
-            . mb_strtolower($url['host'])
-            . ((isset($url['port']) && is_string($url['port']) && '' !== $url['port']) ? ':' . $url['port'] : '')
-            . ((isset($url['path'])) ? $url['path'] : '')
-            . (isset($url['query']) && (is_string($url['query']) && '' !== $url['query']) ? '?' . $url['query'] : '')
-            . (isset($url['fragment']) && (is_string($url['fragment']) && '' !== $url['fragment']) ? '#' . $url['fragment'] : '');
-    }
-
-    /**
-     * @param string $domain
-     *
-     * @return bool
-     */
-    public static function checkDomain(string $domain): bool
-    {
-        if ('.' == mb_substr($domain, -1) || '.' == mb_substr($domain, 0, 1)) {
+            return UriString::build($parts);
+        } catch (\TypeError | SyntaxError $e) {
             return false;
         }
-
-        $domain = idn_to_ascii($domain, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46);
-
-        return (bool) filter_var($domain, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME);
     }
 }
