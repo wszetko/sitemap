@@ -44,7 +44,7 @@ class ArrayType extends AbstractDataType
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($name, string $dataType)
+    public function __construct(string $name, string $dataType)
     {
         parent::__construct($name);
 

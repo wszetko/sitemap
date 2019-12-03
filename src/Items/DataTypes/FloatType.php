@@ -32,14 +32,14 @@ class FloatType extends AbstractDataType
     /**
      * Minimal value that DataType can handle.
      *
-     * @var float|int
+     * @var null|float|int
      */
     private $minValue;
 
     /**
      * Maximum value that DataType can handle.
      *
-     * @var float|int
+     * @var null|float|int
      */
     private $maxValue;
 
@@ -126,11 +126,11 @@ class FloatType extends AbstractDataType
             return $this;
         }
 
-        if (is_numeric($value)) {
-            $value = (float) $value;
-        } else {
+        if (!is_numeric($value)) {
             return $this;
         }
+
+        $value = (float) $value;
 
         if (null !== $this->getMinValue() && $value < $this->getMinValue()) {
             return $this;

@@ -26,14 +26,14 @@ class StringType extends AbstractDataType
     /**
      * Minimum length of string.
      *
-     * @var int
+     * @var null|int
      */
     protected $minLength;
 
     /**
      * Maximum length of string.
      *
-     * @var int
+     * @var null|int
      */
     protected $maxLength;
 
@@ -47,7 +47,7 @@ class StringType extends AbstractDataType
     /**
      * Regular expression to test value.
      *
-     * @var string
+     * @var null|string
      */
     protected $regex;
 

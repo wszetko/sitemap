@@ -33,7 +33,7 @@ abstract class AbstractOutput implements XML
      *
      * @var string
      */
-    private $currentSitemap;
+    private $currentSitemap = '';
 
     /**
      * Path of current work directory.

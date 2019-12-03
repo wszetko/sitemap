@@ -454,7 +454,7 @@ class Sitemap
 
         $this->getXml()->closeSitemapIndex();
 
-        if ($this->isUseCompression() && [] !== $files) {
+        if (true === $this->isUseCompression()) {
             $this->compressFiles($this->getTempDirectory(), $files);
         }
 
@@ -678,7 +678,7 @@ class Sitemap
      */
     public function getTempDirectory(): string
     {
-        if (null === $this->sitemapTempDirectory || '' == $this->sitemapTempDirectory) {
+        if ('' === $this->sitemapTempDirectory) {
             $hash = md5(microtime());
             $this->setTempDirectory(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sitemap' . $hash);
         }
