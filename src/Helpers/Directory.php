@@ -34,11 +34,12 @@ class Directory
         $dir = realpath($directory);
 
         if (false === $dir) {
-            mkdir(
+            @mkdir(
                 $directory,
                 0777,
                 true
             );
+
             $dir = realpath($directory);
         }
 
@@ -56,7 +57,7 @@ class Directory
      */
     public static function removeDir(string $dir): void
     {
-        if (is_dir($dir)) {
+        if (!is_dir($dir)) {
             return;
         }
 

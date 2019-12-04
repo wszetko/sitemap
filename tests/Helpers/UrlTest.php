@@ -23,7 +23,7 @@ use Wszetko\Sitemap\Helpers\Url;
  *
  * @internal
  */
-class HelpersTest extends TestCase
+class UrlTest extends TestCase
 {
     /**
      * @dataProvider validUrlProvider
@@ -94,9 +94,9 @@ class HelpersTest extends TestCase
             ['foo.com'],
             ['http:// shouldfail.com'],
             [':// should fail'],
-//            ['http://-error-.invalid/'],
-//            ['http://-a.b.co'],
-//            ['http://a.b-.co'],
+            ['http://-error-.invalid/'],
+            ['http://-a.b.co'],
+            ['http://a.b-.co'],
             ['http://.www.foo.bar/'],
             ['http://www.foo.bar./'],
             ['http://.www.foo.bar./'],
