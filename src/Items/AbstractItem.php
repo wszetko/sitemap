@@ -160,7 +160,22 @@ abstract class AbstractItem implements Item
                         }
                     } else {
                         foreach ($data as $element) {
-                            $array[static::ELEMENT_NAME][$property][] = $element;
+                            if (is_array($element) && $this->isAssoc($element)) {
+                                $elementData = [];
+
+                                foreach ($element as $value => $attributes) {
+                                    $elementData['_value'] = $value;
+
+                                    foreach ($attributes as $attr => $val) {
+                                        $elementData['_attributes'][$attr] = $val;
+                                    }
+                                }
+
+                                $array[static::ELEMENT_NAME][$property][] = $elementData;
+
+                            } else {
+                                $array[static::ELEMENT_NAME][$property][] = $element;
+                            }
                         }
                     }
                 } elseif (null !== $data && '' !== $data) {

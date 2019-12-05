@@ -70,7 +70,6 @@ To do
 * Ability to generate sitemap without publishing
 * Ability to publish sitemap without clearing previous files
 * Logging compatible with PSR-3
-* Improve URL Normalization
 
 ## License
 

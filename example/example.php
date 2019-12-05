@@ -58,10 +58,10 @@ try {
     $image->setCaption('Caption for JPG');
     $item->addExtension($image);
 
-    // Add HrefLang extension
-    $hrefLang = new Wszetko\Sitemap\Items\HrefLang('pl-PL', '/example-url/pl');
-    $hrefLang->addHrefLang('en', '/example-url/en');
-    $item->addExtension($hrefLang);
+    // Add Hreflang extension
+    $hreflang = new Wszetko\Sitemap\Items\Hreflang('pl-PL', '/example-url/pl');
+    $hreflang->addHreflang('en', '/example-url/en');
+    $item->addExtension($hreflang);
 
     // Add News extension
     $news = (new Wszetko\Sitemap\Items\News('Test', 'pl', new DateTime('now'), 'Test'))
@@ -77,7 +77,8 @@ try {
         ->setContentLoc('/video.avi')
         ->setContentLoc('/video.mp4')
         ->setPlayerLoc('player.swf', 'Yes')
-        ->setPrice(10, 'PLN', 'rent', 'hd')
+        ->addPrice(10, 'PLN', 'rent', 'hd')
+        ->addPrice(5, 'PLN', 'rent', 'sd')
         ->setDuration(10)
         ->setExpirationDate(new DateTime('now'))
         ->setRating(4.5)

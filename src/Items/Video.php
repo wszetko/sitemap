@@ -66,6 +66,7 @@ use Wszetko\Sitemap\Traits\IsAssoc;
  * @method setPlatform($platform, $relationship)
  * @method getPlatform()
  * @method setPrice($price, $currency, $type = null, $resolution = null)
+ * @method addPrice($price, $currency, $type = null, $resolution = null)
  * @method getPrice()
  */
 class Video extends Extension
@@ -161,6 +162,7 @@ class Video extends Extension
     protected $requiresSubscription;
 
     /**
+     * @dataType \Wszetko\Sitemap\Items\DataTypes\FloatType
      * @attribute currency
      * @attributeDataType \Wszetko\Sitemap\Items\DataTypes\StringType
      * @attribute type
@@ -168,7 +170,7 @@ class Video extends Extension
      * @attribute resolution
      * @attributeDataType \Wszetko\Sitemap\Items\DataTypes\StringType
      *
-     * @var \Wszetko\Sitemap\Items\DataTypes\FloatType
+     * @var \Wszetko\Sitemap\Items\DataTypes\ArrayType
      */
     protected $price;
 
@@ -322,52 +324,46 @@ class Video extends Extension
             ->setValueRegex("/^([A-Z]{2}( +[A-Z]{2})*)?$/")
         ;
         /** @var \Wszetko\Sitemap\Items\DataTypes\StringType $restrictionRelationship */
-        $restrictionRelationship = $this->restriction
-            ->getAttribute('relationship');
+        $restrictionRelationship = $this->restriction->getAttribute('relationship');
         $restrictionRelationship
             ->setConversion('lower')
             ->setAllowedValues('allow, deny')
         ;
-
         $this->platform
             ->setConversion('lower')
             ->setValueRegex("/^((web|mobile|tv)( (web|mobile|tv))*)?/")
         ;
         /** @var \Wszetko\Sitemap\Items\DataTypes\StringType $platformRelationship */
-        $platformRelationship = $this->platform
-            ->getAttribute('relationship');
+        $platformRelationship = $this->platform->getAttribute('relationship');
         $platformRelationship
             ->setConversion('lower')
             ->setAllowedValues('allow, deny')
         ;
-
-        $this->price
+        /** @var \Wszetko\Sitemap\Items\DataTypes\FloatType $priceType */
+        $priceType = $this->price->getBaseDataType();
+        $priceType
             ->setMinValue(0)
             ->setPrecision(2)
         ;
         /** @var \Wszetko\Sitemap\Items\DataTypes\StringType $priceCurrency */
-        $priceCurrency = $this->price
-            ->getAttribute('currency');
+        $priceCurrency = $priceType->getAttribute('currency');
         $priceCurrency
             ->setConversion('upper')
             ->setRequired(true)
             ->setValueRegex("/^([A-Z]{3})$/")
         ;
-
         /** @var \Wszetko\Sitemap\Items\DataTypes\StringType $priceType */
-        $priceType = $this->price
-            ->getAttribute('type');
+        $priceType = $this->price->getBaseDataType()->getAttribute('type');
         $priceType
             ->setConversion('lower')
-            ->setAllowedValues('rent, purchase');
-
+            ->setAllowedValues('rent, purchase')
+        ;
         /** @var \Wszetko\Sitemap\Items\DataTypes\StringType $priceResolution */
-        $priceResolution = $this->price
-            ->getAttribute('resolution');
+        $priceResolution = $this->price->getBaseDataType()->getAttribute('resolution');
         $priceResolution
             ->setConversion('upper')
-            ->setAllowedValues('SD, HD');
-
+            ->setAllowedValues('SD, HD')
+        ;
         $this->tag
             ->setMaxElements(32)
         ;

@@ -17,15 +17,15 @@ use InvalidArgumentException;
 use Wszetko\Sitemap\Items\DataTypes\StringType;
 
 /**
- * Class HrefLang.
+ * Class Hreflang.
  *
  * @package Wszetko\Sitemap\Items
  *
- * @method addHrefLang($hrefLang, $href)
- * @method setHrefLang($hrefLang, $href)
- * @method getHrefLang()
+ * @method addHreflang($hreflang, $href)
+ * @method setHreflang($hreflang, $href)
+ * @method getHreflang()
  */
-class HrefLang extends Extension
+class Hreflang extends Extension
 {
     /**
      * Name of Namescapce.
@@ -49,21 +49,21 @@ class HrefLang extends Extension
      *
      * @var \Wszetko\Sitemap\Items\DataTypes\ArrayType
      */
-    protected $hrefLang;
+    protected $hreflang;
 
     /**
-     * @param string $hrefLang
+     * @param string $hreflang
      * @param string $href
      *
      * @throws \ReflectionException
      * @throws \InvalidArgumentException
      * @throws \Error
      */
-    public function __construct(string $hrefLang, string $href)
+    public function __construct(string $hreflang, string $href)
     {
         parent::__construct();
 
-        $baseType = $this->hrefLang->getBaseDataType();
+        $baseType = $this->hreflang->getBaseDataType();
 
         if ($baseType instanceof StringType) {
             $baseType
@@ -81,7 +81,7 @@ class HrefLang extends Extension
             // @codeCoverageIgnoreEnd
         }
 
-        $this->addHrefLang($hrefLang, $href);
+        $this->addHreflang($hreflang, $href);
     }
 
     /**
@@ -97,14 +97,16 @@ class HrefLang extends Extension
             'link' => [],
         ];
 
-        foreach ($this->getHrefLang() as $hreflang => $lang) {
-            $array['link'][] = [
-                '_attributes' => [
-                    'rel' => 'alternate',
-                    'hreflang' => $hreflang,
-                    'href' => $lang['href'],
-                ],
-            ];
+        foreach ($this->getHreflang() as $links) {
+            foreach ($links as $hreflang => $lang) {
+                $array['link'][] = [
+                    '_attributes' => [
+                        'rel' => 'alternate',
+                        'hreflang' => $hreflang,
+                        'href' => $lang['href'],
+                    ],
+                ];
+            }
         }
 
         return $array;

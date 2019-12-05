@@ -66,6 +66,7 @@ class Url
 
             if (true === $parts['host']->isDomain()) {
                 $domain = new Domain($parts['host']);
+
                 if (true === $domain->isAbsolute()) {
                     return false;
                 }

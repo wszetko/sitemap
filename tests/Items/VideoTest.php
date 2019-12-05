@@ -481,7 +481,7 @@ class VideoTest extends TestCase
     }
 
     /**
-     * @dataProvider priceProvider
+     * @dataProvider setPriceProvider
      *
      * @param mixed $price
      * @param mixed $currency
@@ -491,7 +491,7 @@ class VideoTest extends TestCase
      *
      * @throws \ReflectionException
      */
-    public function testPrice($price, $currency, $type, $resolution, $expected)
+    public function testSetPrice($price, $currency, $type, $resolution, $expected)
     {
         $video = new Video('thumb.png', 'Video', 'Description');
         $video->setPrice($price, $currency, $type, $resolution);
@@ -501,22 +501,22 @@ class VideoTest extends TestCase
     /**
      * @return array
      */
-    public function priceProvider()
+    public function setPriceProvider()
     {
         return [
             [null, null, null, null, null],
-            [10, 'USD', '', '', ['10.00' => ['currency' => 'USD']]],
+            [10, 'USD', '', '', [['10.00' => ['currency' => 'USD']]]],
             [10, '', '', '', null],
-            ['10', 'USD', '', '', ['10.00' => ['currency' => 'USD']]],
-            ['10.00', 'USD', '', '', ['10.00' => ['currency' => 'USD']]],
-            [10.00, 'USD', '', '', ['10.00' => ['currency' => 'USD']]],
-            [10, 'usd', '', '', ['10.00' => ['currency' => 'USD']]],
-            [10, 'USD', 'rent', 'SD', ['10.00' => ['currency' => 'USD', 'type' => 'rent', 'resolution' => 'SD']]],
-            [10, 'USD', 'rent', '', ['10.00' => ['currency' => 'USD', 'type' => 'rent']]],
-            [10, 'USD', 'Rent', '', ['10.00' => ['currency' => 'USD', 'type' => 'rent']]],
-            [10, 'USD', 'RENT', '', ['10.00' => ['currency' => 'USD', 'type' => 'rent']]],
-            [10, 'USD', '', 'SD', ['10.00' => ['currency' => 'USD', 'resolution' => 'SD']]],
-            [10, 'USD', '', 'sd', ['10.00' => ['currency' => 'USD', 'resolution' => 'SD']]],
+            ['10', 'USD', '', '', [['10.00' => ['currency' => 'USD']]]],
+            ['10.00', 'USD', '', '', [['10.00' => ['currency' => 'USD']]]],
+            [10.00, 'USD', '', '', [['10.00' => ['currency' => 'USD']]]],
+            [10, 'usd', '', '', [['10.00' => ['currency' => 'USD']]]],
+            [10, 'USD', 'rent', 'SD', [['10.00' => ['currency' => 'USD', 'type' => 'rent', 'resolution' => 'SD']]]],
+            [10, 'USD', 'rent', '', [['10.00' => ['currency' => 'USD', 'type' => 'rent']]]],
+            [10, 'USD', 'Rent', '', [['10.00' => ['currency' => 'USD', 'type' => 'rent']]]],
+            [10, 'USD', 'RENT', '', [['10.00' => ['currency' => 'USD', 'type' => 'rent']]]],
+            [10, 'USD', '', 'SD', [['10.00' => ['currency' => 'USD', 'resolution' => 'SD']]]],
+            [10, 'USD', '', 'sd', [['10.00' => ['currency' => 'USD', 'resolution' => 'SD']]]],
         ];
     }
 
@@ -753,12 +753,14 @@ class VideoTest extends TestCase
                     '_value' => 'web',
                 ],
                 'price' => [
-                    '_attributes' => [
-                        'currency' => 'USD',
-                        'type' => 'rent',
-                        'resolution' => 'SD',
-                    ],
-                    '_value' => '10.00',
+                    [
+                        '_attributes' => [
+                            'currency' => 'USD',
+                            'type' => 'rent',
+                            'resolution' => 'SD',
+                        ],
+                        '_value' => '10.00',
+                    ]
                 ],
                 'requires_subscription' => 'No',
                 'uploader' => [

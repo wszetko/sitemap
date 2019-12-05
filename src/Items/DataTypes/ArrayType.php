@@ -163,7 +163,7 @@ class ArrayType extends AbstractDataType
                     $key = array_key_first($value);
 
                     if (null !== $key) {
-                        $result[$key] = array_values($value)[0];
+                        $result[] = [$key => array_values($value)[0]];
                     }
                 } elseif (null !== $value && '' !== $value) {
                     $result[] = $value;

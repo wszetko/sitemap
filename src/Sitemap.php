@@ -521,6 +521,7 @@ class Sitemap
     private function publishSitemap(): void
     {
         $this->clearPreviousSitemaps();
+        Directory::checkDirectory($this->getSitemapsDirectory());
         $dir = new RecursiveDirectoryIterator($this->getTempDirectory());
         $iterator = new RecursiveIteratorIterator($dir);
         $files = new RegexIterator(
@@ -539,9 +540,14 @@ class Sitemap
         $currentFile = 0;
 
         foreach ($fileList as $file) {
-            ++$currentFile;
-            $destination = str_replace($this->getTempDirectory(), $this->getPublicDirectory(), $file);
-            rename($file, $destination);
+            if (file_exists($file)) {
+                ++$currentFile;
+                $destination = str_replace($this->getTempDirectory(), $this->getPublicDirectory(), $file);
+                rename($file, $destination);
+            } else {
+                Directory::removeDir($this->getTempDirectory());
+                throw new Exception('Couldn\'t find generated sitemap file.');
+            }
         }
 
         Directory::removeDir($this->getTempDirectory());
