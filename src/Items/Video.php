@@ -20,9 +20,7 @@ use Wszetko\Sitemap\Traits\IsAssoc;
 /**
  * Class Video.
  *
- * @todo    : add support for content_segment_loc tag
  * @todo    : add support for tvshow tag
- * @todo    : add support for id tag
  *
  * @package Wszetko\Sitemap\Items
  *
@@ -68,6 +66,12 @@ use Wszetko\Sitemap\Traits\IsAssoc;
  * @method setPrice($price, $currency, $type = null, $resolution = null)
  * @method addPrice($price, $currency, $type = null, $resolution = null)
  * @method getPrice()
+ * @method setId($id, $type)
+ * @method addId($id, $type)
+ * @method getId()
+ * @method setContentSegmentLoc($url, $duration = null)
+ * @method addContentSegmentLoc($url, $duration = null)
+ * @method getContentSegmentLoc()
  */
 class Video extends Extension
 {
@@ -128,6 +132,15 @@ class Video extends Extension
      * @var \Wszetko\Sitemap\Items\DataTypes\URLType
      */
     protected $playerLoc;
+
+    /**
+     * @dataType \Wszetko\Sitemap\Items\DataTypes\URLType
+     * @attribute duration
+     * @attributeDataType \Wszetko\Sitemap\Items\DataTypes\IntegerType
+     *
+     * @var \Wszetko\Sitemap\Items\DataTypes\ArrayType
+     */
+    protected $contentSegmentLoc;
 
     /**
      * Indicates whether the video is live.
@@ -253,6 +266,17 @@ class Video extends Extension
     protected $expirationDate;
 
     /**
+     * An unambiguous identifier for the video within a given identification context.
+     *
+     * @dataType \Wszetko\Sitemap\Items\DataTypes\StringType
+     * @attribute type
+     * @attributeDataType \Wszetko\Sitemap\Items\DataTypes\StringType
+     *
+     * @var \Wszetko\Sitemap\Items\DataTypes\ArrayType
+     */
+    protected $id;
+
+    /**
      * Video constructor.
      *
      * @param string $thumbnailLoc
@@ -287,6 +311,10 @@ class Video extends Extension
                 '' === $this->getPlayerLoc())
         ) {
             throw new InvalidArgumentException('Nor content_loc or player_loc parameter is set.');
+        }
+
+        if (null === $this->getPlayerLoc() && null !== $this->getContentSegmentLoc()) {
+            throw new InvalidArgumentException('Parameter player_loc should be set if content_segment_loc is defined.');
         }
 
         return parent::toArray();
@@ -369,6 +397,16 @@ class Video extends Extension
         ;
         $this->category
             ->setMaxLength(256)
+        ;
+        /** @var \Wszetko\Sitemap\Items\DataTypes\StringType $idType */
+        $idType = $this->id->getBaseDataType()->getAttribute('type');
+        $idType->setRequired(true);
+        $idType->setAllowedValues(['tms:series', 'tms:program', 'rovi:series', 'rovi:program', 'freebase', 'url']);
+        /** @var \Wszetko\Sitemap\Items\DataTypes\IntegerType $contentSegmentLocDuration */
+        $contentSegmentLocDuration = $this->contentSegmentLoc->getBaseDataType()->getAttribute('duration');
+        $contentSegmentLocDuration
+            ->setMinValue(0)
+            ->setMaxValue(28800)
         ;
     }
 }

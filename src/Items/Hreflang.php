@@ -70,7 +70,7 @@ class Hreflang extends Extension
             ->setRequired(true)
         ;
         /** @var \Wszetko\Sitemap\Items\DataTypes\URLType $hrefAttribute */
-        $hrefAttribute =  $baseType->getAttribute('href');
+        $hrefAttribute = $baseType->getAttribute('href');
         $hrefAttribute->setRequired(true);
         $this->addHreflang($hreflang, $href);
     }

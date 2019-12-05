@@ -130,6 +130,31 @@ class VideoTest extends TestCase
         ];
     }
 
+    public function testContentSegmentLoc()
+    {
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $video->setDomain('https://example.com');
+        $video->setPlayerLoc('/player.swf');
+        $video->setContentSegmentLoc('/video1.avi', 10);
+        $video->addContentSegmentLoc('/video2.avi', 5);
+        $expected = [
+            ['https://example.com/video1.avi' => ['duration' => '10']],
+            ['https://example.com/video2.avi' => ['duration' => '5']],
+        ];
+        $this->assertEquals($expected, $video->getContentSegmentLoc());
+    }
+
+    public function testContentSegmentLocNoPlayerLoc()
+    {
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $video->setDomain('https://example.com');
+        $video->setContentLoc('/example/test');
+        $video->setContentSegmentLoc('/video1.avi', 10);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Parameter player_loc should be set if content_segment_loc is defined.');
+        $video->toArray();
+    }
+
     /**
      * @throws \ReflectionException
      */
@@ -520,6 +545,18 @@ class VideoTest extends TestCase
         ];
     }
 
+    public function testAddPrice()
+    {
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $video->setPrice(10, 'EUR', 'rent', 'hd');
+        $video->addPrice(5, 'EUR', 'rent', 'sd');
+        $expected = [
+            ['10.00' => ['currency' => 'EUR', 'type' => 'rent', 'resolution' => 'HD']],
+            ['5.00' => ['currency' => 'EUR', 'type' => 'rent', 'resolution' => 'SD']],
+        ];
+        $this->assertEquals($expected, $video->getPrice());
+    }
+
     /**
      * @dataProvider yesNoProvider
      *
@@ -698,6 +735,31 @@ class VideoTest extends TestCase
         ];
     }
 
+    public function testId()
+    {
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $video->setDomain('https://example.com');
+        $video->setPlayerLoc('/player.swf');
+        $video->setId('00000006', 'tms:series')
+            ->addId('EP000000060001', 'tms:program');
+        $expected = [
+            ['00000006' => ['type' => 'tms:series']],
+            ['EP000000060001' => ['type' => 'tms:program']],
+        ];
+        $this->assertEquals($expected, $video->getId());
+    }
+
+    public function testIdException()
+    {
+        $video = new Video('thumb.png', 'Video', 'Description');
+        $video->setDomain('https://example.com');
+        $video->setPlayerLoc('/player.swf');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('type need to be set.');
+        $video->setId('EP000000060001', 'error');
+
+    }
+
     /**
      * @throws \ReflectionException
      */
@@ -707,6 +769,8 @@ class VideoTest extends TestCase
         $video->setDomain('https://example.com');
         $video->setContentLoc('example/test');
         $video->setPlayerLoc('/player.swf', 'Yes', 'autoplay');
+        $video->setContentSegmentLoc('/video1.avi', 10)
+            ->addContentSegmentLoc('/video2.avi', 5);
         $video->setDuration(60);
         $video->setExpirationDate('2020-01-01');
         $video->setPublicationDate('2018-01-01');
@@ -722,6 +786,7 @@ class VideoTest extends TestCase
         $video->setTag(['tag']);
         $video->setCategory('Travel');
         $video->setGalleryLoc('https://example.com/gallery');
+        $video->setId('00000006', 'tms:series');
 
         $this->assertEquals([
             '_namespace' => 'video',
@@ -773,6 +838,20 @@ class VideoTest extends TestCase
                 'tag' => ['tag'],
                 'category' => 'Travel',
                 'gallery_loc' => 'https://example.com/gallery',
+                'id' => [
+                    [
+                        '_attributes' => ['type' => 'tms:series'],
+                        '_value' => '00000006',
+                    ],
+                ],
+                'content_segment_loc' => [
+                    [
+                        '_value' => 'https://example.com/video1.avi',
+                        '_attributes' => ['duration' => '10']],
+                    [
+                        '_value' => 'https://example.com/video2.avi',
+                        '_attributes' => ['duration' => '5']],
+                ]
             ],
         ], $video->toArray());
 

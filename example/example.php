@@ -77,6 +77,8 @@ try {
         ->setContentLoc('/video.avi')
         ->setContentLoc('/video.mp4')
         ->setPlayerLoc('player.swf', 'Yes')
+        ->setContentSegmentLoc('/video1.avi', 10)
+        ->setContentSegmentLoc('/video2.avi', 5)
         ->addPrice(10, 'PLN', 'rent', 'hd')
         ->addPrice(5, 'PLN', 'rent', 'sd')
         ->setDuration(10)
@@ -93,6 +95,8 @@ try {
         ->setTag(['tag1', 'tag2'])
         ->setCategory('Category')
         ->setGalleryLoc('/upload-gallery')
+        ->setId('00000006', 'tms:series')
+        ->addId('EP000000060001', 'tms:program')
     ;
     $item->addExtension($video);
 
