@@ -757,7 +757,6 @@ class VideoTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('type need to be set.');
         $video->setId('EP000000060001', 'error');
-
     }
 
     /**
