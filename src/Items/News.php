@@ -141,54 +141,25 @@ class News extends Extension
     ) {
         parent::__construct();
 
-        $this->publicationName
-            ->setRequired(true)
-        ;
+        $this->publicationName->setRequired(true);
         $this->setPublicationName($publicationName);
         $this->publicationLanguage
             ->setConversion('lower')
             ->setValueRegex("/^(zh-cn|zh-tw|([a-z]{2,3}))?$/")
             ->setRequired(true)
         ;
-        $this->publicationDate
-            ->setRequired(true)
-        ;
+        $this->publicationDate->setRequired(true);
         $this->setPublicationLanguage($publicationLanguage);
         $this->setPublicationDate($publicationDate);
         $this->setTitle($title);
-        $this->access
-            ->setAllowedValues('Subscription, Registration')
-        ;
-        $generesValue = $this->genres
-            ->getBaseDataType()
-        ;
-
-        if ($generesValue instanceof StringType) {
-            /** @var $generesValue \Wszetko\Sitemap\Items\DataTypes\StringType */
-            $generesValue
-                ->setAllowedValues('PressRelease, Satire, Blog, OpEd, Opinion, UserGenerated')
-            ;
-        } else {
-            // @codeCoverageIgnoreStart
-            throw new InvalidArgumentException('Class is missconfigured.');
-            // @codeCoverageIgnoreEnd
-        }
-
-        $stickTickersValue = $this->stockTickers
-            ->setMaxElements(5)
-            ->getBaseDataType()
-        ;
-
-        if ($stickTickersValue instanceof StringType) {
-            /** @var $stickTickersValue \Wszetko\Sitemap\Items\DataTypes\StringType */
-            $stickTickersValue
-                ->setValueRegex("/^(\\w+:\\w+)?$/")
-            ;
-        } else {
-            // @codeCoverageIgnoreStart
-            throw new InvalidArgumentException('Class is missconfigured.');
-            // @codeCoverageIgnoreEnd
-        }
+        $this->access->setAllowedValues('Subscription, Registration');
+        /** @var \Wszetko\Sitemap\Items\DataTypes\StringType $generesValue */
+        $generesValue = $this->genres->getBaseDataType();
+        $generesValue->setAllowedValues('PressRelease, Satire, Blog, OpEd, Opinion, UserGenerated');
+        $this->stockTickers->setMaxElements(5);
+        /** @var \Wszetko\Sitemap\Items\DataTypes\StringType $stickTickersValue */
+        $stickTickersValue = $this->stockTickers->getBaseDataType();
+        $stickTickersValue->setValueRegex("/^(\\w+:\\w+)?$/");
     }
 
     /**

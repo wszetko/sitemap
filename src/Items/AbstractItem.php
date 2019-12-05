@@ -172,7 +172,6 @@ abstract class AbstractItem implements Item
                                 }
 
                                 $array[static::ELEMENT_NAME][$property][] = $elementData;
-
                             } else {
                                 $array[static::ELEMENT_NAME][$property][] = $element;
                             }

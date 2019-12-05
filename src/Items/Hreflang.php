@@ -63,24 +63,15 @@ class Hreflang extends Extension
     {
         parent::__construct();
 
+        /** @var \Wszetko\Sitemap\Items\DataTypes\StringType $baseType */
         $baseType = $this->hreflang->getBaseDataType();
-
-        if ($baseType instanceof StringType) {
-            $baseType
-                ->setValueRegex("/^(([a-z]{2}|(x))((-)([A-Za-z]{2}|[A-Z]([a-z]|[a-z]{3})|(default)))?)$/")
-                ->setRequired(true)
-            ;
-            $hrefAttribute =  $baseType->getAttribute('href');
-
-            if (null !== $hrefAttribute) {
-                $hrefAttribute->setRequired(true);
-            }
-        } else {
-            // @codeCoverageIgnoreStart
-            throw new InvalidArgumentException('Class is missconfigured.');
-            // @codeCoverageIgnoreEnd
-        }
-
+        $baseType
+            ->setValueRegex("/^(([a-z]{2}|(x))((-)([A-Za-z]{2}|[A-Z]([a-z]|[a-z]{3})|(default)))?)$/")
+            ->setRequired(true)
+        ;
+        /** @var \Wszetko\Sitemap\Items\DataTypes\URLType $hrefAttribute */
+        $hrefAttribute =  $baseType->getAttribute('href');
+        $hrefAttribute->setRequired(true);
         $this->addHreflang($hreflang, $href);
     }
 
