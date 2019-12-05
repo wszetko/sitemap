@@ -13,9 +13,6 @@ declare(strict_types=1);
 
 namespace Wszetko\Sitemap\Items;
 
-use InvalidArgumentException;
-use Wszetko\Sitemap\Items\DataTypes\StringType;
-
 /**
  * Class Hreflang.
  *
